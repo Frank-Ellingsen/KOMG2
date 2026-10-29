@@ -1,0 +1,16 @@
+relationship AutoDetected_0856534d-52a6-45fa-a86e-3ccddd9d527f
+	fromColumn: fact_modelready.kontonavn
+	toColumn: dim_kontoplan.Kontonavn
+
+relationship c41fd83b-bf90-a074-9dd5-af1283c7c4db
+	fromColumn: fact_modelready.accounting_period
+	toColumn: dim_date.Dato
+
+relationship 8c40fa65-8788-8e1d-e6f8-0f8b2c8ad5a1
+	fromColumn: fact_modelready.funksjon_code
+	toColumn: dim_funksjon.KOSTRA_Funksjonsgruppe_Kode
+
+relationship a9142307-53ca-24e5-b541-bc3a2b5468d5
+	fromColumn: fact_modelready.ansvar_code
+	toColumn: dim_ansvar.Ansvar_Kode
+

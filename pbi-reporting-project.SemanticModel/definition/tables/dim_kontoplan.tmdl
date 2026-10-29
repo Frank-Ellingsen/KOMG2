@@ -1,0 +1,160 @@
+table dim_kontoplan
+	lineageTag: c1da39df-293e-4a6c-8594-ee2735e4169d
+
+	column Kontokode_6Siffer
+		dataType: string
+		lineageTag: 9322dfbc-0b44-4e41-89eb-16cec03c265d
+		summarizeBy: none
+		sourceColumn: Kontokode_6Siffer
+
+		annotation SummarizationSetBy = Automatic
+
+	column Kontonavn
+		dataType: string
+		lineageTag: ed0ad100-d3d3-4198-804f-7706c1107448
+		summarizeBy: none
+		sourceColumn: Kontonavn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Konto_Kode_Navn
+		dataType: string
+		lineageTag: 3bb7034c-bba8-4368-926e-7913bcc4e99a
+		summarizeBy: none
+		sourceColumn: Konto_Kode_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column KOSTRA_Art_4Siffer
+		dataType: string
+		lineageTag: 5f32a01f-5b12-45cf-972e-c0882d638ca4
+		summarizeBy: none
+		sourceColumn: KOSTRA_Art_4Siffer
+
+		annotation SummarizationSetBy = Automatic
+
+	column KOSTRA_Art_Navn
+		dataType: string
+		lineageTag: c57b4afd-14ed-4b0d-8891-8e15193af331
+		summarizeBy: none
+		sourceColumn: KOSTRA_Art_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column KOSTRA_Art_4Siffer_Navn
+		dataType: string
+		lineageTag: ce711bf3-f2d0-4d75-b17b-db0c18d30715
+		summarizeBy: none
+		sourceColumn: KOSTRA_Art_4Siffer_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column KOSTRA_Art_3Siffer
+		dataType: string
+		lineageTag: 65df28d8-d461-4271-a095-5974b18e1539
+		summarizeBy: none
+		sourceColumn: KOSTRA_Art_3Siffer
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hovedgruppe_Kode
+		dataType: string
+		lineageTag: a21b942d-d344-4fd4-9ed8-3018740ba529
+		summarizeBy: none
+		sourceColumn: Hovedgruppe_Kode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hovedgruppe_Navn
+		dataType: string
+		lineageTag: 9dc8fec3-0689-450a-8251-5435db96f538
+		summarizeBy: none
+		sourceColumn: Hovedgruppe_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hovedgruppe_Kode_Navn
+		dataType: string
+		lineageTag: b4208a08-8abe-4807-bc1e-2e4b9616f3ad
+		summarizeBy: none
+		sourceColumn: Hovedgruppe_Kode_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hovedkategori_Kode
+		dataType: string
+		lineageTag: 1016aca0-e739-411c-8641-721f69102d4d
+		summarizeBy: none
+		sourceColumn: Hovedkategori_Kode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hovedkategori_Navn
+		dataType: string
+		lineageTag: 9a1bd96c-19c4-43a6-a057-317e67638666
+		summarizeBy: none
+		sourceColumn: Hovedkategori_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hovedkategori_Kode_Navn
+		dataType: string
+		lineageTag: 7db08d9c-f0b7-41a0-9d3e-2b4db2443bf4
+		summarizeBy: none
+		sourceColumn: Hovedkategori_Kode_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Kontoklasse_ID
+		dataType: string
+		lineageTag: 9ca53f5e-32ac-4d3e-92c0-e29b04cc5366
+		summarizeBy: none
+		sourceColumn: Kontoklasse_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Kontoklasse_Navn
+		dataType: string
+		lineageTag: 994c356c-7136-4881-8717-81e855a05309
+		summarizeBy: none
+		sourceColumn: Kontoklasse_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Kontoklasse_Kode_Navn
+		dataType: string
+		lineageTag: 34c39c8b-dc29-49fb-b3ff-0a86c925e8f5
+		summarizeBy: none
+		sourceColumn: Kontoklasse_Kode_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Regnskapsregel_Beskrivelse
+		dataType: string
+		lineageTag: ef89ee78-7915-4677-88f3-3be61eb5365f
+		summarizeBy: none
+		sourceColumn: Regnskapsregel_Beskrivelse
+
+		annotation SummarizationSetBy = Automatic
+
+	column Er_Aktiv
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: dad8cfb4-2619-4cba-ac46-e8f872517a96
+		summarizeBy: none
+		sourceColumn: Er_Aktiv
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_kontoplan = m
+		mode: import
+		source =
+				let
+				    Source = Python.Execute("import duckdb#(lf)#(lf)# Sti til DuckDB#(lf)db_path = r'C:\Users\frank\Desktop\Kom - G2\data\database\kostra_prod.duckdb'#(lf)conn = duckdb.connect(db_path, read_only=True)#(lf)#(lf)# 1. FAKTATABELL (Selve regnskaps- og ML-grunnlaget)#(lf)fact_modelready = conn.execute(""SELECT * FROM modelready_fact"").fetchdf()#(lf)#(lf)# 2. DIMENSJONSTABELLER (Kataloger og hierarkier)#(lf)dim_funksjon = conn.execute(""SELECT * FROM dim_kostra_funksjon"").fetchdf()#(lf)dim_kontoplan = conn.execute(""SELECT * FROM dim_kostra_kontoplan"").fetchdf()#(lf)dim_ansvar = conn.execute(""SELECT * FROM dim_ansvar"").fetchdf()#(lf)dim_date = conn.execute(""SELECT * FROM dim_date"").fetchdf()#(lf)#(lf)conn.close()"),
+				    dim_kontoplan1 = Source{[Name="dim_kontoplan"]}[Value],
+				    #"Changed Type" = Table.TransformColumnTypes(dim_kontoplan1, {{"Kontokode_6Siffer", type text}, {"Kontonavn", type text}, {"Konto_Kode_Navn", type text}, {"KOSTRA_Art_4Siffer", type text}, {"KOSTRA_Art_Navn", type text}, {"KOSTRA_Art_4Siffer_Navn", type text}, {"KOSTRA_Art_3Siffer", type text}, {"Hovedgruppe_Kode", type text}, {"Hovedgruppe_Navn", type text}, {"Hovedgruppe_Kode_Navn", type text}, {"Hovedkategori_Kode", type text}, {"Hovedkategori_Navn", type text}, {"Hovedkategori_Kode_Navn", type text}, {"Kontoklasse_ID", type text}, {"Kontoklasse_Navn", type text}, {"Kontoklasse_Kode_Navn", type text}, {"Regnskapsregel_Beskrivelse", type text}, {"Er_Aktiv", type logical}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

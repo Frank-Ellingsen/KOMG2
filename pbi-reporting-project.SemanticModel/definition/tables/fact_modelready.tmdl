@@ -1,0 +1,311 @@
+table fact_modelready
+	lineageTag: 9604105e-e14c-4607-9be8-590fd9fde143
+
+	column accounting_period
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: dfbbbcf8-18ac-4536-9e96-006cdb09fb40
+		summarizeBy: none
+		sourceColumn: accounting_period
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: 0f73a1cd-15b8-4015-ba7c-ddbfbaf6b2b8
+		summarizeBy: sum
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: int64
+		formatString: 0
+		lineageTag: 69149379-1ed3-4a14-b25b-6a122bcf958d
+		summarizeBy: sum
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		dataType: int64
+		formatString: 0
+		lineageTag: 5196c068-c7b6-48ed-ba4c-08f781a38ce1
+		summarizeBy: sum
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_summer_season
+		dataType: int64
+		formatString: 0
+		lineageTag: de37f28a-a743-4b4f-bfc3-f390fd52de18
+		summarizeBy: sum
+		sourceColumn: is_summer_season
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_year_end
+		dataType: int64
+		formatString: 0
+		lineageTag: f3116b7e-1a5b-49d4-9510-118644af49d8
+		summarizeBy: sum
+		sourceColumn: is_year_end
+
+		annotation SummarizationSetBy = Automatic
+
+	column funksjon_code
+		dataType: string
+		lineageTag: 3133dafd-3c32-4845-83c9-0f0b1b984b3c
+		summarizeBy: none
+		sourceColumn: funksjon_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column funksjon_navn
+		dataType: string
+		lineageTag: 84415ddb-f927-4733-ae20-82b9a070a2ca
+		summarizeBy: none
+		sourceColumn: funksjon_navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column konto_code
+		dataType: string
+		lineageTag: 9504d083-6ea9-4b9f-a13d-d4179e82c7da
+		summarizeBy: none
+		sourceColumn: konto_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column kontonavn
+		dataType: string
+		lineageTag: 939a7e0d-f5b6-4310-b111-a7113e54900f
+		summarizeBy: none
+		sourceColumn: kontonavn
+
+		annotation SummarizationSetBy = Automatic
+
+	column kostra_art_4siffer
+		dataType: string
+		lineageTag: 0aa98f2f-1771-4e58-a9d6-25609efe5011
+		summarizeBy: none
+		sourceColumn: kostra_art_4siffer
+
+		annotation SummarizationSetBy = Automatic
+
+	column ansvar_code
+		dataType: string
+		lineageTag: 285b78a2-389a-4073-b115-44a98bbf6492
+		summarizeBy: none
+		sourceColumn: ansvar_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column sektor_navn
+		dataType: string
+		lineageTag: bc6ede83-0fe1-4417-850d-4283587a1c9c
+		summarizeBy: none
+		sourceColumn: sektor_navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column source_file
+		dataType: string
+		lineageTag: 23949cba-a5ac-46de-bad2-3e8e5287813a
+		summarizeBy: none
+		sourceColumn: source_file
+
+		annotation SummarizationSetBy = Automatic
+
+	column ytd_budsjett_nok
+		dataType: int64
+		formatString: 0
+		lineageTag: a1822b24-c92f-4833-b232-ef3137ca9313
+		summarizeBy: sum
+		sourceColumn: ytd_budsjett_nok
+
+		annotation SummarizationSetBy = Automatic
+
+	column ytd_regnskap_nok
+		dataType: double
+		lineageTag: 8165f389-8df0-4dff-9fef-429148e84e0e
+		summarizeBy: sum
+		sourceColumn: ytd_regnskap_nok
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ytd_avvik_nok
+		dataType: double
+		lineageTag: 9e3300a4-4ec1-49e9-bf80-caa5a203683d
+		summarizeBy: sum
+		sourceColumn: ytd_avvik_nok
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column monthly_delta_budsjett_nok
+		dataType: int64
+		formatString: 0
+		lineageTag: ee49f015-6c74-4095-bd98-516eb34b06ba
+		summarizeBy: sum
+		sourceColumn: monthly_delta_budsjett_nok
+
+		annotation SummarizationSetBy = Automatic
+
+	column monthly_delta_regnskap_nok
+		dataType: double
+		lineageTag: 68bf9bfe-180a-4e72-b6aa-968d7023ecc6
+		summarizeBy: sum
+		sourceColumn: monthly_delta_regnskap_nok
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column monthly_delta_avvik_nok
+		dataType: double
+		lineageTag: 0e70b486-cce3-479c-bf42-d541a1ac7f9c
+		summarizeBy: sum
+		sourceColumn: monthly_delta_avvik_nok
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column lag_1m_regnskap_nok
+		dataType: double
+		lineageTag: b5938b94-62b3-456d-a64f-82771fa58ca0
+		summarizeBy: sum
+		sourceColumn: lag_1m_regnskap_nok
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column lag_1m_avvik_nok
+		dataType: double
+		lineageTag: 1c1bdd73-cde2-47fb-ad05-17fbb296e89a
+		summarizeBy: sum
+		sourceColumn: lag_1m_avvik_nok
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column rolling_3m_avg_regnskap_nok
+		dataType: double
+		lineageTag: a0f206a9-bb1b-411b-9ae2-a68a52f29884
+		summarizeBy: sum
+		sourceColumn: rolling_3m_avg_regnskap_nok
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column rolling_3m_std_regnskap_nok
+		dataType: double
+		lineageTag: 09dedd36-b68d-4ba0-9561-31944ccd9047
+		summarizeBy: sum
+		sourceColumn: rolling_3m_std_regnskap_nok
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column target_next_month_regnskap
+		dataType: double
+		lineageTag: fd5a705b-db1b-4cb2-a0ea-8b183f126e3b
+		summarizeBy: sum
+		sourceColumn: target_next_month_regnskap
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column burn_rate_pct
+		dataType: double
+		lineageTag: a036da02-56c2-4de3-8e61-3e94c345da57
+		summarizeBy: sum
+		sourceColumn: burn_rate_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column budget_coverage_ratio
+		dataType: double
+		lineageTag: bfe3df05-519c-42b6-8935-a719b510488d
+		summarizeBy: sum
+		sourceColumn: budget_coverage_ratio
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column anomaly_z_score_3m
+		dataType: double
+		lineageTag: b36b9969-7ef9-43f1-ad86-1f500a78d685
+		summarizeBy: sum
+		sourceColumn: anomaly_z_score_3m
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column abs_monthly_avvik_nok
+		dataType: double
+		lineageTag: 1cb52197-9152-4ae6-a908-c8a2aad3f739
+		summarizeBy: sum
+		sourceColumn: abs_monthly_avvik_nok
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column log_monthly_regnskap_nok
+		dataType: double
+		lineageTag: b4099688-da31-40a5-a1bd-c36216c0cea3
+		summarizeBy: sum
+		sourceColumn: log_monthly_regnskap_nok
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column target_status_code
+		dataType: int64
+		formatString: 0
+		lineageTag: 0e049d4b-59f0-40ec-9f38-b909780273bc
+		summarizeBy: sum
+		sourceColumn: target_status_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column target_is_overbudget
+		dataType: int64
+		formatString: 0
+		lineageTag: 5dc4c700-824d-4629-b5f8-1dcde95e6247
+		summarizeBy: sum
+		sourceColumn: target_is_overbudget
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_modelready = m
+		mode: import
+		source =
+				let
+				    Source = Python.Execute("import duckdb#(lf)#(lf)# Sti til DuckDB#(lf)db_path = r'C:\Users\frank\Desktop\Kom - G2\data\database\kostra_prod.duckdb'#(lf)conn = duckdb.connect(db_path, read_only=True)#(lf)#(lf)# 1. FAKTATABELL (Selve regnskaps- og ML-grunnlaget)#(lf)fact_modelready = conn.execute(""SELECT * FROM modelready_fact"").fetchdf()#(lf)#(lf)# 2. DIMENSJONSTABELLER (Kataloger og hierarkier)#(lf)dim_funksjon = conn.execute(""SELECT * FROM dim_kostra_funksjon"").fetchdf()#(lf)dim_kontoplan = conn.execute(""SELECT * FROM dim_kostra_kontoplan"").fetchdf()#(lf)dim_ansvar = conn.execute(""SELECT * FROM dim_ansvar"").fetchdf()#(lf)dim_date = conn.execute(""SELECT * FROM dim_date"").fetchdf()#(lf)#(lf)conn.close()"),
+				    fact_modelready1 = Source{[Name="fact_modelready"]}[Value],
+				    #"Changed Type" = Table.TransformColumnTypes(fact_modelready1, {{"accounting_period", type date}, {"year", Int64.Type}, {"month", Int64.Type}, {"quarter", Int64.Type}, {"is_summer_season", Int64.Type}, {"is_year_end", Int64.Type}, {"funksjon_code", type text}, {"funksjon_navn", type text}, {"konto_code", type text}, {"kontonavn", type text}, {"kostra_art_4siffer", type text}, {"ansvar_code", type text}, {"sektor_navn", type text}, {"source_file", type text}, {"ytd_budsjett_nok", Int64.Type}, {"ytd_regnskap_nok", type number}, {"ytd_avvik_nok", type number}, {"monthly_delta_budsjett_nok", Int64.Type}, {"monthly_delta_regnskap_nok", type number}, {"monthly_delta_avvik_nok", type number}, {"lag_1m_regnskap_nok", type number}, {"lag_1m_avvik_nok", type number}, {"rolling_3m_avg_regnskap_nok", type number}, {"rolling_3m_std_regnskap_nok", type number}, {"target_next_month_regnskap", type number}, {"burn_rate_pct", type number}, {"budget_coverage_ratio", type number}, {"anomaly_z_score_3m", type number}, {"abs_monthly_avvik_nok", type number}, {"log_monthly_regnskap_nok", type number}, {"target_status_code", Int64.Type}, {"target_is_overbudget", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

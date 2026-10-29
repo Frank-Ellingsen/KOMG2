@@ -1,0 +1,119 @@
+table dim_funksjon
+	lineageTag: 4a00c08b-61d5-4020-98b3-60b4181984c6
+
+	column KOSTRA_Funksjon_ID
+		dataType: string
+		lineageTag: 97a04684-19c5-4ed7-9632-8a4e4a3e38b2
+		summarizeBy: none
+		sourceColumn: KOSTRA_Funksjon_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column KOSTRA_Funksjon_Navn
+		dataType: string
+		lineageTag: 8f59b4b4-7521-453e-8737-9a73c194b4fe
+		summarizeBy: none
+		sourceColumn: KOSTRA_Funksjon_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Funksjon_Kode_Navn
+		dataType: string
+		lineageTag: a181ba5c-659f-4680-81b9-9438e6a2c669
+		summarizeBy: none
+		sourceColumn: Funksjon_Kode_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column KOSTRA_Funksjonsgruppe_Kode
+		dataType: string
+		lineageTag: 13b716c8-eb7d-49f6-b5fa-dbb419dddb75
+		summarizeBy: none
+		sourceColumn: KOSTRA_Funksjonsgruppe_Kode
+
+		annotation SummarizationSetBy = Automatic
+
+	column KOSTRA_Funksjonsgruppe_Navn
+		dataType: string
+		lineageTag: 9e313ce3-e94f-4408-a2c6-68b2e143adea
+		summarizeBy: none
+		sourceColumn: KOSTRA_Funksjonsgruppe_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Funksjonsgruppe_Kode_Navn
+		dataType: string
+		lineageTag: eb19e89b-58ae-41e0-9d00-9a9a8c435dd4
+		summarizeBy: none
+		sourceColumn: Funksjonsgruppe_Kode_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tjenesteomrade_Kode
+		dataType: string
+		lineageTag: 3a85a653-67f7-478b-8719-6663658fc5ff
+		summarizeBy: none
+		sourceColumn: Tjenesteomrade_Kode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tjenesteomrade_Navn
+		dataType: string
+		lineageTag: 2048245d-0a5a-44b6-a09d-c4db79810bf7
+		summarizeBy: none
+		sourceColumn: Tjenesteomrade_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tjenesteomrade_Kode_Navn
+		dataType: string
+		lineageTag: 79a4862a-4d18-41ce-ae83-028841f2e4fe
+		summarizeBy: none
+		sourceColumn: Tjenesteomrade_Kode_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hovedfunksjon_Kode
+		dataType: string
+		lineageTag: 5164dc29-2d34-4bd0-bece-f96ed7902083
+		summarizeBy: none
+		sourceColumn: Hovedfunksjon_Kode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hovedfunksjon_Navn
+		dataType: string
+		lineageTag: 7131e9cc-1f76-4c14-bdf7-5ae214799baa
+		summarizeBy: none
+		sourceColumn: Hovedfunksjon_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hovedfunksjon_Kode_Navn
+		dataType: string
+		lineageTag: c595fc91-e9ce-4715-b481-5252fd16e289
+		summarizeBy: none
+		sourceColumn: Hovedfunksjon_Kode_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Regnskapsregel_Beskrivelse
+		dataType: string
+		lineageTag: 34352fb8-5eb9-4ab3-92e9-d581c01f6577
+		summarizeBy: none
+		sourceColumn: Regnskapsregel_Beskrivelse
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_funksjon = m
+		mode: import
+		source =
+				let
+				    Source = Python.Execute("import duckdb#(lf)#(lf)# Sti til DuckDB#(lf)db_path = r'C:\Users\frank\Desktop\Kom - G2\data\database\kostra_prod.duckdb'#(lf)conn = duckdb.connect(db_path, read_only=True)#(lf)#(lf)# 1. FAKTATABELL (Selve regnskaps- og ML-grunnlaget)#(lf)fact_modelready = conn.execute(""SELECT * FROM modelready_fact"").fetchdf()#(lf)#(lf)# 2. DIMENSJONSTABELLER (Kataloger og hierarkier)#(lf)dim_funksjon = conn.execute(""SELECT * FROM dim_kostra_funksjon"").fetchdf()#(lf)dim_kontoplan = conn.execute(""SELECT * FROM dim_kostra_kontoplan"").fetchdf()#(lf)dim_ansvar = conn.execute(""SELECT * FROM dim_ansvar"").fetchdf()#(lf)dim_date = conn.execute(""SELECT * FROM dim_date"").fetchdf()#(lf)#(lf)conn.close()"),
+				    dim_funksjon1 = Source{[Name="dim_funksjon"]}[Value],
+				    #"Changed Type" = Table.TransformColumnTypes(dim_funksjon1, {{"KOSTRA_Funksjon_ID", type text}, {"KOSTRA_Funksjon_Navn", type text}, {"Funksjon_Kode_Navn", type text}, {"KOSTRA_Funksjonsgruppe_Kode", type text}, {"KOSTRA_Funksjonsgruppe_Navn", type text}, {"Funksjonsgruppe_Kode_Navn", type text}, {"Tjenesteomrade_Kode", type text}, {"Tjenesteomrade_Navn", type text}, {"Tjenesteomrade_Kode_Navn", type text}, {"Hovedfunksjon_Kode", type text}, {"Hovedfunksjon_Navn", type text}, {"Hovedfunksjon_Kode_Navn", type text}, {"Regnskapsregel_Beskrivelse", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

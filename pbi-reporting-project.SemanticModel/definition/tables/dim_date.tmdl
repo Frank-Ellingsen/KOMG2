@@ -1,0 +1,99 @@
+table dim_date
+	lineageTag: 4f41b502-5ca2-4700-ba50-d8c6ffe708fc
+	dataCategory: Time
+
+	column Dato
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: 86dea3a9-f630-4340-bfd2-7a612d758aa1
+		summarizeBy: none
+		sourceColumn: Dato
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Ar
+		dataType: int64
+		formatString: 0
+		lineageTag: 1f4c5835-f29a-475d-b923-902a6f7f5328
+		summarizeBy: sum
+		sourceColumn: Ar
+
+		annotation SummarizationSetBy = Automatic
+
+	column Maned_Nummer
+		dataType: int64
+		formatString: 0
+		lineageTag: e191c0a0-52cf-4b2d-9a28-d974d81b00e3
+		summarizeBy: sum
+		sourceColumn: Maned_Nummer
+
+		annotation SummarizationSetBy = Automatic
+
+	column Maned_Navn
+		dataType: string
+		lineageTag: 9a4f2b16-106d-4e80-b76d-1ece760b7feb
+		summarizeBy: none
+		sourceColumn: Maned_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Ar_Maned
+		dataType: dateTime
+		formatString: yyyy-mm
+		lineageTag: ae92665b-6fa5-48be-9115-41e614ec5b23
+		summarizeBy: none
+		sourceColumn: _Ar_Maned
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Kvartal
+		dataType: string
+		lineageTag: bc7d4b04-59ed-40c1-8a7b-6fd8277f2af8
+		summarizeBy: none
+		sourceColumn: Kvartal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Uke
+		dataType: int64
+		formatString: 0
+		lineageTag: 9f257b9d-83e1-4b4a-bed6-6ce70a46f050
+		summarizeBy: sum
+		sourceColumn: Uke
+
+		annotation SummarizationSetBy = Automatic
+
+	column Dag_i_Uke
+		dataType: string
+		lineageTag: c62bbafb-92d1-443c-9899-902deef3b634
+		summarizeBy: none
+		sourceColumn: Dag_i_Uke
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_date = m
+		mode: import
+		source =
+				let
+				    Source = Python.Execute("import duckdb#(lf)#(lf)# Sti til DuckDB#(lf)db_path = r'C:\Users\frank\Desktop\Kom - G2\data\database\kostra_prod.duckdb'#(lf)conn = duckdb.connect(db_path, read_only=True)#(lf)#(lf)# 1. FAKTATABELL (Selve regnskaps- og ML-grunnlaget)#(lf)fact_modelready = conn.execute(""SELECT * FROM modelready_fact"").fetchdf()#(lf)#(lf)# 2. DIMENSJONSTABELLER (Kataloger og hierarkier)#(lf)dim_funksjon = conn.execute(""SELECT * FROM dim_kostra_funksjon"").fetchdf()#(lf)dim_kontoplan = conn.execute(""SELECT * FROM dim_kostra_kontoplan"").fetchdf()#(lf)dim_ansvar = conn.execute(""SELECT * FROM dim_ansvar"").fetchdf()#(lf)dim_date = conn.execute(""SELECT * FROM dim_date"").fetchdf()#(lf)#(lf)conn.close()"),
+				    dim_date1 = Source{[Name="dim_date"]}[Value],
+				    #"Changed Type" = Table.TransformColumnTypes(dim_date1,{{"Dato", type date}, {"Ar", Int64.Type}, {"Maned_Nummer", Int64.Type}, {"Maned_Navn", type text}, {"Ar_Maned", type date}, {"Kvartal", type text}, {"Uke", Int64.Type}, {"Dag_i_Uke", type text}}),
+				  #"Inserted Merged Column" = Table.AddColumn(#"Changed Type", "Merged", each Text.Combine({Text.From([Ar], "en-US"), "-0", Text.From([Maned_Nummer], "en-US")}), type text),
+				  #"Renamed columns" = Table.RenameColumns(#"Inserted Merged Column", {{"Merged", "åååå-mm"}}),
+				  #"Replaced value" = Table.ReplaceValue(#"Renamed columns", "-010", "-10", Replacer.ReplaceText, {"åååå-mm"}),
+				  #"Replaced value 1" = Table.ReplaceValue(#"Replaced value", "-011", "-11", Replacer.ReplaceText, {"åååå-mm"}),
+				  #"Replaced value 2" = Table.ReplaceValue(#"Replaced value 1", "-012", "-12", Replacer.ReplaceText, {"åååå-mm"}),
+				  #"Renamed columns 1" = Table.RenameColumns(#"Replaced value 2", {{"Ar_Maned", "_Ar_Maned"}, {"åååå-mm", "Ar_Maned"}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Renamed columns 1",{"Ar_Maned"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

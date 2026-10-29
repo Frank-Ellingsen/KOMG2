@@ -1,0 +1,15 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "bc0b63aad7c646b1eab4",
+  "displayName": "control",
+  "displayOption": "FitToPage",
+  "height": 1080,
+  "width": 1920,
+  "visualInteractions": [
+    {
+      "source": "68b934deeb9803e49bb3",
+      "target": "35a14921dea74a500250",
+      "type": "NoFilter"
+    }
+  ]
+}

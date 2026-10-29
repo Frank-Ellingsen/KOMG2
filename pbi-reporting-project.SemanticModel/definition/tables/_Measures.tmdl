@@ -1,0 +1,232 @@
+table _Measures
+	lineageTag: e53649f6-fb1c-483b-957c-2f9fbd0f35ed
+
+	measure Sum_Regnskap =
+			
+			SUM(fact_modelready[ytd_regnskap_nok])
+		formatString: #,0
+		lineageTag: dc00bea7-ca5c-46a3-b4db-fb87e9e1d03f
+
+	measure Sum_Budsjett =
+			
+			SUM(fact_modelready[ytd_budsjett_nok])
+		formatString: #,0
+		lineageTag: 30f62255-b61f-4fbd-9f81-75fd6a5e3d7c
+
+	measure Sum_Avvik = ```
+			
+			[Sum_Budsjett]-[Sum_Regnskap]
+			
+			```
+		formatString: #,0
+		lineageTag: 369c9eac-b6ed-40cf-b7ce-686225e7ffc4
+
+	measure 'Avvik % YTD' =
+			
+			DIVIDE([Avvik YTD], [Budsjett YTD], 0)
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 35243793-1486-4f7c-a461-71cd36cf1699
+
+	measure Burn_Rate_Pct =
+			
+			DIVIDE([Sum_Regnskap], [Sum_Budsjett], 0)
+		formatString: 0.00
+		lineageTag: 44e34728-036f-40b8-ae35-6a5c8fd2169a
+
+	measure Aktiv_Filter_Tekst = ```
+			
+			// 1. Sjekk filter på År
+			VAR Valgt_Ar = 
+			    IF(
+			        ISFILTERED(dim_date[Ar]),
+			        CONCATENATEX(VALUES(dim_date[Ar]), dim_date[Ar], ", "),
+			        "Alle år"
+			    )
+			
+			// 2. Sjekk filter på ÅÅÅÅ-MM
+			VAR Valgt_Maned = 
+			    IF(
+			        ISFILTERED(dim_date[_Ar_Maned]),
+			        CONCATENATEX(VALUES(dim_date[_Ar_Maned]), dim_date[_Ar_Maned], ", "),
+			        "Alle måneder"
+			    )
+			
+			// 3. Sjekk filter på KOSTRA Funksjon (Viser opptil 3 navn, ellers antall)
+			VAR AntallValgteFunksjoner = COUNTROWS(VALUES(dim_funksjon[Funksjon_Kode_Navn]))
+			VAR Valgt_Funksjon = 
+			    IF(
+			        ISFILTERED(dim_funksjon[KOSTRA_Funksjon_Navn]),
+			        IF(
+			            AntallValgteFunksjoner > 3,
+			            AntallValgteFunksjoner & " funksjoner valgt",
+			            CONCATENATEX(VALUES(dim_funksjon[KOSTRA_Funksjon_Navn]), dim_funksjon[KOSTRA_Funksjon_Navn], ", ")
+			        ),
+			        "Alle funksjoner"
+			    )
+			
+			// 4. Sett sammen sluttteksten med linjeskift (UNICHAR(10))
+			RETURN
+			    "📅 År: " & Valgt_Ar & UNICHAR(10) &
+			    "📆 Måned: " & Valgt_Maned & UNICHAR(10) &
+			    "🏛️ KOSTRA-funksjon: " & Valgt_Funksjon
+			```
+		lineageTag: a970dcf8-2519-4de3-8f39-24a8868593f8
+
+	measure '(Tekst & Emoji)Status_Indikator' =
+			
+			VAR Avvik = [Avvik YTD]
+			VAR BurnRate = [Burn_Rate_Pct YTD]
+			RETURN
+			SWITCH(
+			TRUE(),
+			Avvik > 200000 || BurnRate > 1.25, "🔴 KRITISK AVVIK",
+			Avvik > 50000 || BurnRate > 1.10, "🟡 ADVARSEL",
+			"🟢 I RUTE")
+		lineageTag: 3e10f066-d9d8-4f9d-8a4d-5fa23dec9945
+
+	measure Regnskap_MoM_Forrige =
+			
+			CALCULATE(
+			[Sum_Regnskap],
+			PREVIOUSMONTH(dim_date[Dato])
+			)
+		formatString: #,0
+		lineageTag: 9c0fee90-d206-4ff4-8cb1-47edce051acb
+
+	measure 'Budsjett YTD' =
+			
+			CALCULATE(
+			    [Sum_Budsjett],
+			    All(),
+			    VALUES(dim_funksjon[Funksjon_Kode_Navn])
+			)
+		formatString: #,0
+		lineageTag: 5bc6d1ec-c23e-450f-a275-734e51129b9f
+
+	measure 'Regnskap YTD' =
+			
+			CALCULATE(
+			    [Sum_Regnskap],
+			    All(),
+			    VALUES(dim_funksjon[Funksjon_Kode_Navn])
+			)
+		formatString: #,0
+		lineageTag: 697a1a8c-af0d-458e-a643-68e339636155
+
+	measure 'Avvik YTD' =
+			
+			CALCULATE(
+			    [Sum_Avvik],
+			    All(),
+			    VALUES(dim_funksjon[Funksjon_Kode_Navn])
+			)
+		formatString: #,0
+		lineageTag: 40b33fbd-0019-442a-aa3b-3101b362fb6b
+
+	measure 'Burn_Rate_Pct YTD' =
+			
+			DIVIDE([Regnskap YTD],[Budsjett YTD],0)
+		formatString: 0.00
+		lineageTag: d8013487-87ce-41d1-b3a3-dd5990bf87a8
+
+	measure MoM_Endring_Regnskap =
+			
+			IF(
+			ISBLANK([Regnskap_MoM_Forrige]),
+			BLANK(),
+			[Sum_Regnskap] - [Regnskap_MoM_Forrige]
+			)
+		formatString: #,0
+		lineageTag: d572c6fb-4bfe-4a20-8685-0c867c3f5811
+
+	measure MoM_Endring_Pct =
+			
+			DIVIDE([MoM_Endring_Regnskap], [Regnskap_MoM_Forrige], 0)
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 372ed3ca-8ffd-4b92-8890-9e0aeaad2022
+
+	measure MoM_Status_Symbol =
+			
+			VAR Pct = [MoM_Endring_Pct]
+			RETURN
+			    IF(
+			        ISBLANK([Regnskap_MoM_Forrige]),
+			        BLANK(),
+			        SWITCH(
+			            TRUE(),
+			            Pct > 0.01,  "🔴 ⬆️",  // Økning utover +1% (Merforbruk / økte utgifter)
+			            Pct < -0.01, "🟢 ⬇️",  // Reduksjon utover -1% (Mindreforbruk / lavere utgifter)
+			            "🟡 ➡️"              // Endring innenfor +/- 1% (Stabile utgifter)
+			        )
+			    )
+		lineageTag: 9e52313e-5243-4071-83d0-c0e3345bfbe7
+
+	measure MoM_Status_Tekst =
+			
+			VAR Pct = [MoM_Endring_Pct]
+			VAR Symbol = [MoM_Status_Symbol]
+			VAR FormatertPct = FORMAT(Pct, "+0.0 %;-0.0 %;0.0 %")
+			RETURN
+			    IF(
+			        ISBLANK([Regnskap_MoM_Forrige]),
+			        BLANK(),
+			        Symbol & " " & FormatertPct
+			    )
+		lineageTag: 669c6f9c-6585-45cd-b02a-f1d7c41ff6a3
+
+	measure Regnskap_YoY_ForrigeAar =
+			
+			CALCULATE(
+			[Sum_Regnskap],
+			SAMEPERIODLASTYEAR(dim_date[Dato])
+			)
+		lineageTag: 2efb5b55-774c-4cb3-8953-ff272056d1e2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure YoY_Endring_NOK =
+			
+			[Sum_Regnskap] - [Regnskap_YoY_ForrigeAar]
+		lineageTag: 8fa3274a-dbba-4779-b673-eaa966a202c1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure YoY_Endring_Pct =
+			
+			DIVIDE([YoY_Endring_NOK], [Regnskap_YoY_ForrigeAar], 0)
+		lineageTag: 85d18b50-42af-45d1-9d0f-f6fb3872f265
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Regnskap_Rullende_3M = ```
+			
+			CALCULATE(
+			AVERAGEX(VALUES(dim_date[_Ar_Maned]), [Sum_Regnskap]),
+			DATESINPERIOD(dim_date[Dato], MAX(dim_date[Dato]), -3, MONTH)
+			)
+			
+			```
+		formatString: #,0
+		lineageTag: b58f3593-8dfa-4734-b215-75fba100c7a1
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Mer/Mindre forbruk' = [Sum_Avvik]*(-1)
+		lineageTag: 259ab851-8e87-4871-8db7-4b1877de28ce
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Value
+		lineageTag: b2d1b59d-0b7e-4e7e-8cb9-3488ef43e303
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = calculated
+		mode: import
+		source = {"dummy"}
+
+	annotation PBI_Id = 9f01e16396014918a0dfc49ccdfbf1b6
+

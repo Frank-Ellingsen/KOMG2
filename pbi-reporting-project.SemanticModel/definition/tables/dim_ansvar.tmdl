@@ -1,0 +1,80 @@
+table dim_ansvar
+	lineageTag: 359d2495-76d8-410e-8299-43dc9d94fc95
+
+	column Ansvar_Kode
+		dataType: string
+		lineageTag: c3ef71d8-be9f-42ec-9b17-bf763cae5eff
+		summarizeBy: none
+		sourceColumn: Ansvar_Kode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Enhet_Navn
+		dataType: string
+		lineageTag: d197d54f-9907-4046-93b3-5700db98910e
+		summarizeBy: none
+		sourceColumn: Enhet_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ansvar_Navn
+		dataType: string
+		lineageTag: 7a4a637d-2311-4202-9776-04e2757ff24d
+		summarizeBy: none
+		sourceColumn: Ansvar_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Omrade_Kode
+		dataType: string
+		lineageTag: 4b1c4cb7-6da1-4c18-a4fe-071684ea9215
+		summarizeBy: none
+		sourceColumn: Omrade_Kode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Omrade_Navn
+		dataType: string
+		lineageTag: d8286701-7d2c-4d25-a0f1-bbb8447342d3
+		summarizeBy: none
+		sourceColumn: Omrade_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Omrade_Kode_Navn
+		dataType: string
+		lineageTag: e79b6afd-c1ab-40cf-8757-0038818b3e62
+		summarizeBy: none
+		sourceColumn: Omrade_Kode_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ansvar_Kode_Navn
+		dataType: string
+		lineageTag: 99f6aa2b-87b6-402e-821c-9384a698c260
+		summarizeBy: none
+		sourceColumn: Ansvar_Kode_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Er_Aktiv
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 882a9480-cd06-41ef-9bb0-af589d359e7f
+		summarizeBy: none
+		sourceColumn: Er_Aktiv
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_ansvar = m
+		mode: import
+		source =
+				let
+				    Source = Python.Execute("import duckdb#(lf)#(lf)# Sti til DuckDB#(lf)db_path = r'C:\Users\frank\Desktop\Kom - G2\data\database\kostra_prod.duckdb'#(lf)conn = duckdb.connect(db_path, read_only=True)#(lf)#(lf)# 1. FAKTATABELL (Selve regnskaps- og ML-grunnlaget)#(lf)fact_modelready = conn.execute(""SELECT * FROM modelready_fact"").fetchdf()#(lf)#(lf)# 2. DIMENSJONSTABELLER (Kataloger og hierarkier)#(lf)dim_funksjon = conn.execute(""SELECT * FROM dim_kostra_funksjon"").fetchdf()#(lf)dim_kontoplan = conn.execute(""SELECT * FROM dim_kostra_kontoplan"").fetchdf()#(lf)dim_ansvar = conn.execute(""SELECT * FROM dim_ansvar"").fetchdf()#(lf)dim_date = conn.execute(""SELECT * FROM dim_date"").fetchdf()#(lf)#(lf)conn.close()"),
+				    dim_ansvar1 = Source{[Name="dim_ansvar"]}[Value],
+				    #"Changed Type" = Table.TransformColumnTypes(dim_ansvar1, {{"Ansvar_Kode", type text}, {"Enhet_Navn", type text}, {"Ansvar_Navn", type text}, {"Omrade_Kode", type text}, {"Omrade_Navn", type text}, {"Omrade_Kode_Navn", type text}, {"Ansvar_Kode_Navn", type text}, {"Er_Aktiv", type logical}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
