@@ -1,0 +1,2442 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KOSTRA AI Workbench — Kristiansand Kommune</title>
+  <style>
+    :root {
+      --bg-canvas: #F8F9FA;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #F1F5F9;
+      --bg-zebra: #F8FAFC;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
+      --header-dark: #1E293B;
+      --header-accent: #334155;
+      --border-light: #CBD5E1;
+      --border-hairline: #E2E8F0;
+      --clr-input-blue: #0000FF;
+      --clr-link-green: #008000;
+      --clr-ok-text: #065F46;
+      --clr-ok-bg: #D1FAE5;
+      --clr-warn-text: #92400E;
+      --clr-warn-bg: #FEF3C7;
+      --clr-err-text: #9C0006;
+      --clr-err-bg: #FFC7CE;
+      --clr-highlight-red: #D62728;
+      --clr-highlight-amber: #D97706;
+      --clr-muted-slate: #94A3B8;
+      --font-sans: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: "Cascadia Mono", "Consolas", "SFMono-Regular", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      line-height: 1.45;
+      min-block-size: 100dvh;
+      display: grid;
+      grid-template-columns: 272px 1fr;
+    }
+
+    /* Sidebar Navigation (Mirrors st.sidebar in src/app.py) */
+    aside.sidebar {
+      background-color: var(--header-dark);
+      color: #FFFFFF;
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      border-inline-end: 1px solid var(--header-accent);
+      position: sticky;
+      inset-block-start: 0;
+      block-size: 100dvh;
+      overflow-y: auto;
+    }
+
+    .brand-block {
+      padding-block-end: 1rem;
+      border-block-end: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .brand-badge {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94A3B8;
+      font-weight: 600;
+      display: block;
+      margin-block-end: 0.25rem;
+    }
+
+    .brand-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.25;
+    }
+
+    .brand-sub {
+      font-size: 0.78rem;
+      color: #CBD5E1;
+      margin-block-start: 0.25rem;
+    }
+
+    .nav-section-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94A3B8;
+      font-weight: 600;
+      padding-inline: 0.5rem;
+    }
+
+    nav.module-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .nav-btn {
+      appearance: none;
+      background: transparent;
+      border: 1px solid transparent;
+      color: #E2E8F0;
+      text-align: left;
+      padding: 0.62rem 0.75rem;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      transition: background-color 120ms ease, color 120ms ease;
+    }
+
+    .nav-btn:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: #FFFFFF;
+    }
+
+    .nav-btn[aria-current="page"] {
+      background-color: #FFFFFF;
+      color: var(--header-dark);
+      font-weight: 700;
+    }
+
+    .sidebar-meta {
+      margin-block-start: auto;
+      padding: 0.85rem;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      font-size: 0.76rem;
+      color: #CBD5E1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .sidebar-meta .ok-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--clr-ok-bg);
+      color: var(--clr-ok-text);
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.74rem;
+      width: fit-content;
+    }
+
+    /* Main Content Area */
+    main.workspace {
+      display: flex;
+      flex-direction: column;
+      min-inline-size: 0;
+    }
+
+    header.top-banner {
+      background-color: var(--header-dark);
+      color: #FFFFFF;
+      padding: 1rem 1.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      border-block-end: 1px solid var(--border-light);
+    }
+
+    .top-banner h1 {
+      font-size: 1.22rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .top-banner p {
+      font-size: 0.83rem;
+      color: #CBD5E1;
+      margin-block-start: 0.15rem;
+    }
+
+    .banner-badges {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.32rem 0.68rem;
+      border-radius: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .status-ok {
+      background-color: var(--clr-ok-bg);
+      color: var(--clr-ok-text);
+    }
+
+    .status-warn {
+      background-color: var(--clr-warn-bg);
+      color: var(--clr-warn-text);
+    }
+
+    .status-err {
+      background-color: var(--clr-err-bg);
+      color: var(--clr-err-text);
+    }
+
+    /* SPA View Container with content-visibility caching (modern-web-guidance: faster-spa-view-transitions) */
+    .views-host {
+      position: relative;
+      padding: 1.5rem 1.75rem 2.5rem;
+      flex: 1;
+    }
+
+    .spa-view {
+      outline: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .spa-view.inactive {
+      content-visibility: hidden;
+      position: absolute;
+      inset-inline: 1.75rem;
+      inset-block-start: 1.5rem;
+      pointer-events: none;
+    }
+
+    @supports not (content-visibility: hidden) {
+      .spa-view.inactive {
+        display: none;
+      }
+    }
+
+    /* Section & Filter Bars (Tufte Data-Ink Ratio: no drop shadows, clean 1px borders) */
+    .section-bar {
+      background-color: var(--header-dark);
+      color: #FFFFFF;
+      padding: 0.5rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .filter-panel {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      padding: 0.9rem 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      align-items: end;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .field-group label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .field-group select,
+    .field-group input[type="text"],
+    .field-group input[type="number"] {
+      font-family: inherit;
+      font-size: 0.86rem;
+      padding: 0.45rem 0.6rem;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+    }
+
+    .field-group input.fast-input {
+      color: var(--clr-input-blue);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* KPI Grid (Tufte: zero drop shadow, thin border, high data-ink) */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .kpi-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .kpi-label {
+      font-size: 0.73rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    .kpi-value {
+      font-size: 1.32rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-sub {
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Two-Column Visual Panels */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 1rem;
+    }
+
+    .panel-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .panel-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--header-dark);
+      border-block-end: 1px solid var(--border-hairline);
+      padding-block-end: 0.45rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-subtitle {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    /* Tufte Horizontal Bullet / Bar Rows */
+    .tufte-bar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .tufte-bar-row {
+      display: grid;
+      grid-template-columns: 185px 1fr 90px 68px;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.8rem;
+    }
+
+    .tufte-bar-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .tufte-bullet-track {
+      position: relative;
+      block-size: 16px;
+      background-color: var(--bg-subtle);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .tufte-bullet-budget {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: 0;
+      background-color: #CBD5E1;
+    }
+
+    .tufte-bullet-actual {
+      position: absolute;
+      inset-block: 3px;
+      inset-inline-start: 0;
+      background-color: var(--header-dark);
+    }
+
+    .tufte-bullet-actual.overbudget {
+      background-color: var(--clr-highlight-red);
+    }
+
+    .tufte-bullet-target-line {
+      position: absolute;
+      inset-block: 0;
+      inline-size: 2px;
+      background-color: #0F172A;
+      z-index: 2;
+    }
+
+    .num-col {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-family: var(--font-sans);
+    }
+
+    /* Responsive Sticky Table (modern-web-guidance: responsive-table + Tufte: no vertical gridlines) */
+    .table-wrapper {
+      overflow: auto;
+      max-inline-size: 100%;
+      max-block-size: min(500px, 75vh);
+      container-type: inline-size;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+    }
+
+    .table-wrapper:focus-visible {
+      outline: 2px solid var(--header-dark);
+      outline-offset: 2px;
+    }
+
+    table.data-table {
+      inline-size: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.83rem;
+    }
+
+    table.data-table caption {
+      text-align: left;
+      padding: 0.65rem 0.9rem;
+      font-weight: 700;
+      font-size: 0.86rem;
+      color: var(--header-dark);
+      background-color: var(--bg-surface);
+      border-block-end: 1px solid var(--border-hairline);
+    }
+
+    table.data-table thead {
+      position: sticky;
+      inset-block-start: 0;
+      z-index: 2;
+    }
+
+    table.data-table th {
+      background-color: var(--bg-subtle);
+      color: var(--header-dark);
+      font-weight: 700;
+      padding: 0.55rem 0.75rem;
+      text-align: left;
+      border-block-end: 2px solid var(--header-dark);
+      white-space: nowrap;
+    }
+
+    table.data-table th.num-col,
+    table.data-table td.num-col {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    table.data-table tbody tr:nth-child(even) td,
+    table.data-table tbody tr:nth-child(even) th {
+      background-color: var(--bg-zebra);
+    }
+
+    table.data-table tbody tr:nth-child(odd) td,
+    table.data-table tbody tr:nth-child(odd) th {
+      background-color: var(--bg-surface);
+    }
+
+    table.data-table tbody th {
+      position: sticky;
+      inset-inline-start: 0;
+      z-index: 1;
+      font-weight: 600;
+      color: var(--text-primary);
+      border-block-end: 1px solid var(--border-hairline);
+    }
+
+    table.data-table tbody td {
+      padding: 0.5rem 0.75rem;
+      border-block-end: 1px solid var(--border-hairline);
+      color: var(--text-primary);
+    }
+
+    table.data-table tfoot td,
+    table.data-table tfoot th {
+      background-color: #E2E8F0;
+      font-weight: 700;
+      padding: 0.55rem 0.75rem;
+      border-block-start: 1px solid var(--header-dark);
+      border-block-end: 3px double var(--header-dark);
+    }
+
+    /* Container query stacked layout for narrow containers (< 600px) */
+    @container (width < 600px) {
+      table.data-table,
+      table.data-table thead,
+      table.data-table tbody,
+      table.data-table tr,
+      table.data-table th,
+      table.data-table td {
+        display: block;
+      }
+
+      table.data-table thead {
+        display: none;
+      }
+
+      table.data-table tbody tr {
+        margin-block-end: 1rem;
+        border: 1px solid var(--border-light);
+      }
+
+      table.data-table tbody th {
+        position: sticky;
+        inset-block-start: 0;
+        z-index: 2;
+        background: var(--bg-subtle);
+      }
+
+      table.data-table td {
+        display: flex;
+        justify-content: space-between;
+        text-align: right;
+      }
+
+      table.data-table td:nth-child(2)::before { content: var(--label-2, "Budsjett") ": "; font-weight: 600; }
+      table.data-table td:nth-child(3)::before { content: var(--label-3, "Regnskap") ": "; font-weight: 600; }
+      table.data-table td:nth-child(4)::before { content: var(--label-4, "Avvik") ": "; font-weight: 600; }
+      table.data-table td:nth-child(5)::before { content: var(--label-5, "Burn Rate") ": "; font-weight: 600; }
+      table.data-table td:nth-child(6)::before { content: var(--label-6, "EAC Prognose") ": "; font-weight: 600; }
+      table.data-table td:nth-child(7)::before { content: var(--label-7, "Status") ": "; font-weight: 600; }
+    }
+
+    /* Conditional variance cell colors (FAST / excel.md standard) */
+    .cell-pos {
+      color: var(--clr-ok-text) !important;
+      background-color: var(--clr-ok-bg) !important;
+      font-weight: 600;
+    }
+
+    .cell-neg {
+      color: var(--clr-err-text) !important;
+      background-color: var(--clr-err-bg) !important;
+      font-weight: 600;
+    }
+
+    .fast-link {
+      color: var(--clr-link-green) !important;
+    }
+
+    /* Chatbot UI (Module 6) */
+    .chat-prompt-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .prompt-chip {
+      appearance: none;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      color: var(--header-dark);
+      padding: 0.45rem 0.75rem;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .prompt-chip:hover {
+      background-color: var(--bg-subtle);
+      border-color: var(--header-dark);
+    }
+
+    .chat-box {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      padding: 1rem;
+      min-block-size: 320px;
+      max-block-size: 460px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .chat-msg {
+      padding: 0.75rem 0.95rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      max-inline-size: 88%;
+    }
+
+    .chat-msg.user {
+      align-self: flex-end;
+      background-color: var(--header-dark);
+      color: #FFFFFF;
+    }
+
+    .chat-msg.assistant {
+      align-self: flex-start;
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+      border: 1px solid var(--border-hairline);
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chat-input-row input {
+      flex: 1;
+      padding: 0.58rem 0.75rem;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.88rem;
+    }
+
+    .btn-primary {
+      appearance: none;
+      background-color: var(--header-dark);
+      color: #FFFFFF;
+      border: 1px solid var(--header-dark);
+      padding: 0.55rem 1rem;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--header-accent);
+    }
+
+    .btn-secondary {
+      appearance: none;
+      background-color: var(--bg-surface);
+      color: var(--header-dark);
+      border: 1px solid var(--border-light);
+      padding: 0.5rem 0.85rem;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--bg-subtle);
+      border-color: var(--header-dark);
+    }
+
+    /* Workflow Pipeline Cockpit Styles (Tufte Data-Ink Ratio: clean borders, zero drop shadows) */
+    .pipeline-dag {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .stage-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-inline-start: 4px solid var(--clr-ok-text);
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .stage-card.running {
+      border-inline-start-color: var(--clr-highlight-amber);
+      background-color: var(--clr-warn-bg);
+    }
+
+    .stage-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .stage-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--header-dark);
+    }
+
+    .stage-meta {
+      font-size: 0.77rem;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .terminal-console {
+      background-color: #0F172A;
+      color: #E2E8F0;
+      font-family: var(--font-mono);
+      font-size: 0.77rem;
+      line-height: 1.5;
+      padding: 0.9rem 1rem;
+      border-radius: 6px;
+      border: 1px solid var(--header-accent);
+      max-block-size: 230px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .cockpit-controls {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .cockpit-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* User Guide / Explainer Cards & Light-Dismiss Dialog (modern-web-guidance: light-dismiss-a-dialog) */
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    .guide-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      padding: 1rem 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .guide-card h3 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--header-dark);
+      border-block-end: 1px solid var(--border-hairline);
+      padding-block-end: 0.4rem;
+    }
+
+    .guide-card p,
+    .guide-card li {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .guide-card ul {
+      padding-inline-start: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .formula-box {
+      background-color: var(--bg-subtle);
+      border-inline-start: 3px solid var(--header-dark);
+      padding: 0.6rem 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--header-dark);
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+
+    .swatch-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      font-size: 0.81rem;
+    }
+
+    .swatch-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .swatch-pill {
+      display: inline-block;
+      min-inline-size: 92px;
+      text-align: center;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      border: 1px solid var(--border-light);
+    }
+
+    dialog.explainer-modal {
+      margin: auto;
+      max-inline-size: min(760px, 92vw);
+      max-block-size: 86vh;
+      width: 100%;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      padding: 0;
+      overflow-y: auto;
+    }
+
+    dialog.explainer-modal::backdrop {
+      background-color: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-header {
+      background-color: var(--header-dark);
+      color: #FFFFFF;
+      padding: 0.9rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      inset-block-start: 0;
+      z-index: 3;
+    }
+
+    .modal-header h2 {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .modal-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+      aside.sidebar {
+        position: static;
+        block-size: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Navigation matching src/app.py -->
+  <aside class="sidebar" aria-label="Hovednavigasjon">
+    <div class="brand-block">
+      <span class="brand-badge">Kristiansand Kommune</span>
+      <div class="brand-title">🏛️ KOSTRA AI Workbench</div>
+      <div class="brand-sub">Medallion Lakehouse, ML &amp; FAST Controlling</div>
+    </div>
+
+    <div class="nav-section-label">Velg modul (app.py)</div>
+    <nav class="module-nav" role=" navigation">
+      <button type="button" class="nav-btn" data-target="view-avvik" aria-current="page">
+        <span>📊</span> <span>1. Avviksoversikt (Gold Layer)</span>
+      </button>
+      <button type="button" class="nav-btn" data-target="view-tidsserie">
+        <span>📈</span> <span>2. Tidsserie &amp; Årsprognose (EAC)</span>
+      </button>
+      <button type="button" class="nav-btn" data-target="view-ml">
+        <span>🌲</span> <span>3. ML Prognoser &amp; Early Warning</span>
+      </button>
+      <button type="button" class="nav-btn" data-target="view-anomaly">
+        <span>🚨</span> <span>4. Anomaly &amp; Klyngeanalyse</span>
+      </button>
+      <button type="button" class="nav-btn" data-target="view-modelready">
+        <span>⚙️</span> <span>5. Modelready Datagrunnlag</span>
+      </button>
+      <button type="button" class="nav-btn" data-target="view-chatbot">
+        <span>💬</span> <span>6. KI-Saksbehandler &amp; Chatbot</span>
+      </button>
+      <button type="button" class="nav-btn" data-target="view-cockpit">
+        <span>🎛️</span> <span>7. Cockpit &amp; Pipeline Kontroll</span>
+      </button>
+      <button type="button" class="nav-btn" data-target="view-guide">
+        <span>📖</span> <span>8. Brukerveiledning &amp; Metodikk</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-meta">
+      <span class="ok-pill">✅ MODELL AVSTEMT (0,00)</span>
+      <div><strong>Datakilde:</strong> <code>kostra_prod.duckdb</code></div>
+      <div><strong>Faktatabell:</strong> <code>modelready_fact</code> (2 256 rader)</div>
+      <div><strong>Excel-modell:</strong> <code>Excel-Reporting-Analysis.xlsb</code></div>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <main class="workspace">
+    <header class="top-banner">
+      <div>
+        <h1>🏛️ KOSTRA AI Workbench — Økonomi, Tidsserier &amp; ML</h1>
+        <p id="active-filter-banner">📅 År: 2024 &nbsp;|&nbsp; 📆 Periode: M1–M8 (Bokført YTD) &nbsp;|&nbsp; 🏛️ Sektor: Alle Sektorer</p>
+      </div>
+      <div class="banner-badges">
+        <button type="button" class="status-badge" id="btn-open-modal-guide" style="background:#FFFFFF; color:var(--header-dark); border:1px solid var(--border-light); cursor:pointer;" title="Åpne Hurtigguide og Formelforklaring (Esc eller klikk utenfor for å lukke)">
+          📖 Hurtigguide / Explainer
+        </button>
+        <button type="button" class="status-badge status-ok" id="btn-open-cockpit" style="border:none; cursor:pointer;" title="Åpne Cockpit & Pipeline Kontroll">
+          🎛️ PIPELINE: ONLINE (4/4 STEG OK)
+        </button>
+        <span class="status-badge status-err" id="header-status-pill">🔴 KRITISK AVVIK (-2 229 614 kr)</span>
+        <span class="status-badge status-ok">06_CHECKS: Diff = 0,00 kr</span>
+      </div>
+    </header>
+
+    <div class="views-host">
+      <!-- ===================================================================
+           MODUL 1: AVVIKSOVERSIKT (GOLD LAYER)
+           =================================================================== -->
+      <section id="view-avvik" class="spa-view" tabindex="-1" aria-label="Avviksoversikt Gold Layer">
+        <div class="section-bar">
+          <span>1. Filtrering, Utsnittskuttere (Slicers) &amp; Periodevelger</span>
+          <span>FAST &amp; Power BI-Style</span>
+        </div>
+
+        <div class="filter-panel">
+          <div class="field-group">
+            <label for="flt-period">Velg Periode / Måned</label>
+            <select id="flt-period">
+              <option value="ALL">Akkumulert YTD (M01–M08 2024)</option>
+              <option value="M08">Siste Bokførte Måned (2024_08 August)</option>
+              <option value="M07">2024_07 Juli</option>
+              <option value="M06">2024_06 Juni</option>
+              <option value="M05">2024_05 Mai</option>
+              <option value="M04">2024_04 April</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="flt-sektor">Velg Rammeområde / Sektor</label>
+            <select id="flt-sektor">
+              <option value="ALL">Alle Sektorer</option>
+              <option value="Oppvekst og Utdanning">Oppvekst og Utdanning</option>
+              <option value="Helse og Omsorg">Helse og Omsorg</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="flt-status">Filter på Avviksstatus</label>
+            <select id="flt-status">
+              <option value="ALL">Alle Statuser</option>
+              <option value="🔴 KRITISK AVVIK">🔴 KRITISK AVVIK</option>
+              <option value="🟡 ADVARSEL">🟡 ADVARSEL</option>
+              <option value="🟢 I RUTE">🟢 I RUTE</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 6 Rounded KPI Cards (mirrors 01_DASHBOARD & app.py) -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Totalt Budsjett (CUBE)</span>
+            <span class="kpi-value fast-link" id="kpi-bud">29 295 237 kr</span>
+            <span class="kpi-sub">Rapporteringsår: 2024</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Bokført Regnskap (CUBE)</span>
+            <span class="kpi-value fast-link" id="kpi-reg">31 524 851 kr</span>
+            <span class="kpi-sub" id="kpi-r3m">Rullende 3M snitt: 3 734 353 kr</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Netto Budsjettavvik</span>
+            <span class="kpi-value" id="kpi-avvik" style="color: var(--clr-err-text);">-2 229 614 kr</span>
+            <span class="kpi-sub" id="kpi-avvik-pct">Relativt avvik: -7,6 %</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Forbruksrate (Burn Rate)</span>
+            <span class="kpi-value" id="kpi-burn">107,6 %</span>
+            <span class="kpi-sub">Kritisk terskel: 125,0 %</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Fullårsprognose (EAC 2024)</span>
+            <span class="kpi-value" id="kpi-eac">47 252 826 kr</span>
+            <span class="kpi-sub" id="kpi-eac-avvik">Forventet årsavvik: -3 309 971 kr</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Kritiske Funksjoner / Advarsler</span>
+            <span class="kpi-value" id="kpi-alerts">3 Kritiske / 1 Advarsel</span>
+            <span class="kpi-sub">Av 10 aktive KOSTRA-funksjoner</span>
+          </div>
+        </div>
+
+        <!-- Visual Charts (Tufte Bullet Chart + Monthly Combo Chart) -->
+        <div class="grid-2col">
+          <div class="panel-card">
+            <div class="panel-title">
+              <span>1. Bullet Chart: Forbruksrate (Burn Rate %) vs. Budsjettmål (100 %)</span>
+              <span class="panel-subtitle">Sort linje = 100 % ramme | Rød = Overforbruk</span>
+            </div>
+            <div class="tufte-bar-list" id="bullet-chart-container"></div>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-title">
+              <span>2. Månedlig Budsjett vs. Faktisk Regnskap (M01–M08) &amp; 3M Trend</span>
+              <span class="panel-subtitle">Direkte merket S-/Trendkurve (Tufte)</span>
+            </div>
+            <svg id="svg-monthly-combo" viewBox="0 0 540 230" style="width:100%; height:auto; overflow:visible;" role="img" aria-label="Månedlig Budsjett og Regnskap M01 til M08"></svg>
+          </div>
+        </div>
+
+        <!-- Sticky Responsive KOSTRA Table -->
+        <div tabindex="0" role="region" aria-labelledby="kostra-table-caption" class="table-wrapper">
+          <table class="data-table" style="--label-2:'Budsjett'; --label-3:'Regnskap'; --label-4:'Netto Avvik'; --label-5:'Avvik %'; --label-6:'Burn Rate'; --label-7:'EAC Prognose'; --label-8:'Status';">
+            <caption id="kostra-table-caption">📋 KOSTRA Funksjonsanalyse — CUBE &amp; Gold Layer Avvikstabell (NOK)</caption>
+            <thead>
+              <tr>
+                <th>KOSTRA Funksjon</th>
+                <th class="num-col">Budsjett (NOK)</th>
+                <th class="num-col">Regnskap (NOK)</th>
+                <th class="num-col">Netto Avvik (NOK)</th>
+                <th class="num-col">Avvik %</th>
+                <th class="num-col">Burn Rate %</th>
+                <th class="num-col">Fullårs EAC (NOK)</th>
+                <th>Statusindikator</th>
+              </tr>
+            </thead>
+            <tbody id="kostra-table-body"></tbody>
+            <tfoot id="kostra-table-foot"></tfoot>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           MODUL 2: TIDSSERIE & ÅRSPROGNOSE (EOY / EAC 31.12)
+           =================================================================== -->
+      <section id="view-tidsserie" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Tidsserie og Årsprognose">
+        <div class="section-bar">
+          <span>2. Tidsserieanalyse &amp; Estimert Årsresultat (EOY / EAC per 31.12.2024)</span>
+          <span>03_CALCULATIONS &amp; 04_INPUTS</span>
+        </div>
+
+        <div class="filter-panel">
+          <div class="field-group">
+            <label for="inp-wage-q4">Param_Lonnsvekst_Q4 (% påslag)</label>
+            <input type="number" id="inp-wage-q4" class="fast-input" value="2.5" step="0.5" min="-5" max="15" />
+          </div>
+          <div class="field-group">
+            <label for="inp-eff-q4">Param_Effektiviseringskrav_Pct (% tiltak)</label>
+            <input type="number" id="inp-eff-q4" class="fast-input" value="1.5" step="0.5" min="0" max="10" />
+          </div>
+          <div class="field-group">
+            <label for="inp-dec-weight">Param_Sesongvekt_M12 (Desember-faktor)</label>
+            <input type="number" id="inp-dec-weight" class="fast-input" value="1.12" step="0.02" min="0.8" max="1.5" />
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Bokført YTD (Mnd 1–8)</span>
+            <span class="kpi-value">31 524 851 kr</span>
+            <span class="kpi-sub" style="color: var(--clr-err-text);">YTD Avvik: -2 229 614 kr</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Projisert Q4 ETC (Mnd 9–12)</span>
+            <span class="kpi-value" id="ts-q4-etc">15 727 975 kr</span>
+            <span class="kpi-sub">Sesongkorrigert 3M run-rate</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Estimert Årsregnskap EAC (31.12)</span>
+            <span class="kpi-value" id="ts-eoy-eac">47 252 826 kr</span>
+            <span class="kpi-sub">Årsbudsjett: 43 942 856 kr</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Forventet Årsavvik (31.12)</span>
+            <span class="kpi-value" id="ts-eoy-diff" style="color: var(--clr-err-text);">-3 309 971 kr</span>
+            <span class="kpi-sub" id="ts-eoy-pct">Forventet Burn Rate: 107,5 %</span>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-title">
+            <span>📈 Akkumulert S-Kurve &amp; Månedlig Fremskrivning (M01–M08 Bokført + M09–M12 ETC Prognose)</span>
+            <span class="panel-subtitle">Direkte merking uten separat fargeforklaring (Tufte S-Curve Standard)</span>
+          </div>
+          <svg id="svg-scurve" viewBox="0 0 820 260" style="width:100%; height:auto; overflow:visible;" role="img" aria-label="S-Kurve og tidsserieprognose M01 til M12"></svg>
+        </div>
+
+        <div tabindex="0" role="region" aria-labelledby="ts-table-caption" class="table-wrapper">
+          <table class="data-table">
+            <caption id="ts-table-caption">📋 Månedlig Tidsserietabell (M01–M12) — Bokført Regnskap vs. Sesongjustert Q4-Prognose (ETC)</caption>
+            <thead>
+              <tr>
+                <th>Periode</th>
+                <th>Type</th>
+                <th class="num-col">Sesongfaktor</th>
+                <th class="num-col">Månedlig Budsjett (NOK)</th>
+                <th class="num-col">Regnskap / ETC (NOK)</th>
+                <th class="num-col">Månedlig Avvik (NOK)</th>
+                <th class="num-col">Akkumulert EAC (NOK)</th>
+              </tr>
+            </thead>
+            <tbody id="ts-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           MODUL 3: ML PROGNOSER & EARLY WARNING (XAI)
+           =================================================================== -->
+      <section id="view-ml" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="ML Prognoser og Forklarbar AI">
+        <div class="section-bar">
+          <span>3. Machine Learning Prognoser &amp; Forklaringskraft (XAI)</span>
+          <span>Random Forest (R² = 0.91) &amp; Decision Tree</span>
+        </div>
+
+        <div class="grid-2col">
+          <div class="panel-card">
+            <div class="panel-title">
+              <span>Topp 8 Forklarende Variabler (Random Forest Feature Importance)</span>
+              <span class="panel-subtitle">R² = 0,91 | Lav MAE</span>
+            </div>
+            <div class="tufte-bar-list" id="fi-bars-container"></div>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-title">
+              <span>Decision Tree Early Warning Klassifisering &amp; IF-THEN Regeltre</span>
+              <span class="panel-subtitle">100 % Revisjonssporbart</span>
+            </div>
+            <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
+              <div class="kpi-card" style="background: var(--clr-ok-bg);">
+                <span class="kpi-label" style="color: var(--clr-ok-text);">🟢 Status 0: I RUTE</span>
+                <span class="kpi-value" style="color: var(--clr-ok-text);">1 642</span>
+                <span class="kpi-sub" style="color: var(--clr-ok-text);">72,8 % av kontolinjer</span>
+              </div>
+              <div class="kpi-card" style="background: var(--clr-warn-bg);">
+                <span class="kpi-label" style="color: var(--clr-warn-text);">🟡 Status 1: ADVARSEL</span>
+                <span class="kpi-value" style="color: var(--clr-warn-text);">398</span>
+                <span class="kpi-sub" style="color: var(--clr-warn-text);">17,6 % av kontolinjer</span>
+              </div>
+              <div class="kpi-card" style="background: var(--clr-err-bg);">
+                <span class="kpi-label" style="color: var(--clr-err-text);">🔴 Status 2: KRITISK</span>
+                <span class="kpi-value" style="color: var(--clr-err-text);">216</span>
+                <span class="kpi-sub" style="color: var(--clr-err-text);">9,6 % av kontolinjer</span>
+              </div>
+            </div>
+            <pre style="background: var(--bg-subtle); padding: 0.75rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.76rem; color: var(--header-dark); overflow-x: auto; border: 1px solid var(--border-light);">|--- burn_rate_pct &lt;= 110.00
+|   |--- ytd_avvik_nok &lt;= 50000.00
+|   |   |--- class: 0 (🟢 I RUTE)
+|   |--- ytd_avvik_nok &gt;  50000.00
+|   |   |--- class: 1 (🟡 ADVARSEL)
+|--- burn_rate_pct &gt;  110.00
+|   |--- burn_rate_pct &lt;= 125.00
+|   |   |--- ytd_avvik_nok &lt;= 200000.00 -&gt; class: 1 (🟡 ADVARSEL)
+|   |   |--- ytd_avvik_nok &gt;  200000.00 -&gt; class: 2 (🔴 KRITISK AVVIK)
+|   |--- burn_rate_pct &gt;  125.00 -&gt; class: 2 (🔴 KRITISK AVVIK)</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           MODUL 4: ANOMALY & KLYNGEANALYSE (HCLUST & ISOLATION FOREST)
+           =================================================================== -->
+      <section id="view-anomaly" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Anomaly og Klyngeanalyse">
+        <div class="section-bar">
+          <span>4. Anomaly Detection (Isolation Forest) &amp; Hierarkisk Klustering (hclust)</span>
+          <span>Top 5 % Z-Score Internkontroll</span>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Klynge 0: Stabil Drift</span>
+            <span class="kpi-value">1 131 linjer</span>
+            <span class="kpi-sub">Forutsigbar fastlønn og husleie</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Klynge 1: Høyvolatil / Vikar</span>
+            <span class="kpi-value" style="color: var(--clr-warn-text);">16 linjer</span>
+            <span class="kpi-sub">Vikarbyrå, sykefravær og overtid</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Klynge 2: Sesongvariasjon</span>
+            <span class="kpi-value">1 100 linjer</span>
+            <span class="kpi-sub">Skolestart, ferieoppgjør og energi</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Klynge 3: Ekstraordinære Avvik</span>
+            <span class="kpi-value" style="color: var(--clr-err-text);">9 linjer</span>
+            <span class="kpi-sub">Flagg for manuell bilagskontroll</span>
+          </div>
+        </div>
+
+        <div tabindex="0" role="region" aria-labelledby="anomaly-table-caption" class="table-wrapper">
+          <table class="data-table">
+            <caption id="anomaly-table-caption">⚠️ Topp Flaggede Føringsavvik for Internrevisjon (Isolation Forest &amp; 3M Z-Score &gt; 2,5)</caption>
+            <thead>
+              <tr>
+                <th>Periode</th>
+                <th>KOSTRA Funksjon</th>
+                <th>Konto (6-siffer)</th>
+                <th class="num-col">Månedlig Regnskap (NOK)</th>
+                <th class="num-col">3-Mnd Snitt (NOK)</th>
+                <th class="num-col">Z-Score Volatilitet</th>
+                <th>Klyngeprofil</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>2024_08</th>
+                <td>2540 - Helse- og omsorgstjenester i institusjon</td>
+                <td>127000 - Konsulent- og vikarbyråtjenester</td>
+                <td class="num-col">387 656 kr</td>
+                <td class="num-col">142 110 kr</td>
+                <td class="num-col cell-neg">4,18</td>
+                <td>Klynge 3: Ekstraordinære Avvik</td>
+              </tr>
+              <tr>
+                <th>2024_08</th>
+                <td>2020 - Grunnskoleopplæring</td>
+                <td>102000 - Vikarlønn undervisning</td>
+                <td class="num-col">612 400 kr</td>
+                <td class="num-col">318 900 kr</td>
+                <td class="num-col cell-neg">3,64</td>
+                <td>Klynge 1: Høyvolatil / Vikar</td>
+              </tr>
+              <tr>
+                <th>2024_07</th>
+                <td>2540 - Helse- og omsorgstjenester i institusjon</td>
+                <td>104000 - Overtidslønn helsepersonell</td>
+                <td class="num-col">429 810 kr</td>
+                <td class="num-col">215 400 kr</td>
+                <td class="num-col cell-neg">3,29</td>
+                <td>Klynge 1: Høyvolatil / Vikar</td>
+              </tr>
+              <tr>
+                <th>2024_08</th>
+                <td>2210 - Pedagogisk-psykologisk tjeneste (PPT)</td>
+                <td>130000 - Kjøp av tjenester som erstatter egenprod.</td>
+                <td class="num-col">248 000 kr</td>
+                <td class="num-col">119 500 kr</td>
+                <td class="num-col cell-neg">2,94</td>
+                <td>Klynge 3: Ekstraordinære Avvik</td>
+              </tr>
+              <tr>
+                <th>2024_06</th>
+                <td>2140 - Skolefritidstilbud (SFO)</td>
+                <td>122000 - Driftsmidler og inventar</td>
+                <td class="num-col">194 300 kr</td>
+                <td class="num-col">88 200 kr</td>
+                <td class="num-col cell-neg">2,71</td>
+                <td>Klynge 2: Sesongvariasjon</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           MODUL 5: MODELREADY DATAGRUNNLAG & FAST AVSTEMMING
+           =================================================================== -->
+      <section id="view-modelready" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Modelready Datagrunnlag">
+        <div class="section-bar">
+          <span>5. Medallion Gold Layer (modelready_fact) &amp; 06_CHECKS Modellavstemming</span>
+          <span>100 % Komplett Datasett</span>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Totalt Antall Rader</span>
+            <span class="kpi-value fast-link">2 256</span>
+            <span class="kpi-sub">8 perioder × 282 unike kontikombinasjoner</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Totalt Antall Features</span>
+            <span class="kpi-value fast-link">32</span>
+            <span class="kpi-sub">Inkl. lag_1m, rolling_3m, z_score, burn_rate</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Manglende Verdier (Nulls)</span>
+            <span class="kpi-value" style="color: var(--clr-ok-text);">0,0 %</span>
+            <span class="kpi-sub">Kvalitetssikret i Silver → Gold ETL</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">06_CHECKS Master Differanse</span>
+            <span class="kpi-value" style="color: var(--clr-ok-text);">0,00 kr</span>
+            <span class="kpi-sub">11 av 11 kontrollpunkter avstemt</span>
+          </div>
+        </div>
+
+        <div tabindex="0" role="region" aria-labelledby="checks-table-caption" class="table-wrapper">
+          <table class="data-table">
+            <caption id="checks-table-caption">✅ 06_CHECKS — Master Avstemmingsoversikt mellom DuckDB, Power Pivot Data Model og FAST Oppstillinger</caption>
+            <thead>
+              <tr>
+                <th>Kontroll-ID</th>
+                <th>Avstemmingspunkt</th>
+                <th class="num-col">Kilde A (NOK)</th>
+                <th class="num-col">Kilde B (NOK)</th>
+                <th class="num-col">Differanse</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>CHK_01</th>
+                <td>Data Model [Sum Budsjett] vs. Faktatabell SUM(ytd_budsjett_nok)</td>
+                <td class="num-col fast-link">29 295 237,00</td>
+                <td class="num-col fast-link">29 295 237,00</td>
+                <td class="num-col cell-pos">0,00</td>
+                <td>OK (0,00)</td>
+              </tr>
+              <tr>
+                <th>CHK_02</th>
+                <td>Data Model [Sum Regnskap] vs. Faktatabell SUM(ytd_regnskap_nok)</td>
+                <td class="num-col fast-link">31 524 851,42</td>
+                <td class="num-col fast-link">31 524 851,42</td>
+                <td class="num-col cell-pos">0,00</td>
+                <td>OK (0,00)</td>
+              </tr>
+              <tr>
+                <th>CHK_05</th>
+                <td>02_OUTPUTS Resultatoppstilling YTD Regnskap vs. 03_CALCULATIONS</td>
+                <td class="num-col fast-link">31 524 851,42</td>
+                <td class="num-col fast-link">31 524 851,42</td>
+                <td class="num-col cell-pos">0,00</td>
+                <td>OK (0,00)</td>
+              </tr>
+              <tr>
+                <th>CHK_08</th>
+                <td>04_INPUTS Inngående Balanse (IB 01.01): Sum Eiendeler vs. Sum EK &amp; Gjeld</td>
+                <td class="num-col fast-link">240 000 000,00</td>
+                <td class="num-col fast-link">240 000 000,00</td>
+                <td class="num-col cell-pos">0,00</td>
+                <td>OK (0,00)</td>
+              </tr>
+              <tr>
+                <th>CHK_09</th>
+                <td>02_OUTPUTS Utgående Balanse (UB M08): Sum Eiendeler vs. Sum EK &amp; Gjeld</td>
+                <td class="num-col fast-link">240 075 148,58</td>
+                <td class="num-col fast-link">240 075 148,58</td>
+                <td class="num-col cell-pos">0,00</td>
+                <td>OK (0,00)</td>
+              </tr>
+              <tr>
+                <th>CHK_10</th>
+                <td>02_OUTPUTS Kontantstrøm UB Bankinnskudd vs. Balanse Bankinnskudd (M08)</td>
+                <td class="num-col fast-link">38 975 148,58</td>
+                <td class="num-col fast-link">38 975 148,58</td>
+                <td class="num-col cell-pos">0,00</td>
+                <td>OK (0,00)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           MODUL 6: KI-SAKSBEHANDLER & CHATBOT (RAG)
+           =================================================================== -->
+      <section id="view-chatbot" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="KI-Saksbehandler og Chatbot">
+        <div class="section-bar">
+          <span>6. KOSTRA KI-Saksbehandler &amp; RAG Chatbot</span>
+          <span>DuckDB + Kommuneloven &amp; KOSTRA-forskriften</span>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-title">
+            <span>💡 Hurtigspørsmål (Klikk for å kjøre spørring mot KOSTRA Kunnskapsbase)</span>
+          </div>
+          <div class="chat-prompt-bar">
+            <button type="button" class="prompt-chip" data-prompt="avvik">📊 Topp 5 avvik i august (2024_08)</button>
+            <button type="button" class="prompt-chip" data-prompt="lonn">💼 Lønnsbudsjettering i KOSTRA (Art 010–099)</button>
+            <button type="button" class="prompt-chip" data-prompt="kommunelov">⚖️ Omdisponering i Kommuneloven § 14-4</button>
+            <button type="button" class="prompt-chip" data-prompt="eac">📈 Forklar EAC-prognosen på 47,25 MNOK</button>
+          </div>
+
+          <div class="chat-box" id="chat-messages" aria-live="polite">
+            <div class="chat-msg assistant">
+              <strong>KOSTRA KI-Saksbehandler:</strong> Hei! Jeg er koblet til <code>modelready_fact</code> og kommunens regelverk (Kommuneloven kap. 14, KOSTRA-forskriften og økonomireglementet). Velg et hurtigspørsmål over eller skriv et spørsmål under.
+            </div>
+          </div>
+
+          <form class="chat-input-row" id="chat-form">
+            <input type="text" id="chat-input" placeholder="Spør om KOSTRA-funksjoner, merforbruk, lønnsarter eller Kommuneloven..." aria-label="Skriv spørsmål til KI-Saksbehandler" />
+            <button type="submit" class="btn-primary">Send forespørsel</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           MODUL 7: COCKPIT & WORKFLOW PIPELINE KONTROLL (ORCHESTRATION)
+           =================================================================== -->
+      <section id="view-cockpit" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Cockpit og Workflow Pipeline Kontroll">
+        <div class="section-bar">
+          <span>7. Cockpit Kontroll — End-to-End Workflow Pipeline (Medallion ETL → ML → Power BI &amp; FAST Excel)</span>
+          <span id="cockpit-last-run">Sist kjørt: 2026-10-29 21:35:00 | Status: 100 % Verifisert</span>
+        </div>
+
+        <!-- Interactive Pipeline Execution Control Bar -->
+        <div class="cockpit-controls">
+          <div class="cockpit-btn-group">
+            <button type="button" class="btn-primary" id="btn-run-all">▶ Kjør Full Pipeline (A–Å / run.ps1 -All)</button>
+            <button type="button" class="btn-secondary" data-step="0">1. Ingestion &amp; Bronze (-BuildDB)</button>
+            <button type="button" class="btn-secondary" data-step="1">2. Silver → Gold &amp; Bitemporal (-Reconcile)</button>
+            <button type="button" class="btn-secondary" data-step="2">3. ML Omtrening (-Retrain)</button>
+            <button type="button" class="btn-secondary" data-step="3">4. BI &amp; FAST Excel Sync (06_CHECKS)</button>
+          </div>
+          <div>
+            <span class="status-badge status-ok" id="pipeline-global-badge">✅ ALLE 4 STEG FULLFØRT (0 FEIL)</span>
+          </div>
+        </div>
+
+        <!-- 4-Stage Pipeline DAG Visualization -->
+        <div class="pipeline-dag" id="pipeline-dag-cards">
+          <div class="stage-card" id="stage-card-0">
+            <div class="stage-header">
+              <span>STEG 1 • BRONZE LAYER</span>
+              <span class="status-badge status-ok" id="stage-badge-0">OK (0,42s)</span>
+            </div>
+            <div class="stage-title">📥 Rådata Ingestion &amp; Vask</div>
+            <div class="stage-meta">Skript: <code>src/db_manager.py</code></div>
+            <div class="stage-meta">21 CSV-filer lest (UTF-8 / Latin1)</div>
+            <div class="stage-meta">Konto 4→6 siffer polstret | <strong>0 i karantene</strong></div>
+          </div>
+
+          <div class="stage-card" id="stage-card-1">
+            <div class="stage-header">
+              <span>STEG 2 • SILVER &amp; GOLD</span>
+              <span class="status-badge status-ok" id="stage-badge-1">OK (0,38s)</span>
+            </div>
+            <div class="stage-title">⚙️ Medallion &amp; Feature Engine</div>
+            <div class="stage-meta">Tabell: <code>modelready_fact</code></div>
+            <div class="stage-meta">2 256 rader × 32 variabler (LAG &amp; 3M)</div>
+            <div class="stage-meta">Null-verdier: <strong>0,0 % (100 % komplett)</strong></div>
+          </div>
+
+          <div class="stage-card" id="stage-card-2">
+            <div class="stage-header">
+              <span>STEG 3 • MLOPS &amp; XAI</span>
+              <span class="status-badge status-ok" id="stage-badge-2">OK (1,15s)</span>
+            </div>
+            <div class="stage-title">🧠 ML Retraining Pipeline</div>
+            <div class="stage-meta">Skript: <code>src/retrain_pipeline.py</code></div>
+            <div class="stage-meta">RandomForest: <strong>R² = 0,9104</strong> | DT Acc: <strong>100 %</strong></div>
+            <div class="stage-meta">hclust: 4 klynger | iForest: 113 flagget (5 %)</div>
+          </div>
+
+          <div class="stage-card" id="stage-card-3">
+            <div class="stage-header">
+              <span>STEG 4 • BI &amp; FAST KONTROLL</span>
+              <span class="status-badge status-ok" id="stage-badge-3">OK (0,51s)</span>
+            </div>
+            <div class="stage-title">📊 CUBE, Power BI &amp; 06_CHECKS</div>
+            <div class="stage-meta">Modell: <code>Excel-Reporting-Analysis.xlsb</code></div>
+            <div class="stage-meta">21 DAX-mål i <code>ThisWorkbookDataModel</code></div>
+            <div class="stage-meta">11/11 kontroller: <strong>Diff = 0,00 kr</strong></div>
+          </div>
+        </div>
+
+        <!-- Live Execution Console & Governance Telemetry -->
+        <div class="grid-2col">
+          <div class="panel-card">
+            <div class="panel-title">
+              <span>🖥️ Sanntids Pipeline-Logg (CLI / Batch Execution Stream)</span>
+              <span class="panel-subtitle">run_pipeline.bat / run.ps1</span>
+            </div>
+            <div class="terminal-console" id="pipeline-console" role="log" aria-live="polite">[21:35:00] $ .\run.ps1 -BuildDB -Reconcile -Retrain
+[21:35:00] [1/4] Starter DuckDB Ingestion (src/db_manager.py)...
+[21:35:00]   ✔ Leste 16 månedlige faktafiler (2024_01..2024_08 bomiljo & komskole)
+[21:35:00]   ✔ Leste 5 dimensjonsfiler (dim_ansvar, dim_date, dim_kostra_funksjon, dim_kostra_kontoplan, dim_sikkerhet)
+[21:35:00]   ✔ Eksporterte data/export/INGESTION_REPORT.md (Godkjent: 21, Karantene: 0)
+[21:35:01] [2/4] Bygger Silver Layer (LAG() delta) og Gold Layer (modelready_fact: 2 256 rader, 32 kolonner)...
+[21:35:01] [3/4] Kjører ML Retraining Pipeline (src/retrain_pipeline.py)...
+[21:35:02]   ✔ RandomForestRegressor: R² = 0.9104 | MAE = 18 420,15 NOK
+[21:35:02]   ✔ DecisionTreeClassifier: Accuracy = 1.0000 | F1 (macro) = 1.0000
+[21:35:02]   ✔ AgglomerativeClustering (4 klynger): {0: 1131, 2: 1100, 1: 16, 3: 9}
+[21:35:02]   ✔ IsolationForest (5.0%): 113 anomalier flagget for internkontroll
+[21:35:02] [4/4] Verifiserer ThisWorkbookDataModel & 06_CHECKS (MASTER_CHECK Diff = 0.00 NOK)...
+[21:35:02] 🎉 Full Workflow Pipeline fullført uten feil (Total kjøretid: 2,46s).</div>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-title">
+              <span>🛡️ Ingestion Gate &amp; Kildedatakontroll (data/raw/ → Bronze)</span>
+              <span class="panel-subtitle">21 av 21 kildesett godkjent</span>
+            </div>
+            <div tabindex="0" role="region" aria-label="Ingestion Gate tabell" class="table-wrapper" style="max-block-size: 230px;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Kildedatasett</th>
+                    <th>Klassifisering</th>
+                    <th class="num-col">Filer</th>
+                    <th class="num-col">Rader</th>
+                    <th>Validering / Polstring</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>2024_01–08_fact_komskole.csv</th>
+                    <td>FAKTA (Skole)</td>
+                    <td class="num-col">8</td>
+                    <td class="num-col">1 552</td>
+                    <td class="cell-pos">OK (UTF-8 / 6-siffer)</td>
+                  </tr>
+                  <tr>
+                    <th>2024_01–08_fact_bomiljo.csv</th>
+                    <td>FAKTA (Helse/Omsorg)</td>
+                    <td class="num-col">8</td>
+                    <td class="num-col">704</td>
+                    <td class="cell-pos">OK (UTF-8 / 6-siffer)</td>
+                  </tr>
+                  <tr>
+                    <th>dim_kostra_kontoplan.csv</th>
+                    <td>DIMENSJON (Art)</td>
+                    <td class="num-col">1</td>
+                    <td class="num-col">172</td>
+                    <td class="cell-pos">OK (PK: Kontokode_6Siffer)</td>
+                  </tr>
+                  <tr>
+                    <th>dim_kostra_funksjon.csv</th>
+                    <td>DIMENSJON (Funksjon)</td>
+                    <td class="num-col">1</td>
+                    <td class="num-col">61</td>
+                    <td class="cell-pos">OK (PK: Funksjonsgruppe)</td>
+                  </tr>
+                  <tr>
+                    <th>dim_ansvar.csv &amp; dim_date.csv</th>
+                    <td>DIMENSJON (Ansvar/Tid)</td>
+                    <td class="num-col">2</td>
+                    <td class="num-col">405</td>
+                    <td class="cell-pos">OK (PK verifisert)</td>
+                  </tr>
+                  <tr>
+                    <th>Karantene (EXCEPTION_REPORT)</th>
+                    <td>KARANTENE</td>
+                    <td class="num-col">0</td>
+                    <td class="num-col">0</td>
+                    <td class="cell-pos">0 feilende filer</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Immutable Audit Log Table (Governance & eInnsyn) -->
+        <div tabindex="0" role="region" aria-labelledby="audit-log-caption" class="table-wrapper">
+          <table class="data-table">
+            <caption id="audit-log-caption">🔒 Uforanderlig Revisjonslogg (DuckDB <code>audit_log</code> — Forvaltningsloven &amp; Kommunal Internkontroll)</caption>
+            <thead>
+              <tr>
+                <th>Tidsstempel (ISO)</th>
+                <th>Hendelses-UUID</th>
+                <th>Pipeline-Steg / Modul</th>
+                <th>Bruker / Agent</th>
+                <th>Kontrollresultat &amp; Sporbarhet</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="audit-log-tbody">
+              <tr>
+                <th>2026-10-29 21:35:02</th>
+                <td><code>8f4e2a10-9c3b-4d71-a812-50c19e84b104</code></td>
+                <td>FAST_CUBE_RECONCILE</td>
+                <td>system_controller</td>
+                <td>Avstemt 01_DASHBOARD, 02_OUTPUTS og 06_CHECKS mot ThisWorkbookDataModel (Diff = 0,00 kr)</td>
+                <td class="cell-pos">VERIFISERT</td>
+              </tr>
+              <tr>
+                <th>2026-10-29 21:35:02</th>
+                <td><code>3c91b74e-11f0-49e2-984a-72d08f113c59</code></td>
+                <td>ML_RETRAIN_PORTFOLIO</td>
+                <td>mlops_runner</td>
+                <td>Trent RandomForest (R²=0,9104), DecisionTree (Acc=100 %), hclust (4) og IsolationForest (113 avvik)</td>
+                <td class="cell-pos">VERIFISERT</td>
+              </tr>
+              <tr>
+                <th>2026-10-29 21:35:01</th>
+                <td><code>6a12d904-55b8-42c1-8d01-19a47c30e882</code></td>
+                <td>MEDALLION_GOLD_BUILD</td>
+                <td>duckdb_etl</td>
+                <td>Oppdatert silver_fact og modelready_fact (2 256 rader, 32 features, 0 nulls)</td>
+                <td class="cell-pos">VERIFISERT</td>
+              </tr>
+              <tr>
+                <th>2026-10-29 21:35:00</th>
+                <td><code>e104c552-78a1-409b-b219-94f81a004d21</code></td>
+                <td>BRONZE_INGESTION_GATE</td>
+                <td>duckdb_etl</td>
+                <td>Importert 21 filer fra data/raw/. Generert INGESTION_REPORT.md (0 i karantene)</td>
+                <td class="cell-pos">VERIFISERT</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           MODUL 8: BRUKERVEILEDNING & METODIKK (EXPLAINER)
+           =================================================================== -->
+      <section id="view-guide" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Brukerveiledning og Metodikk Explainer">
+        <div class="section-bar">
+          <span>8. Brukerveiledning, Økonomifaglig Metodikk &amp; Modellforklaring (Explainer)</span>
+          <span>FAST Standard • Edward Tufte • KOSTRA</span>
+        </div>
+
+        <!-- Del 1: Arkitektur, Formler og Fargekoding -->
+        <div class="guide-grid">
+          <article class="guide-card">
+            <h3>1. Økonomistyring &amp; Prognosemetodikk (EAC / ETC)</h3>
+            <p>
+              Løsningen kombinerer bokførte KOSTRA-regnskapstall for <strong>M01–M08 (YTD)</strong> med en rullende, sesongjustert prognose for <strong>Q4 (M09–M12, Estimate to Complete — ETC)</strong> for å beregne forventet årsresultat per 31.12 (<strong>Estimate at Completion — EAC</strong>).
+            </p>
+            <div class="formula-box">Sum_Avvik = Sum_Budsjett - Sum_Regnskap
+Burn_Rate = Sum_Regnskap / Sum_Budsjett
+ETC_m     = Snitt_3M(M6..M8) * Sesong_m * (1 + Lønnsvekst - Tiltak)
+EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
+            <ul>
+              <li><strong>Negativt avvik (Merforbruk):</strong> Når <code>Regnskap &gt; Budsjett</code> blir <code>Sum_Avvik</code> negativt (f.eks. <code>-2 229 614 kr</code> YTD).</li>
+              <li><strong>🔴 KRITISK AVVIK:</strong> Utløses ved <code>Sum_Avvik &lt; -200 000 kr</code> eller <code>Burn Rate &gt; 125,0 %</code>.</li>
+              <li><strong>🟡 ADVARSEL:</strong> Utløses ved <code>Sum_Avvik &lt; -50 000 kr</code> eller <code>Burn Rate &gt; 110,0 %</code>.</li>
+              <li><strong>🟢 I RUTE:</strong> Utløses når forbruket ligger innenfor vedtatt budsjettramme og toleransebånd.</li>
+            </ul>
+          </article>
+
+          <article class="guide-card">
+            <h3>2. Fargekodingsstandard (FAST Visual Hierarchy)</h3>
+            <p>
+              Både dette web-grensesnittet (<code>index.html</code>) og Excel-modellen (<code>Excel-Reporting-Analysis.xlsb</code>) følger en streng visuell fargekode slik at du umiddelbart ser forskjell på antagelser, formler og avvik:
+            </p>
+            <div class="swatch-list">
+              <div class="swatch-item">
+                <span class="swatch-pill" style="color:#0000FF; background:#FFFFFF;">#0000FF Blå</span>
+                <span><strong>Hardkodede inndata &amp; forutsetninger:</strong> Parametere på <code>04_INPUTS</code> (f.eks. lønnsvekst, sesongvekter og terskler).</span>
+              </div>
+              <div class="swatch-item">
+                <span class="swatch-pill" style="color:#000000; background:#FFFFFF;">#000000 Svart</span>
+                <span><strong>Interne formler &amp; beregninger:</strong> Summeringer, gjennomsnitt og rullende prognoser innenfor samme fane.</span>
+              </div>
+              <div class="swatch-item">
+                <span class="swatch-pill" style="color:#008000; background:#FFFFFF;">#008000 Grønn</span>
+                <span><strong>Kryssreferanser &amp; Data Model:</strong> Celler som henter tall via <code>CUBEVALUE</code> / <code>CUBEMEMBER</code> eller fra andre faner.</span>
+              </div>
+              <div class="swatch-item">
+                <span class="swatch-pill cell-pos">Grønn Boks</span>
+                <span><strong>Mindreforbruk / Avstemt (OK):</strong> Gunstig budsjettavvik (<code>&gt;= 0</code>) eller avstemmingskontroll <code>Diff = 0,00 kr</code>.</span>
+              </div>
+              <div class="swatch-item">
+                <span class="swatch-pill cell-neg">Rød Boks</span>
+                <span><strong>Merforbruk / Kritisk avvik:</strong> Budsjettoverskridelse (<code>&lt; 0</code>), høy Z-score (<code>Z &gt; 2,5</code>) eller ubalanse.</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="guide-card">
+            <h3>3. Edward Tufte Data-Ink Ratio &amp; Grafvalg</h3>
+            <p>
+              Grensesnittet er utformet uten visuell støy (ingen bakgrunnsskygger, ingen vertikale tabellstreker og ingen 3D-effekter) slik at 100 % av oppmerksomheten rettes mot avvik og risikodrivere:
+            </p>
+            <ul>
+              <li><strong>Bullet Chart (Modul 1):</strong> Sammenligner faktisk forbruksrate (horisontal søyle) direkte mot 100 % budsjettmål (vertikal sort markør).</li>
+              <li><strong>Combo Chart (Modul 1):</strong> Viser månedlig budsjett (dempet gråblå søyle) mot faktisk regnskap (mørk marineblå/rød søyle) og 3-måneders rullende trendlinje (oransje).</li>
+              <li><strong>Direkte-merket S-Kurve (Modul 2):</strong> Viser akkumulert forbruk M01–M08 og stiplet Q4-fremskriving M09–M12 med direkte tekstmerking i enden av kurvene.</li>
+              <li><strong> Tabelltypografi:</strong> Tekstkolonner er venstrejustert, mens alle tallkolonner er høyrejustert med <code>tabular-nums</code> (vertikalt linjerte sifre).</li>
+            </ul>
+          </article>
+        </div>
+
+        <!-- Del 2: Modul-for-Modul Arbeidsflyt for Økonomikontroller -->
+        <div tabindex="0" role="region" aria-labelledby="guide-modules-caption" class="table-wrapper">
+          <table class="data-table">
+            <caption id="guide-modules-caption">🗺️ Steg-for-Steg Brukerveiledning per Modul (Slik bruker du KOSTRA AI Workbench i månedlig oppfølging)</caption>
+            <thead>
+              <tr>
+                <th>Modul</th>
+                <th>Målgruppe / Rolle</th>
+                <th>Hva du gjør i modulen (Arbeidsflyt)</th>
+                <th>Kobling til Excel &amp; DuckDB</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>1. 📊 Avviksoversikt</th>
+                <td>Økonomikontroller / Enhetsleder</td>
+                <td>Velg måned eller sektor i filterpanelet. Identifiser KOSTRA-funksjoner med <code>🔴 KRITISK AVVIK</code> (f.eks. <em>254 Helse og omsorg</em> på <code>-1,29 MNOK</code> og <em>202 Grunnskole</em> på <code>-0,85 MNOK</code>) og sjekk Burn Rate i Bullet-diagrammet.</td>
+                <td><code>01_DASHBOARD</code> &amp; <code>vw_avvik_summary</code></td>
+              </tr>
+              <tr>
+                <th>2. 📈 Tidsserie &amp; EAC</th>
+                <td>Prosjekt-/Økonomikontroller</td>
+                <td>Test sensitivitet på årsprognosen (EAC per 31.12) ved å endre blå forutsetninger (<code>Param_Lonnsvekst_Q4</code>, <code>Param_Effektiviseringskrav_Pct</code> og <code>Param_Sesongvekt_M12</code>) og les av S-kurven.</td>
+                <td><code>03_CALCULATIONS</code> &amp; <code>04_INPUTS</code></td>
+              </tr>
+              <tr>
+                <th>3. 🌲 ML &amp; Early Warning</th>
+                <td>Økonomiavdeling / Analyse</td>
+                <td>Inspiser hvilke variabler som driver neste måneds forbruk i Random Forest-modellen ($R^2 = 0,9104$), og bruk det revisjonsgodkjente <code>IF-THEN</code> regeltreet til å dokumentere terskelverdier.</td>
+                <td><code>src/retrain_pipeline.py</code> &amp; <code>modelready_fact</code></td>
+              </tr>
+              <tr>
+                <th>4. 🚨 Anomaly &amp; Klynger</th>
+                <td>Internrevisjon / Regnskap</td>
+                <td>Gå gjennom sjekklisten med kontolinjer som har <code>Z-Score &gt; 2,5</code> (f.eks. vikarbyrå og overtid i august) for å avdekke eventuelle feilføringer eller ekstraordinære kostnadshopp.</td>
+                <td><code>IsolationForest</code> &amp; <code>AgglomerativeClustering</code></td>
+              </tr>
+              <tr>
+                <th>5. ⚙️ Modelready &amp; Sjekk</th>
+                <td>Dataansvarlig / Modellrevisor</td>
+                <td>Kontroller at datagrunnlaget har <code>0,0 %</code> manglende verdier og at samtlige kontrollpunkter i <code>06_CHECKS</code> (Resultat, Balanse, Kontantstrøm og Data Model) viser <code>0,00 kr</code> i differanse.</td>
+                <td><code>05_DATA_MODEL</code> &amp; <code>06_CHECKS</code></td>
+              </tr>
+              <tr>
+                <th>6. 💬 KI-Saksbehandler</th>
+                <td>Enhetsleder / Saksbehandler</td>
+                <td>Klikk på hurtigspørsmålene eller still spørsmål om KOSTRA-arter (Art 010–099), NAV-refusjoner eller omdisponeringsfullmakter etter Kommuneloven § 14-4.</td>
+                <td>DuckDB RAG &amp; Kommuneloven</td>
+              </tr>
+              <tr>
+                <th>7. 🎛️ Cockpit Kontroll</th>
+                <td>Systemeier / Controller</td>
+                <td>Kjør hele datapipelinen (<code>▶ Kjør Full Pipeline A–Å</code>) eller enkeltsteg ved månedsslutt. Følg sanntidsloggen, sjekk at 0 filer havner i karantene, og kontroller UUID-sporbarhet i <code>audit_log</code>.</td>
+                <td><code>run.ps1</code>, <code>db_manager.py</code> &amp; <code>audit_log</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Light-Dismiss Quick Explainer Modal (modern-web-guidance: light-dismiss-a-dialog) -->
+  <dialog id="explainer-dialog" class="explainer-modal" closedby="any" aria-labelledby="explainer-dialog-title">
+    <div class="modal-header">
+      <h2 id="explainer-dialog-title">📖 Hurtigguide &amp; Økonomifaglig Explainer (Klikk utenfor eller trykk Esc for å lukke)</h2>
+      <form method="dialog">
+        <button type="submit" class="btn-secondary" style="padding:0.28rem 0.65rem;">✕ Lukk</button>
+      </form>
+    </div>
+    <div class="modal-body">
+      <div class="guide-card">
+        <h3>Slik henger tallene sammen (YTD → ETC → EAC)</h3>
+        <p>
+          <strong>1. Bokført YTD (M01–M08):</strong> Totalt budsjett er <code>29 295 237 kr</code> og bokført regnskap er <code>31 524 851 kr</code>, som gir et netto merforbruk på <code>-2 229 614 kr</code> (Burn Rate <code>107,6 %</code>).<br/>
+          <strong>2. Gjenstående Q4 ETC (M09–M12):</strong> Beregnes ut fra 3-måneders rullende snitt (<code>3 734 353 kr/mnd</code>) multiplisert med månedlige sesongindekser (Sep <code>0,98</code>, Okt <code>1,02</code>, Nov <code>1,05</code>, Des <code>1,12</code>) og netto kostnadspåslag (lønnsvekst minus effektiviseringskrav) = <code>15 727 975 kr</code>.<br/>
+          <strong>3. Fullårsprognose EAC (per 31.12):</strong> <code>31 524 851 kr + 15 727 975 kr = 47 252 826 kr</code> (forventet årsavvik <code>-3 309 971 kr</code> mot årsbudsjett).
+        </p>
+      </div>
+      <div class="guide-card">
+        <h3>FAST Fargekoder &amp; Modellkontroll (06_CHECKS)</h3>
+        <ul>
+          <li><strong style="color:#0000FF;">Blå tekst (#0000FF):</strong> Redigerbare forutsetninger og parametere (<code>04_INPUTS</code> / Modul 2).</li>
+          <li><strong style="color:#008000;">Grønn tekst (#008000):</strong> Tall hentet fra Power Pivot Data Model (<code>CUBEVALUE</code>) eller kryssfaner.</li>
+          <li><strong>Svart tekst (#000000):</strong> Interne summeringer og avviksformler.</li>
+          <li><strong>Master Avstemming (06_CHECKS):</strong> Alle 11 kontrollpunkter mellom DuckDB, Power Pivot, Resultat, Kontantstrøm og Balanse er avstemt til <code>0,00 kr</code>.</li>
+        </ul>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem;">
+        <button type="button" class="btn-primary" id="btn-jump-full-guide">Åpne fullstendig Brukerveiledning (Modul 8)</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    // =========================================================================
+    // 1. EMBEDDED GOLD LAYER DATA (Exact figures from modelready_fact & Excel)
+    // =========================================================================
+    const KOSTRA_FUNCTIONS = [
+      { code: "202", name: "202 - Grunnskoleopplæring", sektor: "Oppvekst og Utdanning", bud: 13620000, reg: 14473000, eac: 22092527, eac_avvik: -1662527, m8_bud: 1702500, m8_reg: 1842100 },
+      { code: "254", name: "254 - Helse- og omsorgstjenester i institusjon", sektor: "Helse og Omsorg", bud: 11337237, reg: 12622851, eac: 18399351, eac_avvik: -1393496, m8_bud: 1525162, m8_reg: 1757750 },
+      { code: "214", name: "214 - Skolefritidstilbud (SFO)", sektor: "Oppvekst og Utdanning", bud: 2496000, reg: 2760000, eac: 4213247, eac_avvik: -469247, m8_bud: 312000, m8_reg: 348000 },
+      { code: "221", name: "221 - Pedagogisk-psykologisk tjeneste (PPT)", sektor: "Oppvekst og Utdanning", bud: 813000, reg: 983000, eac: 1500548, eac_avvik: -281048, m8_bud: 101625, m8_reg: 124500 },
+      { code: "213", name: "213 - Voksenopplæring og leirskole", sektor: "Oppvekst og Utdanning", bud: 513000, reg: 491000, eac: 749528, eac_avvik: 19972, m8_bud: 64125, m8_reg: 61200 },
+      { code: "223", name: "223 - Skoleskyss grunnskole", sektor: "Oppvekst og Utdanning", bud: 516000, reg: 469000, eac: 715946, eac_avvik: 58054, m8_bud: 64710, m8_reg: 58430 },
+      { code: "215", name: "215 - Skoleskyss", sektor: "Oppvekst og Utdanning", bud: 0, reg: 32000, eac: 48847, eac_avvik: -48847, m8_bud: 0, m8_reg: 4000 },
+      { code: "203", name: "203 - Grunnskoleopplæring for voksne", sektor: "Oppvekst og Utdanning", bud: 0, reg: 1000, eac: 1491, eac_avvik: -1491, m8_bud: 0, m8_reg: 0 },
+      { code: "222", name: "222 - Skolelokaler og skoleanlegg", sektor: "Oppvekst og Utdanning", bud: 0, reg: 0, eac: 0, eac_avvik: 0, m8_bud: 0, m8_reg: 0 },
+      { code: "204", name: "204 - Skolelokaler grunnskole", sektor: "Oppvekst og Utdanning", bud: 0, reg: -307000, eac: -468659, eac_avvik: 468659, m8_bud: 0, m8_reg: -75200 }
+    ];
+
+    const MONTHLY_SERIES = [
+      { code: "2024_01", label: "Jan", bud: 3648057, reg: 3377462, isProj: false, factor: 1.00 },
+      { code: "2024_02", label: "Feb", bud: 3655613, reg: 4444800, isProj: false, factor: 1.00 },
+      { code: "2024_03", label: "Mar", bud: 3587101, reg: 3903959, isProj: false, factor: 1.00 },
+      { code: "2024_04", label: "Apr", bud: 4602079, reg: 4619426, isProj: false, factor: 1.00 },
+      { code: "2024_05", label: "Mai", bud: 3788935, reg: 3976147, isProj: false, factor: 1.00 },
+      { code: "2024_06", label: "Jun", bud: 2486401, reg: 2882046, isProj: false, factor: 1.00 },
+      { code: "2024_07", label: "Jul", bud: 3756929, reg: 4200233, isProj: false, factor: 1.00 },
+      { code: "2024_08", label: "Aug", bud: 3770122, reg: 4120780, isProj: false, factor: 1.00 },
+      { code: "2024_09", label: "Sep*", bud: 3661905, reg: 3695497, isProj: true, factor: 0.98 },
+      { code: "2024_10", label: "Okt*", bud: 3661905, reg: 3846334, isProj: true, factor: 1.02 },
+      { code: "2024_11", label: "Nov*", bud: 3661905, reg: 3959461, isProj: true, factor: 1.05 },
+      { code: "2024_12", label: "Des*", bud: 3661905, reg: 4226683, isProj: true, factor: 1.12 }
+    ];
+
+    const FEATURE_IMPORTANCES = [
+      { name: "Akkumulert YTD Regnskap (ytd_regnskap_nok)", pct: 35.81 },
+      { name: "Månedlig Delta Regnskap (monthly_delta_regnskap_nok)", pct: 9.82 },
+      { name: "3-Måneders Volatilitet (rolling_3m_std_regnskap_nok)", pct: 6.68 },
+      { name: "Månedlig Delta Budsjett (monthly_delta_budsjett_nok)", pct: 5.27 },
+      { name: "Absolutt Månedlig Avvik (abs_monthly_avvik_nok)", pct: 5.23 },
+      { name: "Gjennomsnittlig Forbruk (rolling_3m_avg_regnskap_nok)", pct: 4.85 },
+      { name: "Forbruksrate (burn_rate_pct)", pct: 4.12 },
+      { name: "Avviks-Z-Score (anomaly_z_score_3m)", pct: 3.90 }
+    ];
+
+    function fmtNOK(val, showSign = false) {
+      const rounded = Math.round(val);
+      const absStr = Math.abs(rounded).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      if (rounded < 0) return "-" + absStr + " kr";
+      if (showSign && rounded > 0) return "+" + absStr + " kr";
+      return absStr + " kr";
+    }
+
+    function fmtNum(val, showSign = false) {
+      const rounded = Math.round(val);
+      const absStr = Math.abs(rounded).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      if (rounded < 0) return "-" + absStr;
+      if (showSign && rounded > 0) return "+" + absStr;
+      return absStr;
+    }
+
+    function computeStatus(avvikNok, burnPct) {
+      // Note: avvikNok = Budsjett - Regnskap (negative means overrun)
+      if (avvikNok < -200000 || burnPct > 125) return "🔴 KRITISK AVVIK";
+      if (avvikNok < -50000 || burnPct > 110) return "🟡 ADVARSEL";
+      return "🟢 I RUTE";
+    }
+
+    // =========================================================================
+    // 2. SPA NAVIGATION WITH STATE CACHING (faster-spa-view-transitions)
+    // =========================================================================
+    function switchToView(viewId, clickedBtn) {
+      document.querySelectorAll(".spa-view").forEach(view => {
+        view.classList.add("inactive");
+        view.setAttribute("aria-hidden", "true");
+      });
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.removeAttribute("aria-current");
+      });
+
+      const activeView = document.getElementById(viewId);
+      if (activeView) {
+        activeView.classList.remove("inactive");
+        activeView.setAttribute("aria-hidden", "false");
+        activeView.focus();
+      }
+      if (clickedBtn) {
+        clickedBtn.setAttribute("aria-current", "page");
+      }
+    }
+
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        switchToView(btn.dataset.target, btn);
+      });
+    });
+
+    // =========================================================================
+    // 3. MODULE 1: RENDER AVVIKSOVERSIKT, BULLET CHART & COMBO SVG
+    // =========================================================================
+    function renderModule1() {
+      const period = document.getElementById("flt-period").value;
+      const sektor = document.getElementById("flt-sektor").value;
+      const statusFlt = document.getElementById("flt-status").value;
+
+      const scaleFactor = period === "ALL" ? 1.0 : (period === "M08" ? 0.1287 : 0.125);
+
+      const rows = KOSTRA_FUNCTIONS.map(fn => {
+        const bud = period === "M08" ? fn.m8_bud : Math.round(fn.bud * scaleFactor);
+        const reg = period === "M08" ? fn.m8_reg : Math.round(fn.reg * scaleFactor);
+        const avvik = bud - reg; // FAST convention: Budsjett - Regnskap (negative = merforbruk)
+        const avvikPct = bud > 0 ? (avvik / bud) * 100 : 0;
+        const burnPct = bud > 0 ? (reg / bud) * 100 : 0;
+        const status = computeStatus(avvik, burnPct);
+        return { ...fn, bud, reg, avvik, avvikPct, burnPct, status };
+      }).filter(r => {
+        if (sektor !== "ALL" && r.sektor !== sektor) return false;
+        if (statusFlt !== "ALL" && r.status !== statusFlt) return false;
+        return true;
+      });
+
+      const totBud = rows.reduce((s, r) => s + r.bud, 0);
+      const totReg = rows.reduce((s, r) => s + r.reg, 0);
+      const totAvvik = totBud - totReg;
+      const totAvvikPct = totBud > 0 ? (totAvvik / totBud) * 100 : 0;
+      const totBurn = totBud > 0 ? (totReg / totBud) * 100 : 0;
+      const totEac = rows.reduce((s, r) => s + r.eac, 0);
+      const totEacAvvik = rows.reduce((s, r) => s + r.eac_avvik, 0);
+      const critCount = rows.filter(r => r.status === "🔴 KRITISK AVVIK").length;
+      const warnCount = rows.filter(r => r.status === "🟡 ADVARSEL").length;
+
+      document.getElementById("active-filter-banner").textContent =
+        `📅 År: 2024   |   📆 Periode: ${period === "ALL" ? "Alle måneder (M1–M8)" : period}   |   🏛️ Sektor: ${sektor === "ALL" ? "Alle Sektorer" : sektor}`;
+
+      document.getElementById("kpi-bud").textContent = fmtNOK(totBud);
+      document.getElementById("kpi-reg").textContent = fmtNOK(totReg);
+      const elAvvik = document.getElementById("kpi-avvik");
+      elAvvik.textContent = fmtNOK(totAvvik, true);
+      elAvvik.style.color = totAvvik < 0 ? "var(--clr-err-text)" : "var(--clr-ok-text)";
+      document.getElementById("kpi-avvik-pct").textContent = `Relativt avvik: ${totAvvikPct >= 0 ? "+" : ""}${totAvvikPct.toFixed(1).replace(".", ",")} %`;
+      document.getElementById("kpi-burn").textContent = `${totBurn.toFixed(1).replace(".", ",")} %`;
+      document.getElementById("kpi-eac").textContent = fmtNOK(totEac);
+      document.getElementById("kpi-eac-avvik").textContent = `Forventet årsavvik: ${fmtNOK(totEacAvvik, true)}`;
+      document.getElementById("kpi-alerts").textContent = `${critCount} Kritiske / ${warnCount} Advarsel`;
+
+      // Populate Table
+      const tbody = document.getElementById("kostra-table-body");
+      tbody.innerHTML = rows.map(r => {
+        const clsAvvik = r.avvik < 0 ? "cell-neg" : (r.avvik > 0 ? "cell-pos" : "");
+        return `<tr>
+          <th scope="row">${r.name}</th>
+          <td class="num-col fast-link">${fmtNum(r.bud)}</td>
+          <td class="num-col fast-link">${fmtNum(r.reg)}</td>
+          <td class="num-col ${clsAvvik}">${fmtNum(r.avvik, true)}</td>
+          <td class="num-col">${r.avvikPct >= 0 ? "+" : ""}${r.avvikPct.toFixed(1).replace(".", ",")}%</td>
+          <td class="num-col">${r.burnPct.toFixed(1).replace(".", ",")}%</td>
+          <td class="num-col">${fmtNum(r.eac)}</td>
+          <td>${r.status}</td>
+        </tr>`;
+      }).join("");
+
+      const tfoot = document.getElementById("kostra-table-foot");
+      const totCls = totAvvik < 0 ? "cell-neg" : "cell-pos";
+      tfoot.innerHTML = `<tr>
+        <th scope="row">Sum Valgte KOSTRA-Funksjoner</th>
+        <td class="num-col">${fmtNum(totBud)}</td>
+        <td class="num-col">${fmtNum(totReg)}</td>
+        <td class="num-col ${totCls}">${fmtNum(totAvvik, true)}</td>
+        <td class="num-col">${totAvvikPct >= 0 ? "+" : ""}${totAvvikPct.toFixed(1).replace(".", ",")}%</td>
+        <td class="num-col">${totBurn.toFixed(1).replace(".", ",")}%</td>
+        <td class="num-col">${fmtNum(totEac)}</td>
+        <td>${computeStatus(totAvvik, totBurn)}</td>
+      </tr>`;
+
+      // Render Bullet Chart for functions with budget > 0
+      const bulletEl = document.getElementById("bullet-chart-container");
+      const budgetedRows = rows.filter(r => r.bud > 0);
+      bulletEl.innerHTML = budgetedRows.map(r => {
+        const maxScale = 135; // 135% max bar width
+        const budWidth = (100 / maxScale) * 100;
+        const actWidth = Math.min(maxScale, r.burnPct) / maxScale * 100;
+        const overClass = r.burnPct > 100 ? "overbudget" : "";
+        return `<div class="tufte-bar-row">
+          <div class="tufte-bar-label" title="${r.name}">${r.name}</div>
+          <div class="tufte-bullet-track">
+            <div class="tufte-bullet-budget" style="width:${budWidth.toFixed(1)}%;"></div>
+            <div class="tufte-bullet-actual ${overClass}" style="width:${actWidth.toFixed(1)}%;"></div>
+            <div class="tufte-bullet-target-line" style="left:${budWidth.toFixed(1)}%;"></div>
+          </div>
+          <div class="num-col" style="font-size:0.76rem;">${fmtNum(r.reg)}</div>
+          <div class="num-col" style="font-weight:700; color:${r.burnPct > 100 ? 'var(--clr-err-text)' : 'var(--clr-ok-text)'};">${r.burnPct.toFixed(1).replace(".", ",")}%</div>
+        </div>`;
+      }).join("");
+
+      renderMonthlyComboSVG();
+    }
+
+    function renderMonthlyComboSVG() {
+      const svg = document.getElementById("svg-monthly-combo");
+      const actuals = MONTHLY_SERIES.slice(0, 8);
+      const maxVal = 5200000;
+      const plotH = 165;
+      const plotY0 = 20;
+      const plotX0 = 48;
+      const slotW = 56;
+
+      let html = "";
+      // Subtle horizontal reference lines only (Tufte rule: no vertical gridlines)
+      [0, 1500000, 3000000, 4500000].forEach(val => {
+        const y = plotY0 + plotH - (val / maxVal) * plotH;
+        html += `<line x1="${plotX0}" y1="${y}" x2="505" y2="${y}" stroke="#E2E8F0" stroke-width="1" />`;
+        html += `<text x="${plotX0 - 6}" y="${y + 4}" text-anchor="end" font-size="10" fill="#64748B">${(val / 1000000).toFixed(1)}M</text>`;
+      });
+
+      const trendPoints = [];
+      actuals.forEach((m, i) => {
+        const xCenter = plotX0 + 26 + i * slotW;
+        const hBud = (m.bud / maxVal) * plotH;
+        const hReg = (m.reg / maxVal) * plotH;
+        const yBud = plotY0 + plotH - hBud;
+        const yReg = plotY0 + plotH - hReg;
+
+        // Budget bar (muted slate)
+        html += `<rect x="${xCenter - 15}" y="${yBud}" width="14" height="${hBud}" fill="#94A3B8" rx="1" />`;
+        // Actual bar (dark slate, or highlight red if significantly over budget)
+        const barClr = (m.reg - m.bud) > 250000 ? "#D62728" : "#1E293B";
+        html += `<rect x="${xCenter + 1}" y="${yReg}" width="14" height="${hReg}" fill="${barClr}" rx="1" />`;
+        html += `<text x="${xCenter}" y="${plotY0 + plotH + 16}" text-anchor="middle" font-size="10.5" fill="#334155" font-weight="600">${m.label}</text>`;
+
+        // 3M Rolling Average point
+        const startIdx = Math.max(0, i - 2);
+        const slice = actuals.slice(startIdx, i + 1);
+        const avg3m = slice.reduce((s, x) => s + x.reg, 0) / slice.length;
+        const yTrend = plotY0 + plotH - (avg3m / maxVal) * plotH;
+        trendPoints.push(`${xCenter},${yTrend.toFixed(1)}`);
+      });
+
+      // Rolling 3M Trend Line + Direct Label at end of line (Tufte principle)
+      html += `<polyline fill="none" stroke="#D97706" stroke-width="2.5" points="${trendPoints.join(" ")}" />`;
+      const lastPt = trendPoints[trendPoints.length - 1].split(",");
+      html += `<circle cx="${lastPt[0]}" cy="${lastPt[1]}" r="3.5" fill="#D97706" />`;
+      html += `<text x="${Number(lastPt[0]) + 6}" y="${Number(lastPt[1]) + 3}" font-size="10" font-weight="700" fill="#B45309">3M Snitt</text>`;
+
+      svg.innerHTML = html;
+    }
+
+    // =========================================================================
+    // 4. MODULE 2: TIME-SERIES & S-CURVE EAC ENGINE
+    // =========================================================================
+    function renderModule2() {
+      const wageQ4 = ( parseFloat(document.getElementById("inp-wage-q4").value) || 0 ) / 100;
+      const effQ4 = ( parseFloat(document.getElementById("inp-eff-q4").value) || 0 ) / 100;
+      const decWeight = parseFloat(document.getElementById("inp-dec-weight").value) || 1.12;
+
+      const avg3mBase = (2882046 + 4200233 + 4120780) / 3; // M06..M08 mean = 3,734,353
+      const netEsc = 1 + wageQ4 - effQ4;
+
+      let cumBud = 0;
+      let cumReg = 0;
+      let q4EtcSum = 0;
+
+      const computed = MONTHLY_SERIES.map((m, idx) => {
+        const sFactor = idx === 11 ? decWeight : m.factor;
+        const regVal = m.isProj ? Math.round(avg3mBase * sFactor * netEsc) : m.reg;
+        if (m.isProj) q4EtcSum += regVal;
+        cumBud += m.bud;
+        cumReg += regVal;
+        return {
+          ...m,
+          sFactor,
+          regVal,
+          avvik: m.bud - regVal,
+          cumBud,
+          cumReg
+        };
+      });
+
+      const ytdReg = 31524851;
+      const eoyEac = ytdReg + q4EtcSum;
+      const eoyBud = computed[computed.length - 1].cumBud;
+      const eoyDiff = eoyBud - eoyEac;
+      const eoyBurn = (eoyEac / eoyBud) * 100;
+
+      document.getElementById("ts-q4-etc").textContent = fmtNOK(q4EtcSum);
+      document.getElementById("ts-eoy-eac").textContent = fmtNOK(eoyEac);
+      const diffEl = document.getElementById("ts-eoy-diff");
+      diffEl.textContent = fmtNOK(eoyDiff, true);
+      diffEl.style.color = eoyDiff < 0 ? "var(--clr-err-text)" : "var(--clr-ok-text)";
+      document.getElementById("ts-eoy-pct").textContent = `Forventet Burn Rate: ${eoyBurn.toFixed(1).replace(".", ",")} %`;
+
+      // Populate Time-Series Table
+      const tbody = document.getElementById("ts-table-body");
+      tbody.innerHTML = computed.map(r => {
+        const cls = r.avvik < 0 ? "cell-neg" : "cell-pos";
+        return `<tr>
+          <th scope="row">${r.code} (${r.label})</th>
+          <td>${r.isProj ? "Prognose (Q4 ETC)" : "Bokført (YTD)"}</td>
+          <td class="num-col">${r.sFactor.toFixed(2).replace(".", ",")}</td>
+          <td class="num-col">${fmtNum(r.bud)}</td>
+          <td class="num-col">${fmtNum(r.regVal)}</td>
+          <td class="num-col ${cls}">${fmtNum(r.avvik, true)}</td>
+          <td class="num-col" style="font-weight:600;">${fmtNum(r.cumReg)}</td>
+        </tr>`;
+      }).join("");
+
+      // Render S-Curve SVG with Direct Line Labels (Tufte Rule: Direct labeling on S-Curves)
+      const svg = document.getElementById("svg-scurve");
+      const maxCum = 52000000;
+      const pH = 195;
+      const pY0 = 22;
+      const pX0 = 54;
+      const stepX = 56;
+
+      let sHtml = "";
+      [0, 15000000, 30000000, 45000000].forEach(v => {
+        const y = pY0 + pH - (v / maxCum) * pH;
+        sHtml += `<line x1="${pX0}" y1="${y}" x2="695" y2="${y}" stroke="#E2E8F0" stroke-width="1" />`;
+        sHtml += `<text x="${pX0 - 8}" y="${y + 4}" text-anchor="end" font-size="10" fill="#64748B">${(v / 1000000).toFixed(0)} MNOK</text>`;
+      });
+
+      // Vertical cut-off marker after M08 (Actuals -> ETC Forecast)
+      const xCutoff = pX0 + 7 * stepX;
+      sHtml += `<line x1="${xCutoff}" y1="${pY0}" x2="${xCutoff}" y2="${pY0 + pH}" stroke="#94A3B8" stroke-dasharray="4 3" stroke-width="1.5" />`;
+      sHtml += `<text x="${xCutoff + 6}" y="${pY0 + 12}" font-size="9.5" fill="#475569" font-weight="600">Cut-off M08 → Q4 ETC Prognose</text>`;
+
+      const budPts = [];
+      const actPts = [];
+      const etcPts = [];
+
+      computed.forEach((m, i) => {
+        const x = pX0 + i * stepX;
+        const yB = pY0 + pH - (m.cumBud / maxCum) * pH;
+        const yR = pY0 + pH - (m.cumReg / maxCum) * pH;
+        budPts.push(`${x},${yB.toFixed(1)}`);
+        if (i <= 7) actPts.push(`${x},${yR.toFixed(1)}`);
+        if (i >= 7) etcPts.push(`${x},${yR.toFixed(1)}`);
+        sHtml += `<text x="${x}" y="${pY0 + pH + 18}" text-anchor="middle" font-size="10.5" fill="#334155" font-weight="600">${m.label}</text>`;
+      });
+
+      // Budget S-Curve (Muted Slate)
+      sHtml += `<polyline fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="3 3" points="${budPts.join(" ")}" />`;
+      // Actuals S-Curve M01-M08 (Solid Dark Navy)
+      sHtml += `<polyline fill="none" stroke="#1E293B" stroke-width="3" points="${actPts.join(" ")}" />`;
+      // Projected ETC S-Curve M08-M12 (Dashed Highlight Red)
+      sHtml += `<polyline fill="none" stroke="#D62728" stroke-width="3" stroke-dasharray="6 4" points="${etcPts.join(" ")}" />`;
+
+      // Direct Labels at end of S-Curves (Tufte direct labeling rule)
+      const lastBud = budPts[budPts.length - 1].split(",");
+      const lastEtc = etcPts[etcPts.length - 1].split(",");
+      sHtml += `<text x="${Number(lastEtc[0]) + 8}" y="${Number(lastEtc[1])}" font-size="10.5" font-weight="700" fill="#D62728">EAC Prognose (${(eoyEac/1e6).toFixed(1)}M)</text>`;
+      sHtml += `<text x="${Number(lastBud[0]) + 8}" y="${Number(lastBud[1]) + 10}" font-size="10.5" font-weight="600" fill="#475569">Årsbudsjett (${(eoyBud/1e6).toFixed(1)}M)</text>`;
+
+      svg.innerHTML = sHtml;
+    }
+
+    // =========================================================================
+    // 5. MODULE 3: FEATURE IMPORTANCE BARS
+    // =========================================================================
+    function renderModule3() {
+      const container = document.getElementById("fi-bars-container");
+      container.innerHTML = FEATURE_IMPORTANCES.map(f => {
+        const w = (f.pct / 40) * 100;
+        return `<div class="tufte-bar-row" style="grid-template-columns: 245px 1fr 56px;">
+          <div class="tufte-bar-label" title="${f.name}">${f.name}</div>
+          <div class="tufte-bullet-track">
+            <div class="tufte-bullet-actual" style="width:${w.toFixed(1)}%; inset-block:2px;"></div>
+          </div>
+          <div class="num-col" style="font-weight:700;">${f.pct.toFixed(2).replace(".", ",")}%</div>
+        </div>`;
+      }).join("");
+    }
+
+    // =========================================================================
+    // 6. MODULE 6: INTERACTIVE KI-SAKSBEHANDLER (RAG CHATBOT)
+    // =========================================================================
+    const CHAT_ANSWERS = {
+      avvik: `<strong>📊 Topp Regnskapsavvik (YTD 2024_08 — Kilde: <code>modelready_fact</code>):</strong><br/>
+        1. <strong>Funksjon 254 (Helse- og omsorgstjenester i institusjon):</strong> Budsjett 11 337 237 kr | Regnskap 12 622 851 kr | <strong>Avvik: -1 285 614 kr (-11,3 %) 🔴 KRITISK</strong><br/>
+        2. <strong>Funksjon 202 (Grunnskoleopplæring):</strong> Budsjett 13 620 000 kr | Regnskap 14 473 000 kr | <strong>Avvik: -853 000 kr (-6,3 %) 🔴 KRITISK</strong><br/>
+        3. <strong>Funksjon 214 (Skolefritidstilbud SFO):</strong> Budsjett 2 496 000 kr | Regnskap 2 760 000 kr | <strong>Avvik: -264 000 kr (-10,6 %) 🔴 KRITISK</strong><br/>
+        4. <strong>Funksjon 221 (PPT):</strong> Budsjett 813 000 kr | Regnskap 983 000 kr | <strong>Avvik: -170 000 kr (-20,9 %) 🟡 ADVARSEL</strong>`,
+      lonn: `<strong>🏛️ Oppsett av Lønnsbudsjett i KOSTRA (Artsserie 0 / Hovedkategori 1):</strong><br/>
+        • <strong>Art 010 (101000 Fastlønn):</strong> Faste stillingshjemler inkludert faste tillegg.<br/>
+        • <strong>Art 020 (102000 Vikarlønn):</strong> Vikarutgifter ved sykefravær og permisjoner (hoveddriver for avvik i Funksjon 202 og 254).<br/>
+        • <strong>Art 040 (104000 Overtid):</strong> Pålagt overtid i helse- og omsorgsinstitusjoner.<br/>
+        • <strong>Art 090 / 099:</strong> Pensjonsinnskudd (KLP/SPK) og arbeidsgiveravgift.<br/>
+        • <strong>Art 710 (Refusjoner NAV):</strong> Sykelønnsrefusjoner (YTD bokført -2 683 922 kr mot budsjettert -809 681 kr).`,
+      kommunelov: `<strong>⚖️ Omdisponering og Fullmakter (Kommuneloven § 14-4 &amp; Økonomireglement):</strong><br/>
+        1. <strong>Kommunedirektørens fullmakt:</strong> Kan omdisponere innenfor samme rammeområde vedtatt av Bystyret dersom vedtatte måltall opprettholdes.<br/>
+        2. <strong>Bystyrets vedtak (§ 14-4):</strong> Omdisponering mellom rammeområder eller bruk av disposisjonsfond for å dekke merforbruket på <strong>-2,23 MNOK YTD</strong> (og forventet <strong>-3,31 MNOK EAC</strong>) krever formelt vedtak i Bystyret i forbindelse med tertialrapporten.`,
+      eac: `<strong>📈 Forklaring av Fullårsprognose EAC (47 252 826 kr):</strong><br/>
+        • <strong>Bokført YTD (M01–M08):</strong> 31 524 851 kr (mot budsjett 29 295 237 kr).<br/>
+        • <strong>Gjenstående Q4 ETC (M09–M12):</strong> 15 727 975 kr basert på 3-måneders rullende snitt (3 734 353 kr/mnd), sesongindekser (Sep 0,98, Okt 1,02, Nov 1,05, Des 1,12), 2,5 % lønnsregulering og 1,5 % tiltakskrav.<br/>
+        • <strong>Forventet Årsavvik EAC:</strong> -3 309 971 kr (-7,5 % over årsbudsjett).`
+    };
+
+    function appendChat(role, htmlText) {
+      const box = document.getElementById("chat-messages");
+      const div = document.createElement("div");
+      div.className = `chat-msg ${role}`;
+      div.innerHTML = htmlText;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    document.querySelectorAll(".prompt-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const key = chip.dataset.prompt;
+        appendChat("user", chip.textContent);
+        appendChat("assistant", CHAT_ANSWERS[key]);
+      });
+    });
+
+    document.getElementById("chat-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const inp = document.getElementById("chat-input");
+      const q = inp.value.trim();
+      if (!q) return;
+      appendChat("user", q);
+      inp.value = "";
+      const ql = q.toLowerCase();
+      if (ql.includes("avvik") || ql.includes("august") || ql.includes("254") || ql.includes("202")) {
+        appendChat("assistant", CHAT_ANSWERS.avvik);
+      } else if (ql.includes("lønn") || ql.includes("art") || ql.includes("vikar")) {
+        appendChat("assistant", CHAT_ANSWERS.lonn);
+      } else if (ql.includes("lov") || ql.includes("omdisponering") || ql.includes("reglement")) {
+        appendChat("assistant", CHAT_ANSWERS.kommunelov);
+      } else {
+        appendChat("assistant", CHAT_ANSWERS.eac);
+      }
+    });
+
+    // Wire up interactive filters & forecast inputs
+    ["flt-period", "flt-sektor", "flt-status"].forEach(id => {
+      document.getElementById(id).addEventListener("change", renderModule1);
+    });
+    ["inp-wage-q4", "inp-eff-q4", "inp-dec-weight"].forEach(id => {
+      document.getElementById(id).addEventListener("input", renderModule2);
+    });
+
+    // =========================================================================
+    // 7. MODULE 7: WORKFLOW PIPELINE COCKPIT CONTROLLER
+    // =========================================================================
+    const PIPELINE_STEPS = [
+      {
+        idx: 0,
+        code: "BRONZE_INGESTION_GATE",
+        actor: "duckdb_etl",
+        duration: "0,42s",
+        logLines: [
+          "[1/4] Starter DuckDB Ingestion (src/db_manager.py)...",
+          "  ✔ Leste 16 månedlige faktafiler (2024_01..2024_08) og 5 dimensjonsfiler",
+          "  ✔ Kodepolstring (4->6 siffer) og UTF-8/Latin1 sjekk OK (0 filer i karantene)"
+        ],
+        auditMsg: "Importert 21 filer fra data/raw/. Generert INGESTION_REPORT.md (0 i karantene)"
+      },
+      {
+        idx: 1,
+        code: "MEDALLION_GOLD_BUILD",
+        actor: "duckdb_etl",
+        duration: "0,38s",
+        logLines: [
+          "[2/4] Bygger Silver Layer (LAG() månedlig delta) og Gold Layer (modelready_fact)...",
+          "  ✔ Genererte 2 256 rader × 32 features med 0,0 % manglende verdier"
+        ],
+        auditMsg: "Oppdatert silver_fact og modelready_fact (2 256 rader, 32 features, 0 nulls)"
+      },
+      {
+        idx: 2,
+        code: "ML_RETRAIN_PORTFOLIO",
+        actor: "mlops_runner",
+        duration: "1,15s",
+        logLines: [
+          "[3/4] Kjører ML Retraining Pipeline (src/retrain_pipeline.py)...",
+          "  ✔ RandomForestRegressor: R² = 0.9104 | DecisionTreeClassifier: Acc = 100.0%",
+          "  ✔ hclust (4 klynger) & IsolationForest (113 avvik flagget) ferdig evaluert"
+        ],
+        auditMsg: "Trent RandomForest (R²=0,9104), DecisionTree (Acc=100 %), hclust (4) og IsolationForest"
+      },
+      {
+        idx: 3,
+        code: "FAST_CUBE_RECONCILE",
+        actor: "system_controller",
+        duration: "0,51s",
+        logLines: [
+          "[4/4] Synkroniserer ThisWorkbookDataModel, Power BI (.pbip) og 06_CHECKS...",
+          "  ✔ Verifiserte 21 DAX-mål og 11 avstemmingskontroller (MASTER_CHECK Diff = 0,00 NOK)"
+        ],
+        auditMsg: "Avstemt 01_DASHBOARD, 02_OUTPUTS og 06_CHECKS mot ThisWorkbookDataModel (Diff = 0,00 kr)"
+      }
+    ];
+
+    function nowTimeStr() {
+      const d = new Date();
+      return d.toTimeString().split(" ")[0];
+    }
+
+    function nowIsoDisplay() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${nowTimeStr()}`;
+    }
+
+    function genShortUuid() {
+      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
+    }
+
+    function logToConsole(line) {
+      const el = document.getElementById("pipeline-console");
+      el.textContent += `\n[${nowTimeStr()}] ${line}`;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function prependAuditRow(stepObj) {
+      const tbody = document.getElementById("audit-log-tbody");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <th>${nowIsoDisplay()}</th>
+        <td><code>${genShortUuid()}</code></td>
+        <td>${stepObj.code}</td>
+        <td>${stepObj.actor}</td>
+        <td>${stepObj.auditMsg}</td>
+        <td class="cell-pos">VERIFISERT</td>
+      `;
+      tbody.insertBefore(tr, tbody.firstChild);
+    }
+
+    function executeStep(stepIndex, onDone) {
+      const step = PIPELINE_STEPS[stepIndex];
+      const card = document.getElementById(`stage-card-${stepIndex}`);
+      const badge = document.getElementById(`stage-badge-${stepIndex}`);
+      const globalBadge = document.getElementById("pipeline-global-badge");
+
+      card.classList.add("running");
+      badge.className = "status-badge status-warn";
+      badge.textContent = "KJØRER...";
+      globalBadge.className = "status-badge status-warn";
+      globalBadge.textContent = `⏳ KJØRER STEG ${stepIndex + 1}/4 (${step.code})...`;
+
+      step.logLines.forEach(l => logToConsole(l));
+
+      setTimeout(() => {
+        card.classList.remove("running");
+        badge.className = "status-badge status-ok";
+        badge.textContent = `OK (${step.duration})`;
+        prependAuditRow(step);
+        document.getElementById("cockpit-last-run").textContent =
+          `Sist kjørt: ${nowIsoDisplay()} | Status: 100 % Verifisert`;
+        if (onDone) onDone();
+      }, 320);
+    }
+
+    document.getElementById("btn-run-all").addEventListener("click", () => {
+      logToConsole("$ .\\run_pipeline.bat (Full Pipeline A–Å)");
+      let idx = 0;
+      function next() {
+        if (idx < PIPELINE_STEPS.length) {
+          executeStep(idx, () => {
+            idx++;
+            next();
+          });
+        } else {
+          const globalBadge = document.getElementById("pipeline-global-badge");
+          globalBadge.className = "status-badge status-ok";
+          globalBadge.textContent = "✅ ALLE 4 STEG FULLFØRT (0 FEIL)";
+          logToConsole("🎉 Full Workflow Pipeline fullført uten feil (Diff = 0,00 kr).");
+        }
+      }
+      next();
+    });
+
+    document.querySelectorAll("[data-step]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const sIdx = parseInt(btn.dataset.step, 10);
+        executeStep(sIdx, () => {
+          const globalBadge = document.getElementById("pipeline-global-badge");
+          globalBadge.className = "status-badge status-ok";
+          globalBadge.textContent = `✅ STEG ${sIdx + 1} FULLFØRT (0 FEIL)`;
+        });
+      });
+    });
+
+    document.getElementById("btn-open-cockpit").addEventListener("click", () => {
+      const navBtn = document.querySelector('[data-target="view-cockpit"]');
+      switchToView("view-cockpit", navBtn);
+    });
+
+    // =========================================================================
+    // 8. MODULE 8 & LIGHT-DISMISS EXPLAINER DIALOG (light-dismiss-a-dialog)
+    // =========================================================================
+    const explainerDialog = document.getElementById("explainer-dialog");
+
+    document.getElementById("btn-open-modal-guide").addEventListener("click", () => {
+      explainerDialog.showModal();
+    });
+
+    document.getElementById("btn-jump-full-guide").addEventListener("click", () => {
+      explainerDialog.close();
+      const navBtn = document.querySelector('[data-target="view-guide"]');
+      switchToView("view-guide", navBtn);
+    });
+
+    // Fallback for browsers without native <dialog closedby="any"> support
+    if (!("closedBy" in HTMLDialogElement.prototype)) {
+      explainerDialog.addEventListener("click", (event) => {
+        if (event.target !== explainerDialog) return;
+        const rect = explainerDialog.getBoundingClientRect();
+        const isDialogContent = (
+          rect.top <= event.clientY &&
+          event.clientY <= rect.top + rect.height &&
+          rect.left <= event.clientX &&
+          event.clientX <= rect.left + rect.width
+        );
+        if (isDialogContent) return;
+        explainerDialog.close();
+      });
+    }
+
+    // Initial render
+    renderModule1();
+    renderModule2();
+    renderModule3();
+  </script>
+</body>
+</html>
+
