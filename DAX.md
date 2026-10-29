@@ -77,8 +77,8 @@ VAR BurnRate = [Burn_Rate_Pct]
 RETURN
 SWITCH(
 TRUE(),
-Avvik > 200000 || BurnRate > 125, "🔴 KRITISK AVVIK",
-Avvik > 50000 || BurnRate > 110, "🟡 ADVARSEL",
+Avvik > 200000 || BurnRate > 1.25, "🔴 KRITISK AVVIK",
+Avvik > 50000 || BurnRate > 1.10, "🟡 ADVARSEL",
 "🟢 I RUTE"
 )
 
