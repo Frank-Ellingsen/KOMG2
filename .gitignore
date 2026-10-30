@@ -66,3 +66,4 @@ db_manager.txt
 data/einnsyn_import/*.json
 data/export/*
 !data/export/.gitkeep
+KOM_G2_oppdateringer/

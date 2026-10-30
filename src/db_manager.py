@@ -1,10 +1,17 @@
 import os
+import sys
 import glob
 import json
 import uuid
 import duckdb
 import pandas as pd
 from datetime import datetime
+
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 class DuckDBManager:
     def __init__(self, db_path: str = "data/database/kostra_prod.duckdb", raw_dir: str = "data/raw", export_dir: str = "data/export"):
@@ -146,6 +153,8 @@ class DuckDBManager:
             category = "Budsjett"
 
         df_mapped['source_file'] = filename
+        file_prefix = 'bomiljo' if 'bomiljo' in filename_lower else ('komskole' if 'komskole' in filename_lower else os.path.splitext(filename_lower)[0])
+        df_mapped['line_id'] = [f"{file_prefix}_{i}" for i in range(len(df_mapped))]
         return "FACT", df_mapped, category
 
     def build_from_raw(self):
@@ -264,12 +273,12 @@ class DuckDBManager:
                     CAST(Regnskap AS DOUBLE) AS ytd_regnskap_nok,
                     (CAST(Regnskap AS DOUBLE) - CAST(Budsjett AS DOUBLE)) AS ytd_avvik_nok,
                     source_file,
+                    COALESCE(CAST(line_id AS VARCHAR), CAST(ROW_NUMBER() OVER (
+                        PARTITION BY Dato, Funksjon, Kontokode_6Siffer, COALESCE(Ansvar_Kode, 0)
+                        ORDER BY source_file DESC
+                    ) AS VARCHAR)) AS sub_line_id,
                     CURRENT_TIMESTAMP AS batch_timestamp
-                FROM stg_fact
-                QUALIFY ROW_NUMBER() OVER (
-                    PARTITION BY Dato, Funksjon, Kontokode_6Siffer, COALESCE(Ansvar_Kode, 0)
-                    ORDER BY source_file DESC
-                );
+                FROM stg_fact;
             """)
 
             conn.execute("""
@@ -279,34 +288,14 @@ class DuckDBManager:
                     s.funksjon_code,
                     s.konto_code,
                     s.ansvar_code,
+                    s.sub_line_id,
                     s.sektor_navn,
                     s.ytd_budsjett_nok,
                     s.ytd_regnskap_nok,
                     s.ytd_avvik_nok,
-                    -- Beregn månedlige nettotall fra akkumulert YTD via LAG()
-                    s.ytd_budsjett_nok - COALESCE(
-                        LAG(s.ytd_budsjett_nok) OVER (
-                            PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, YEAR(s.accounting_period)
-                            ORDER BY s.accounting_period ASC
-                        ), 0.0
-                    ) AS monthly_delta_budsjett_nok,
-                    s.ytd_regnskap_nok - COALESCE(
-                        LAG(s.ytd_regnskap_nok) OVER (
-                            PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, YEAR(s.accounting_period)
-                            ORDER BY s.accounting_period ASC
-                        ), 0.0
-                    ) AS monthly_delta_regnskap_nok,
-                    (s.ytd_regnskap_nok - COALESCE(
-                        LAG(s.ytd_regnskap_nok) OVER (
-                            PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, YEAR(s.accounting_period)
-                            ORDER BY s.accounting_period ASC
-                        ), 0.0
-                    )) - (s.ytd_budsjett_nok - COALESCE(
-                        LAG(s.ytd_budsjett_nok) OVER (
-                            PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, YEAR(s.accounting_period)
-                            ORDER BY s.accounting_period ASC
-                        ), 0.0
-                    )) AS monthly_delta_avvik_nok,
+                    s.ytd_budsjett_nok AS monthly_delta_budsjett_nok,
+                    s.ytd_regnskap_nok AS monthly_delta_regnskap_nok,
+                    s.ytd_avvik_nok AS monthly_delta_avvik_nok,
                     s.source_file,
                     s.batch_timestamp
                 FROM vw_silver_snapshots s;
@@ -422,34 +411,54 @@ class DuckDBManager:
 
                     -- Lags
                     COALESCE(LAG(s.monthly_delta_regnskap_nok, 1) OVER (
-                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code ORDER BY s.accounting_period
+                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, s.sub_line_id ORDER BY s.accounting_period
                     ), 0.0) AS lag_1m_regnskap_nok,
                     
                     COALESCE(LAG(s.monthly_delta_avvik_nok, 1) OVER (
-                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code ORDER BY s.accounting_period
+                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, s.sub_line_id ORDER BY s.accounting_period
                     ), 0.0) AS lag_1m_avvik_nok,
 
                     -- Rolling 3-Month Average & Standard Deviation
                     COALESCE(AVG(s.monthly_delta_regnskap_nok) OVER (
-                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code ORDER BY s.accounting_period
+                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, s.sub_line_id ORDER BY s.accounting_period
                         ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
                     ), s.monthly_delta_regnskap_nok) AS rolling_3m_avg_regnskap_nok,
 
                     COALESCE(STDDEV_SAMP(s.monthly_delta_regnskap_nok) OVER (
-                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code ORDER BY s.accounting_period
+                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, s.sub_line_id ORDER BY s.accounting_period
                         ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
                     ), 0.0) AS rolling_3m_std_regnskap_nok,
 
                     -- Regresjons-mål:
                     COALESCE(LEAD(s.monthly_delta_regnskap_nok, 1) OVER (
-                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code ORDER BY s.accounting_period
-                    ), s.monthly_delta_regnskap_nok) AS target_next_month_regnskap
+                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, s.sub_line_id ORDER BY s.accounting_period
+                    ), s.monthly_delta_regnskap_nok) AS target_next_month_regnskap,
+
+                    -- Akkumulert YTD (M1..M) per kombinasjon for EOY/LOY-analyse
+                    SUM(COALESCE(s.ytd_budsjett_nok, 0.0)) OVER (
+                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, s.sub_line_id, YEAR(s.accounting_period)
+                        ORDER BY s.accounting_period
+                        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                    ) AS cum_budsjett_ytd_nok,
+
+                    SUM(COALESCE(s.ytd_regnskap_nok, 0.0)) OVER (
+                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, s.sub_line_id, YEAR(s.accounting_period)
+                        ORDER BY s.accounting_period
+                        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                    ) AS cum_regnskap_ytd_nok
                 FROM silver_fact s
                 {join_funks}
                 {join_konto}
             )
             SELECT 
                 b.*,
+                -- EOY & Left of Year (LOY M9-M12) Rådgivningskolonner
+                (b.cum_budsjett_ytd_nok * 1.5) AS annual_budget_eoy_nok,
+                ((b.cum_budsjett_ytd_nok * 1.5) - b.cum_regnskap_ytd_nok) AS remaining_budget_loy_nok,
+                ((b.cum_regnskap_ytd_nok / 8.0) * 12.0) AS eoy_forecast_unadjusted_nok,
+                (((b.cum_regnskap_ytd_nok / 8.0) * 12.0) - (b.cum_budsjett_ytd_nok * 1.5)) AS eoy_variance_projected_nok,
+                (((b.cum_budsjett_ytd_nok * 1.5) - b.cum_regnskap_ytd_nok) / 4.0) AS required_monthly_run_rate_loy,
+
                 -- Ratios & Burn Rates
                 CASE WHEN b.ytd_budsjett_nok != 0 THEN (b.ytd_regnskap_nok / b.ytd_budsjett_nok) * 100.0 ELSE 100.0 END AS burn_rate_pct,
                 CASE WHEN b.monthly_delta_budsjett_nok != 0 THEN (b.monthly_delta_regnskap_nok / b.monthly_delta_budsjett_nok) ELSE 1.0 END AS budget_coverage_ratio,

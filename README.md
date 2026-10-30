@@ -64,13 +64,14 @@ Både Streamlit-applikasjonen (`src/app.py`) og det frittstående web-grensesnit
    * Dynamiske filtre for perioder, rammeområder/sektorer og avviksstatus (`🔴 KRITISK AVVIK` / `🟡 ADVARSEL` / `🟢 I RUTE`).
    * Tufte Bullet Chart (Forbruksrate vs. 100 % ramme) og Månedlig Combo Chart med 3M rullende trendlinje.
 
-2. **📈 2. Tidsserie & Årsprognose (EAC / ETC per 31.12):**
-   * **Bokført YTD (Mnd 1–8):** Faktisk registrert forbruk (`31 524 851 kr`).
-   * **Projisert Q4 ETC (Mnd 9–12):** Sesongkorrigert fremskriving (`15 727 975 kr`) med interaktive blå FAST-parametere (`Param_Lonnsvekst_Q4`, `Param_Effektiviseringskrav_Pct`, `Param_Sesongvekt_M12`).
-   * **Fullårsprognose EAC (per 31.12):** Estimert årsresultat (`47 252 826 kr`, forventet årsavvik `-3 309 971 kr`) visualisert med direkte-merket S-kurve.
+2. **📈 2. Tidsserie, EOY-Prognose & Left of Year (LOY M9–M12) Rådgivning:**
+   * **Bokført YTD (Mnd 1–8) & Helårsramme EOY:** Full oversikt over vedtatt årsbudsjett, bokført regnskap M1–M8, gjenstående ramme for Sep–Des (`Left of Year / LOY`), ujustert helårsprognose og påkrevd månedstak (`2 281 890 kr/mnd`).
+   * **Left of Year (M9–M12) Kutt- & Inndragningssimulator:** Interaktive spaker for *Vikar- & Lønnsstopp (%)*, *Kjøps- & Konsulentstopp (%)* og *Direkte Månedlig Kutt (kr/mnd)* som beregner månedlig innsparing og nytt forventet årsavvik per 31.12.2024 i sanntid.
+   * **Juridisk Handlingsrom (Kommuneloven § 14-2 vs. § 14-4):** Klassifisering av administrative tiltak innenfor kommunedirektørs/enhetsleders fullmakt (§ 14-2) mot politiske tiltak som krever vedtak i Bystyret (§ 14-4).
+   * **Rådgivernotat Generator:** Genererer ferdig formatert rådgivningsnotat til budsjettmøte med ett-klikks kopiering og nedlasting (`.txt` / PDF via `templates/index.html`).
 
 3. **🌲 3. ML Prognoser & Early Warning (XAI):**
-   * Forklarbar AI (XAI) som rangerer topp forklarende variabler fra `RandomForestRegressor` ($R^2 = 0.9104$).
+   * Forklarbar AI (XAI) som rangerer topp forklarende variabler fra `RandomForestRegressor` ($R^2 = 0.9758$, $\text{MAE} = 1\,655\text{ NOK}$).
    * 100 % revisjonssporbart `IF-THEN` beslutningstre fra `DecisionTreeClassifier` (`Status 0: I RUTE`, `Status 1: ADVARSEL`, `Status 2: KRITISK`).
 
 4. **🚨 4. Anomaly Detection & Klyngeanalyse:**
@@ -125,7 +126,12 @@ Arbeidsboken `Excel-Reporting-Analysis.xlsb` (og `.xlsx`) er bygget etter **FAST
 
 ```text
 Kom - G2/
-├── index.html                          # Frittstående Tufte/FAST Web-UI med 7 moduler & Pipeline Cockpit
+├── index.html                          # Frittstående Tufte/FAST Web-UI med 8 moduler, LOY-simulator & Pipeline Cockpit
+├── templates/
+│   └── index.html                      # Dedikert EOY & LOY Rådgivningscockpit med Chart.js og PDF-eksport (html2pdf.js)
+├── docs/
+│   ├── COPILOT_PYTHON_IN_EXCEL_INSTRUCTIONS.md # Instruks for Copilot & Python in Excel (=PY())
+│   └── INSTRUKS_EXCEL_DASHBOARD.md     # Instruks for Power Query & Power Pivot i Excel-Reporting-Analysis.xlsb
 ├── .env.example                        # Mal for miljøvariabler (kopieres til .env)
 ├── .gitignore                          # Git-ignoreringsregler for sikkerhet og tunge filer
 ├── Dockerfile                          # Container-definisjon for Streamlit & MLflow

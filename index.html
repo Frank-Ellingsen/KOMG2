@@ -1153,6 +1153,92 @@
             <tbody id="ts-table-body"></tbody>
           </table>
         </div>
+
+        <!-- NEW FROM KOM_G2_OPPDATERINGER: LOY SIMULATOR, JURIDISK HANDLINGSROM & RÅDGIVERNOTAT -->
+        <div class="section-bar" style="margin-top:0.5rem;">
+          <span>⏱️ Left of Year (LOY M9–M12) Kuttanalysator, Juridisk Handlingsrom (§ 14-2 / § 14-4) &amp; Rådgivernotat</span>
+          <span>SEP–DES 2024 SIMULATOR</span>
+        </div>
+
+        <div class="grid-2col">
+          <!-- LOY Simulator Card -->
+          <div class="panel-card">
+            <div class="panel-title">
+              <span>🎛️ Simuler Inndragningstiltak (Sep–Des / M9–M12)</span>
+              <span class="panel-subtitle">Påkrevd Mnd-Tak: 2 281 890 kr/mnd</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.85rem;">
+              <div class="field-group">
+                <label for="loy-slider-vikar">Vikar- &amp; Lønnsstopp (%): <span id="loy-val-vikar" style="color:var(--clr-input-blue);">10 %</span></label>
+                <input type="range" id="loy-slider-vikar" min="0" max="30" value="10" style="width:100%; accent-color:#0F172A;" />
+              </div>
+              <div class="field-group">
+                <label for="loy-slider-konsulent">Kjøps- &amp; Konsulentstopp (%): <span id="loy-val-konsulent" style="color:var(--clr-input-blue);">15 %</span></label>
+                <input type="range" id="loy-slider-konsulent" min="0" max="50" value="15" style="width:100%; accent-color:#0F172A;" />
+              </div>
+              <div class="field-group">
+                <label for="loy-slider-direkte">Direkte Månedlig Kutt (kr/mnd): <span id="loy-val-direkte" style="color:var(--clr-input-blue);">100 000 kr</span></label>
+                <input type="range" id="loy-slider-direkte" min="0" max="500000" step="25000" value="100000" style="width:100%; accent-color:#0F172A;" />
+              </div>
+              <div class="kpi-grid" style="grid-template-columns:repeat(3, 1fr); margin-top:0.25rem;">
+                <div class="kpi-card" style="padding:0.65rem;">
+                  <span class="kpi-label">Mnd Innsparing</span>
+                  <span class="kpi-value" id="loy-mnd-saving" style="font-size:1.05rem; color:var(--clr-input-blue);">523 411 kr/mnd</span>
+                </div>
+                <div class="kpi-card" style="padding:0.65rem;">
+                  <span class="kpi-label">Innsparing Sep–Des</span>
+                  <span class="kpi-value" id="loy-tot-saving" style="font-size:1.05rem; color:var(--clr-ok-text);">2 093 644 kr</span>
+                </div>
+                <div class="kpi-card" style="padding:0.65rem;">
+                  <span class="kpi-label">Nytt EOY-Avvik 31.12</span>
+                  <span class="kpi-value" id="loy-new-var" style="font-size:1.05rem; color:var(--clr-err-text);">+459 089 kr</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Juridisk Handlingsrom (Kommuneloven § 14-2 vs § 14-4) -->
+          <div class="panel-card">
+            <div class="panel-title">
+              <span>⚖️ Juridisk Handlingsrom (Kommuneloven § 14-2 vs. § 14-4)</span>
+              <span class="panel-subtitle">Administrativ vs. Politisk Fullmakt</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; font-size:0.81rem;">
+              <div style="background-color:#F0FDF4; border:1px solid #BBF7D0; border-radius:6px; padding:0.75rem;">
+                <strong style="color:#166534; display:block; margin-bottom:0.35rem;">🟢 Administrative Tiltak (§ 14-2)</strong>
+                <p style="font-size:0.75rem; color:#15803D; margin-bottom:0.4rem;">Fullmakt: Kommunedirektør / Enhetsleder</p>
+                <ul style="padding-inline-start:1rem; color:#14532D; display:flex; flex-direction:column; gap:0.25rem;">
+                  <li>Ansettelses- og innleiestopp i Sep–Des.</li>
+                  <li>Stram vikarstyring (godkjenning av kommunalsjef).</li>
+                  <li>Inndragning av overtid (kun akutt liv og helse).</li>
+                  <li>Kansellere kurs, reiser og konsulentkjøp.</li>
+                </ul>
+              </div>
+              <div style="background-color:#FEF2F2; border:1px solid #FECACA; border-radius:6px; padding:0.75rem;">
+                <strong style="color:#991B1B; display:block; margin-bottom:0.35rem;">🔴 Politiske Tiltak (§ 14-4)</strong>
+                <p style="font-size:0.75rem; color:#B91C1C; margin-bottom:0.4rem;">Fullmakt: Bystyret / Kommunestyret</p>
+                <ul style="padding-inline-start:1rem; color:#7F1D1D; display:flex; flex-direction:column; gap:0.25rem;">
+                  <li>Endring i skolestruktur eller barnehagekapasitet.</li>
+                  <li>Bruk av disposisjonsfond ved merforbruk.</li>
+                  <li>Reduksjon i lovpålagt servicenivå/tildeling.</li>
+                  <li>Omdisponering mellom rammeområder.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rådgivernotat Generator -->
+        <div class="panel-card">
+          <div class="panel-title">
+            <span>📝 Generert Rådgivernotat til Enhetsleder / Budsjettmøte (2. Tertial 2024)</span>
+            <div style="display:flex; gap:0.5rem;">
+              <button type="button" id="btn-copy-notat" class="cockpit-btn" style="padding:0.3rem 0.65rem; font-size:0.76rem;">📋 Kopier Notat</button>
+              <button type="button" id="btn-download-notat" class="cockpit-btn primary" style="padding:0.3rem 0.65rem; font-size:0.76rem;">📥 Last ned (.txt)</button>
+            </div>
+          </div>
+          <textarea id="radgivernotat-textarea" rows="10" style="width:100%; font-family:var(--font-mono); font-size:0.78rem; padding:0.75rem; border:1px solid var(--border-light); border-radius:4px; background-color:var(--bg-subtle); color:var(--text-primary); line-height:1.5;"></textarea>
+        </div>
       </section>
 
       <!-- ===================================================================
@@ -2436,6 +2522,106 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     renderModule1();
     renderModule2();
     renderModule3();
+
+    // =========================================================================
+    // 9. LOY (LEFT OF YEAR) SIMULATOR & RÅDGIVERNOTAT GENERATOR (KOM_G2_oppdateringer)
+    // =========================================================================
+    function updateLoySimulator() {
+      const vikarEl = document.getElementById("loy-slider-vikar");
+      const konsEl = document.getElementById("loy-slider-konsulent");
+      const dirEl = document.getElementById("loy-slider-direkte");
+      if (!vikarEl || !konsEl || !dirEl) return;
+
+      const vikarPct = parseFloat(vikarEl.value) || 0;
+      const konsPct = parseFloat(konsEl.value) || 0;
+      const dirKutt = parseFloat(dirEl.value) || 0;
+
+      document.getElementById("loy-val-vikar").textContent = `${vikarPct} %`;
+      document.getElementById("loy-val-konsulent").textContent = `${konsPct} %`;
+      document.getElementById("loy-val-direkte").textContent = `${fmtNok(dirKutt)} kr`;
+
+      const budsjettEoy = 32488148;
+      const regnskapM8 = 23360587;
+      const remainingLoy = 9127560;
+      const forecastEoy = 35040881;
+      const baseVarianceEoy = 2552733;
+      const requiredMndRate = 2281890;
+      const avgMnd = regnskapM8 / 8.0;
+
+      const mndSaving = Math.round((avgMnd * (vikarPct / 100.0)) + (avgMnd * (konsPct / 100.0) * 0.3) + dirKutt);
+      const totSaving = mndSaving * 4;
+      const newVar = baseVarianceEoy - totSaving;
+
+      document.getElementById("loy-mnd-saving").textContent = `${fmtNok(mndSaving)} kr/mnd`;
+      document.getElementById("loy-tot-saving").textContent = `${fmtNok(totSaving)} kr`;
+      const newVarEl = document.getElementById("loy-new-var");
+      newVarEl.textContent = `${newVar > 0 ? "+" : ""}${fmtNok(newVar)} kr`;
+      newVarEl.style.color = newVar > 0 ? "var(--clr-err-text)" : "var(--clr-ok-text)";
+
+      const notatArea = document.getElementById("radgivernotat-textarea");
+      if (notatArea) {
+        notatArea.value = [
+          "# 🏛️ NOTAT: ØKONOMISK STATUS OG LOY-TILTAKSPLAN 2024",
+          "Mottaker: Budsjettansvarlig / Enhetsleder (Kristiansand Kommune)",
+          "Fra: Økonomirådgiver / KOSTRA Økonomihub",
+          "Status per: 2. Tertial (August / M8 2024)",
+          "------------------------------------------------------------------",
+          "",
+          "1. HOVEDTALL & EOY-STATUS 2024",
+          `• Vedtatt Helårsbudsjett 2024: ${fmtNok(budsjettEoy)} kr`,
+          `• Bokført Regnskap hittil (M1–M8): ${fmtNok(regnskapM8)} kr (Snitt: ${fmtNok(Math.round(avgMnd))} kr/mnd)`,
+          `• Ujustert Helårsprognose (31.12.2024): ${fmtNok(forecastEoy)} kr`,
+          `• Forventet Helårsavvik EOY (før tiltak): +${fmtNok(baseVarianceEoy)} kr (Merforbruk)`,
+          "",
+          "2. LEFT OF YEAR (LOY) — HANDLINGSROM & SIMULERTE TILTAK SEP–DES (M9–M12)",
+          `• Gjenstående budsjettramme for Sep–Des: ${fmtNok(remainingLoy)} kr`,
+          `• Påkrevd månedstak for nullbalanse: ${fmtNok(requiredMndRate)} kr/mnd`,
+          `• Valgte tiltak: Vikar-/lønnsstopp ${vikarPct} %, Kjøps-/konsulentstopp ${konsPct} %, Direkte kutt ${fmtNok(dirKutt)} kr/mnd`,
+          `• Simulert innsparing i Sep–Des (4 mnd): ${fmtNok(totSaving)} kr (${fmtNok(mndSaving)} kr/mnd)`,
+          `• Nytt forventet årsavvik per 31.12.2024: ${newVar > 0 ? "+" : ""}${fmtNok(newVar)} kr`,
+          "",
+          "3. ANBEFALTE TILTAK ETTER KOMMUNELOVEN § 14-2 / § 14-4",
+          "1. Innføre umiddelbar vikar- og ansettelsesstopp på administrative oppgaver (§ 14-2).",
+          "2. Gjennomgå overtidstimer og godkjenne kun kritiske vakter ved fare for liv og helse (§ 14-2).",
+          "3. Kansellere planlagte kurs, reiser og konsulentkjøp i M9–M12 (§ 14-2).",
+          "4. Forberede politisk sak til Bystyret dersom uregulerbare avvik krever fondsbruk (§ 14-4)."
+        ].join("\n");
+      }
+    }
+
+    ["loy-slider-vikar", "loy-slider-konsulent", "loy-slider-direkte"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", updateLoySimulator);
+    });
+
+    const btnCopyNotat = document.getElementById("btn-copy-notat");
+    if (btnCopyNotat) {
+      btnCopyNotat.addEventListener("click", () => {
+        const area = document.getElementById("radgivernotat-textarea");
+        if (area && navigator.clipboard) {
+          navigator.clipboard.writeText(area.value);
+          btnCopyNotat.textContent = "✅ Kopiert!";
+          setTimeout(() => { btnCopyNotat.textContent = "📋 Kopier Notat"; }, 1800);
+        }
+      });
+    }
+
+    const btnDlNotat = document.getElementById("btn-download-notat");
+    if (btnDlNotat) {
+      btnDlNotat.addEventListener("click", () => {
+        const area = document.getElementById("radgivernotat-textarea");
+        if (!area) return;
+        const blob = new Blob([area.value], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Radgivernotat_KOSTRA_2024.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    updateLoySimulator();
   </script>
 </body>
 </html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kristiansand Kommune — KOSTRA Økonomihub (EOY & LOY Cockpit)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- html2pdf.js for direkte PDF-generering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #0F172A; }
+        .card-flat { border: 1px solid #E2E8F0; background-color: #FFFFFF; }
+        .tab-btn.active { border-bottom: 3px solid #2563EB; color: #2563EB; font-weight: 600; }
+        .num-cell { font-variant-numeric: tabular-nums; text-align: right; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white text-lg">🏛️</div>
+                <div>
+                    <h1 class="font-bold text-base tracking-tight leading-tight">Kristiansand Kommune</h1>
+                    <p class="text-xs text-slate-400">KOSTRA Økonomistyring & Rådgivningshub — 2. Tertial 2024</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1.5 animate-pulse"></span> DuckDB: Operativ
+                </span>
+                <button onclick="window.print()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-md transition flex items-center gap-1.5">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i> Skriv ut
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- FILTER BAR -->
+    <section class="bg-white border-b border-slate-200 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+                <div>
+                    <label for="sektorFilter" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Sektor / Hovedområde</label>
+                    <select id="sektorFilter" onchange="updateDashboard()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg p-2">
+                        <option value="alle">Alle Sektorer (Oppvekst & Helse)</option>
+                        <option value="oppvekst">Oppvekst og Utdanning (KomSkole)</option>
+                        <option value="helse">Helse og Omsorg (Bomiljø)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="funksjonFilter" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">KOSTRA Funksjon</label>
+                    <select id="funksjonFilter" onchange="updateDashboard()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg p-2">
+                        <option value="alle">Alle Funksjoner</option>
+                        <option value="2020">2020 - Grunnskole</option>
+                        <option value="2140">2140 - SFO (Skolefritidsordning)</option>
+                        <option value="2210">2210 - PPT (Pedagogisk-psykologisk tjeneste)</option>
+                        <option value="2540">2540 - Pleie og Omsorg (Institusjon/Bolig)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="ansvarFilter" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Ansvarssted / Enhet</label>
+                    <select id="ansvarFilter" onchange="updateDashboard()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg p-2">
+                        <option value="alle">Alle Ansvarssteder</option>
+                        <option value="20210">20210 - Wilds Minne Skole</option>
+                        <option value="20220">20220 - Presteheia Skole</option>
+                        <option value="25310">25310 - Eg Omsorgssenter</option>
+                        <option value="25720">25720 - Valhalla Omsorgssenter</option>
+                    </select>
+                </div>
+                <div class="flex items-end h-full pt-4 md:pt-0">
+                    <div class="w-full bg-blue-50 border border-blue-200 rounded-lg p-2 text-center text-xs text-blue-900 font-medium">
+                        📊 Årsbase: <strong>2024 (M1–M8 Bokført)</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- HERO KPI GRID -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+            <div class="p-4 rounded-xl card-flat">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Helårsbudsjett 2024</span>
+                <span id="kpiBudsjettEoy" class="text-xl font-bold text-slate-900 block num-cell" style="text-align:left">32 488 148 kr</span>
+                <span class="text-[11px] text-slate-500 mt-1 block">Vedtatt Årsramme</span>
+            </div>
+            <div class="p-4 rounded-xl card-flat">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Bokført YTD (M1–M8)</span>
+                <span id="kpiRegnskapYtd" class="text-xl font-bold text-blue-600 block num-cell" style="text-align:left">23 360 587 kr</span>
+                <span id="kpiMndSnitt" class="text-[11px] text-slate-500 mt-1 block">Snitt: 2 920 073 kr/mnd</span>
+            </div>
+            <div class="p-4 rounded-xl card-flat">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Ramme Sep–Des</span>
+                <span id="kpiRemainingLoy" class="text-xl font-bold text-emerald-600 block num-cell" style="text-align:left">9 127 560 kr</span>
+                <span class="text-[11px] text-slate-500 mt-1 block">Left of Year (4 mnd)</span>
+            </div>
+            <div class="p-4 rounded-xl card-flat">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Ujustert Prognose</span>
+                <span id="kpiForecastEoy" class="text-xl font-bold text-slate-900 block num-cell" style="text-align:left">35 040 881 kr</span>
+                <span class="text-[11px] text-slate-500 mt-1 block">M1–M8 Run-rate * 12</span>
+            </div>
+            <div class="p-4 rounded-xl card-flat">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Forventet Avvik 31.12</span>
+                <span id="kpiVarianceEoy" class="text-xl font-bold text-rose-600 block num-cell" style="text-align:left">+2 552 733 kr</span>
+                <span class="text-[11px] text-rose-500 font-medium mt-1 block">🔴 Merforbruk EOY</span>
+            </div>
+            <div class="p-4 rounded-xl card-flat">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Påkrevd Mnd-Tak</span>
+                <span id="kpiRequiredRate" class="text-xl font-bold text-blue-700 block num-cell" style="text-align:left">2 281 890 kr</span>
+                <span class="text-[11px] text-slate-500 mt-1 block">Maks utgift/mnd Sep–Des</span>
+            </div>
+        </div>
+
+        <!-- TABS NAVIGATION -->
+        <div class="border-b border-slate-200 mb-6 bg-white rounded-t-xl px-4 pt-2">
+            <nav class="flex space-x-8 overflow-x-auto">
+                <button onclick="switchTab('tab1')" id="tab1-btn" class="tab-btn active py-3 px-1 text-sm font-medium transition flex items-center gap-2">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Status & EOY-Prognose
+                </button>
+                <button onclick="switchTab('tab2')" id="tab2-btn" class="tab-btn py-3 px-1 text-sm font-medium text-slate-500 hover:text-slate-700 transition flex items-center gap-2">
+                    <i data-lucide="sliders" class="w-4 h-4"></i> Left of Year (LOY) Simulator
+                </button>
+                <button onclick="switchTab('tab3')" id="tab3-btn" class="tab-btn py-3 px-1 text-sm font-medium text-slate-500 hover:text-slate-700 transition flex items-center gap-2">
+                    <i data-lucide="scale" class="w-4 h-4"></i> Juridisk Handlingsrom (Kommuneloven)
+                </button>
+                <button onclick="switchTab('tab4')" id="tab4-btn" class="tab-btn py-3 px-1 text-sm font-medium text-slate-500 hover:text-slate-700 transition flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> Rådgivernotat Generator
+                </button>
+            </nav>
+        </div>
+
+        <!-- TAB 1: STATUS & PROGNOSE -->
+        <div id="tab1" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="p-5 rounded-xl card-flat">
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i> Top 10 Merforbruk per KOSTRA-Konto (NOK)
+                    </h3>
+                    <div class="h-72"><canvas id="topAvvikChart"></canvas></div>
+                </div>
+
+                <div class="p-5 rounded-xl card-flat">
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <i data-lucide="layers" class="w-4 h-4 text-blue-500"></i> Helårsramme 2024 vs. YTD Bokført vs. EOY Prognose
+                    </h3>
+                    <div class="h-72"><canvas id="rammeComparisonChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: LEFT OF YEAR SIMULATOR -->
+        <div id="tab2" class="tab-content space-y-6" hidden>
+            <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl text-blue-900 text-sm flex items-start gap-3">
+                <i data-lucide="info" class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"></i>
+                <div>
+                    <strong>Realtidssimulator for Månedene 9–12 (Sep–Des):</strong>
+                    Juster tiltakene under for å se hvor mye månedlig utgiftsreduksjon som kreves for å lukke avviket og hente inn nullbalanse innen 31.12.2024.
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="p-5 rounded-xl card-flat space-y-5">
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4 text-blue-600"></i> Simuler Inndragningstiltak (Sep–Des)
+                    </h3>
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+                            <label for="sliderVikar">Vikar- & Lønnsstopp (%)</label>
+                            <span id="sliderVikarVal" class="text-blue-600">10 %</span>
+                        </div>
+                        <input type="range" id="sliderVikar" min="0" max="30" value="10" oninput="runSimulation()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+                            <label for="sliderKonsulent">Kjøps- & Konsulentstopp (%)</label>
+                            <span id="sliderKonsulentVal" class="text-blue-600">15 %</span>
+                        </div>
+                        <input type="range" id="sliderKonsulent" min="0" max="50" value="15" oninput="runSimulation()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+                            <label for="sliderDirekte">Direkte Månedlig Kutt (kr/mnd)</label>
+                            <span id="sliderDirekteVal" class="text-blue-600">100 000 kr</span>
+                        </div>
+                        <input type="range" id="sliderDirekte" min="0" max="500000" step="25000" value="100000" oninput="runSimulation()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 p-5 rounded-xl card-flat flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">
+                            📉 Simulert Løp M1–M12 vs. Påkrevd Løype
+                        </h3>
+                        <div class="h-64"><canvas id="simulatedRunChart"></canvas></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100 mt-4 text-center">
+                        <div class="p-2 bg-slate-50 rounded-lg">
+                            <span class="text-[11px] text-slate-500 uppercase font-semibold block">Mnd Innsparing</span>
+                            <span id="simMndSaving" class="text-base font-bold text-blue-600">350 000 kr/mnd</span>
+                        </div>
+                        <div class="p-2 bg-slate-50 rounded-lg">
+                            <span class="text-[11px] text-slate-500 uppercase font-semibold block">Innsparing 2024 (4 mnd)</span>
+                            <span id="simTotalSaving" class="text-base font-bold text-emerald-600">1 400 000 kr</span>
+                        </div>
+                        <div class="p-2 bg-slate-50 rounded-lg">
+                            <span class="text-[11px] text-slate-500 uppercase font-semibold block">Nytt Avvik EOY 31.12</span>
+                            <span id="simNewVariance" class="text-base font-bold text-rose-600">+1 152 733 kr</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: JURIDISK HANDLINGSROM -->
+        <div id="tab3" class="tab-content space-y-6" hidden>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-emerald-50/60 border border-emerald-200 p-6 rounded-xl">
+                    <h3 class="text-base font-bold text-emerald-900 mb-2 flex items-center gap-2">🟢 Administrative Tiltak ("Doable" NÅ)</h3>
+                    <p class="text-xs text-emerald-800 mb-4 font-medium">Fullmakt: Kommunedirektør/Enhetsleder (Kommuneloven § 14-2).</p>
+                    <ul class="space-y-2 text-sm text-emerald-950">
+                        <li>• Ansettelses- & Innleiestopp i Sep–Des.</li>
+                        <li>• Stram vikarstyring med krav om godkjenning.</li>
+                        <li>• Inndragning av overtid (unntatt akutt liv/helse).</li>
+                        <li>• Kansellere kurs, konsulentkjøp & nyanskaffelser.</li>
+                    </ul>
+                </div>
+                <div class="bg-rose-50/60 border border-rose-200 p-6 rounded-xl">
+                    <h3 class="text-base font-bold text-rose-900 mb-2 flex items-center gap-2">🔴 Politiske Tiltak (Sak til Bystyret / 2025)</h3>
+                    <p class="text-xs text-rose-800 mb-4 font-medium">Fullmakt: Bystyret (Kommuneloven § 14-4).</p>
+                    <ul class="space-y-2 text-sm text-rose-950">
+                        <li>• Endring i skolestruktur eller barnehagekapasitet.</li>
+                        <li>• Bruk av Disposisjonsfond for uregulerbare merforbruk.</li>
+                        <li>• Endringer i lovpålagte servicenivåer/kriterier.</li>
+                        <li>• Omdisponering på tvers av rammeområder.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: RÅDGIVERNOTAT -->
+        <div id="tab4" class="tab-content space-y-6" hidden>
+            <div class="p-6 rounded-xl card-flat space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">📝 Generert Rådgivernotat til Budsjettmøte</h3>
+                    <div class="flex items-center gap-2">
+                        <button onclick="copyNotat()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-medium px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Kopier Notat
+                        </button>
+                        <button onclick="exportToPDF()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                            <i data-lucide="file-down" class="w-3.5 h-3.5"></i> Last ned PDF
+                        </button>
+                    </div>
+                </div>
+                <textarea id="notatContent" rows="14" class="w-full bg-slate-50 border border-slate-300 p-4 rounded-lg text-slate-800 font-mono text-xs leading-relaxed"></textarea>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        lucide.createIcons();
+        const mockData = {
+            "alle": { budsjettEoy: 32488148, regnskapYtd: 23360587, remainingLoy: 9127560, forecastEoy: 35040881, varianceEoy: 2552733, requiredRate: 2281890, mndHist: [3377462, 4444800, 3903959, 4619426, 3976147, 2882046, 4200233, 4120780] },
+            "oppvekst": { budsjettEoy: 22192000, regnskapYtd: 16210400, remainingLoy: 5981600, forecastEoy: 24315600, varianceEoy: 2123600, requiredRate: 1495400, mndHist: [1980000, 2110000, 2040000, 2180000, 2010000, 1790000, 2060000, 2040400] },
+            "helse": { budsjettEoy: 10296148, regnskapYtd: 7150187, remainingLoy: 3145960, forecastEoy: 10725281, varianceEoy: 429133, requiredRate: 786490, mndHist: [890000, 920000, 880000, 940000, 910000, 840000, 890000, 880187] }
+        };
+        let currentData = mockData["alle"];
+        let topAvvikChartInstance = null, rammeCompChartInstance = null, simulatedRunChartInstance = null;
+
+        function formatNok(val) { return new Intl.NumberFormat('no-NO').format(Math.round(val)) + ' kr'; }
+
+        function switchTab(tabId) {
+            const applySwitch = () => {
+                document.querySelectorAll('.tab-content').forEach(el => { el.hidden = true; });
+                document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+                const target = document.getElementById(tabId);
+                if (target) target.hidden = false;
+                document.getElementById(tabId + '-btn').classList.add('active');
+            };
+            if (document.startViewTransition) {
+                document.startViewTransition(applySwitch);
+            } else {
+                applySwitch();
+            }
+        }
+
+        function updateDashboard() {
+            const sek = document.getElementById('sektorFilter').value;
+            currentData = mockData[sek] || mockData["alle"];
+            document.getElementById('kpiBudsjettEoy').innerText = formatNok(currentData.budsjettEoy);
+            document.getElementById('kpiRegnskapYtd').innerText = formatNok(currentData.regnskapYtd);
+            document.getElementById('kpiMndSnitt').innerText = 'Snitt: ' + formatNok(currentData.regnskapYtd / 8) + '/mnd';
+            document.getElementById('kpiRemainingLoy').innerText = formatNok(currentData.remainingLoy);
+            document.getElementById('kpiForecastEoy').innerText = formatNok(currentData.forecastEoy);
+            document.getElementById('kpiVarianceEoy').innerText = '+' + formatNok(currentData.varianceEoy);
+            document.getElementById('kpiRequiredRate').innerText = formatNok(currentData.requiredRate);
+            renderCharts();
+            runSimulation();
+            generateNotat();
+        }
+
+        function renderCharts() {
+            const ctx1 = document.getElementById('topAvvikChart').getContext('2d');
+            if (topAvvikChartInstance) topAvvikChartInstance.destroy();
+            topAvvikChartInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['101000 Fast Lønn', '109000 Pensjon', '127040 Kjøp Tjenester', '102011 Overtid', '101030 Vikarer'],
+                    datasets: [{ data: [1850000, 920000, 650000, 480000, 350000], backgroundColor: '#EF4444' }]
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } } } }
+            });
+
+            const ctx2 = document.getElementById('rammeComparisonChart').getContext('2d');
+            if (rammeCompChartInstance) rammeCompChartInstance.destroy();
+            rammeCompChartInstance = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Helårsfokus 2024'],
+                    datasets: [
+                        { label: 'Helårsbudsjett EOY', data: [currentData.budsjettEoy], backgroundColor: '#1E293B' },
+                        { label: 'Bokført YTD (M1-M8)', data: [currentData.regnskapYtd], backgroundColor: '#2563EB' },
+                        { label: 'Ujustert Prognose', data: [currentData.forecastEoy], backgroundColor: '#DC2626' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } } } }
+            });
+        }
+
+        function runSimulation() {
+            const vikarPct = parseFloat(document.getElementById('sliderVikar').value);
+            const konsulentPct = parseFloat(document.getElementById('sliderKonsulent').value);
+            const direkteKutt = parseFloat(document.getElementById('sliderDirekte').value);
+
+            document.getElementById('sliderVikarVal').innerText = vikarPct + ' %';
+            document.getElementById('sliderKonsulentVal').innerText = konsulentPct + ' %';
+            document.getElementById('sliderDirekteVal').innerText = formatNok(direkteKutt);
+
+            const avgMnd = currentData.regnskapYtd / 8;
+            const mndSaving = (avgMnd * (vikarPct / 100)) + (avgMnd * (konsulentPct / 100) * 0.3) + direkteKutt;
+            const total4MndSaving = mndSaving * 4;
+            const newVariance = currentData.varianceEoy - total4MndSaving;
+
+            document.getElementById('simMndSaving').innerText = formatNok(mndSaving) + '/mnd';
+            document.getElementById('simTotalSaving').innerText = formatNok(total4MndSaving);
+            document.getElementById('simNewVariance').innerText = (newVariance > 0 ? '+' : '') + formatNok(newVariance);
+
+            const ctx3 = document.getElementById('simulatedRunChart').getContext('2d');
+            if (simulatedRunChartInstance) simulatedRunChartInstance.destroy();
+
+            simulatedRunChartInstance = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9 (Sep)', 'M10 (Okt)', 'M11 (Nov)', 'M12 (Des)'],
+                    datasets: [
+                        { label: 'Historisk Bokført', data: [...currentData.mndHist, null, null, null, null], backgroundColor: '#3B82F6' },
+                        { label: 'Ujustert løp', data: [null, null, null, null, null, null, null, null, avgMnd, avgMnd, avgMnd, avgMnd], backgroundColor: '#EF4444' },
+                        { label: 'Simulert løp', data: [null, null, null, null, null, null, null, null, avgMnd - mndSaving, avgMnd - mndSaving, avgMnd - mndSaving, avgMnd - mndSaving], backgroundColor: '#10B981' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } } } }
+            });
+        }
+
+        function generateNotat() {
+            const enhetNavn = document.getElementById('ansvarFilter').options[document.getElementById('ansvarFilter').selectedIndex].text;
+            document.getElementById('notatContent').value = `
+🏛️ NOTAT: ØKONOMISK STATUS OG LOY-TILTAKSPLAN 2024
+------------------------------------------------------------------
+Mottaker: Budsjettansvarlig (${enhetNavn})
+Fra: Økonomirådgiver / KOSTRA Økonomihub
+Dato: 30. oktober 2024
+Status per: 2. Tertial (August / M8)
+
+1. HOVEDTALL 2024
+• Vedtatt Helårsbudsjett 2024: ${formatNok(currentData.budsjettEoy)}
+• Bokført Regnskap YTD (M1–M8): ${formatNok(currentData.regnskapYtd)}
+• Ujustert Helårsprognose (31.12): ${formatNok(currentData.forecastEoy)}
+• Forventet Helårsavvik EOY: +${formatNok(currentData.varianceEoy)} (Merforbruk)
+
+2. LEFT OF YEAR (LOY) HANDLINGSROM (M9–M12)
+• Gjenstående ramme for Sep–Des: ${formatNok(currentData.remainingLoy)}
+• Påkrevd Månedstak for Nullbalanse: ${formatNok(currentData.requiredRate)}/mnd
+
+3. ANBEFALTE TILTAK (KOMMUNELOVEN § 14-2 / § 14-4)
+• Innføre umiddelbar vikar- og ansettelsesstopp på ikke-lovpålagte oppgaver.
+• Gjennomgå overtidstimer og godkjenne kun kritiske vakter.
+• Kansellere planlagte kurs og konsulentkjøp for M9–M12.
+            `.trim();
+        }
+
+        function copyNotat() {
+            const txt = document.getElementById('notatContent');
+            txt.select();
+            navigator.clipboard.writeText(txt.value);
+            alert('Notat kopiert!');
+        }
+
+        function exportToPDF() {
+            const enhetNavn = document.getElementById('ansvarFilter').options[document.getElementById('ansvarFilter').selectedIndex].text;
+            const notatTekst = document.getElementById('notatContent').value;
+
+            const pdfContainer = document.createElement('div');
+            pdfContainer.className = "p-8 bg-white font-sans text-slate-900 leading-relaxed";
+            pdfContainer.innerHTML = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #1e293b;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0284c7; padding-bottom: 12px; margin-bottom: 20px;">
+                        <div>
+                            <h1 style="font-size: 20px; font-weight: bold; color: #0f172a; margin: 0;">Kristiansand Kommune</h1>
+                            <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">KOSTRA Økonomistyring — Rådgivningsnotat</p>
+                        </div>
+                        <div style="text-align: right; font-size: 11px; color: #64748b;">
+                            <p style="margin:0;"><strong>Status:</strong> 2. Tertial (M8)</p>
+                            <p style="margin:0;"><strong>Dato:</strong> ${new Date().toLocaleDateString('no-NO')}</p>
+                        </div>
+                    </div>
+
+                    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 12px;">
+                        <p style="margin: 2px 0;"><strong>Mottaker:</strong> Budsjettansvarlig for ${enhetNavn}</p>
+                        <p style="margin: 2px 0;"><strong>Fra:</strong> Økonomirådgiver / KOSTRA Økonomihub</p>
+                    </div>
+
+                    <div style="white-space: pre-wrap; font-size: 12px; line-height: 1.6; color: #334155;">
+${notatTekst}
+                    </div>
+
+                    <div style="margin-top: 40px; border-top: 1px solid #cbd5e1; padding-top: 10px; font-size: 11px; color: #94a3b8; display: flex; justify-content: space-between;">
+                        <span>Generert via KOSTRA Analytics Engine</span>
+                        <span>Side 1 av 1</span>
+                    </div>
+                </div>
+            `;
+
+            const opt = {
+                margin:       10,
+                filename:     `Radgivernotat_${enhetNavn.replace(/[^a-zA-Z0-9]/g, '_')}_2024.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(pdfContainer).save();
+        }
+
+        window.onload = function() { updateDashboard(); };
+    </script>
+</body>
+</html>
+
