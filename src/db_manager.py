@@ -436,28 +436,36 @@ class DuckDBManager:
 
                     -- Akkumulert YTD (M1..M) per kombinasjon for EOY/LOY-analyse
                     SUM(COALESCE(s.ytd_budsjett_nok, 0.0)) OVER (
-                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, s.sub_line_id, YEAR(s.accounting_period)
+                        PARTITION BY s.sub_line_id, YEAR(s.accounting_period)
                         ORDER BY s.accounting_period
                         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
                     ) AS cum_budsjett_ytd_nok,
 
                     SUM(COALESCE(s.ytd_regnskap_nok, 0.0)) OVER (
-                        PARTITION BY s.funksjon_code, s.konto_code, s.ansvar_code, s.sub_line_id, YEAR(s.accounting_period)
+                        PARTITION BY s.sub_line_id, YEAR(s.accounting_period)
                         ORDER BY s.accounting_period
                         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-                    ) AS cum_regnskap_ytd_nok
+                    ) AS cum_regnskap_ytd_nok,
+
+                    -- Helårsbudsjett EOY (fast 12-måneders årsramme uavhengig av regnskapsmåned, jf. kostra_økonomi_hub.md)
+                    SUM(COALESCE(s.ytd_budsjett_nok, 0.0)) OVER (
+                        PARTITION BY s.sub_line_id, YEAR(s.accounting_period)
+                    ) * 1.5 AS annual_budget_eoy_nok
                 FROM silver_fact s
                 {join_funks}
                 {join_konto}
             )
             SELECT 
                 b.*,
-                -- EOY & Left of Year (LOY M9-M12) Rådgivningskolonner
-                (b.cum_budsjett_ytd_nok * 1.5) AS annual_budget_eoy_nok,
-                ((b.cum_budsjett_ytd_nok * 1.5) - b.cum_regnskap_ytd_nok) AS remaining_budget_loy_nok,
-                ((b.cum_regnskap_ytd_nok / 8.0) * 12.0) AS eoy_forecast_unadjusted_nok,
-                (((b.cum_regnskap_ytd_nok / 8.0) * 12.0) - (b.cum_budsjett_ytd_nok * 1.5)) AS eoy_variance_projected_nok,
-                (((b.cum_budsjett_ytd_nok * 1.5) - b.cum_regnskap_ytd_nok) / 4.0) AS required_monthly_run_rate_loy,
+                -- EOY & Left of Year (LOY) Rådgivningskolonner (jf. kostra_økonomi_hub.md seksjon 3)
+                -- Remaining_Budget_LOY = Annual_Budget_EOY - YTD_Regnskap
+                (b.annual_budget_eoy_nok - b.cum_regnskap_ytd_nok) AS remaining_budget_loy_nok,
+                -- EOY_Forecast = (YTD_Regnskap / Closed_Months) * 12
+                CASE WHEN b.month > 0 THEN (b.cum_regnskap_ytd_nok / CAST(b.month AS DOUBLE)) * 12.0 ELSE 0.0 END AS eoy_forecast_unadjusted_nok,
+                -- Projected EOY Variance = (YTD_Regnskap / Closed_Months) * 12 - Annual_Budget_EOY
+                CASE WHEN b.month > 0 THEN ((b.cum_regnskap_ytd_nok / CAST(b.month AS DOUBLE)) * 12.0) - b.annual_budget_eoy_nok ELSE 0.0 END AS eoy_variance_projected_nok,
+                -- Required Monthly LOY Rate = (Annual_Budget_EOY - YTD_Regnskap) / Remaining_Months (Divisjonsbeskyttelse mot 0)
+                CASE WHEN (12 - b.month) > 0 THEN (b.annual_budget_eoy_nok - b.cum_regnskap_ytd_nok) / CAST(12 - b.month AS DOUBLE) ELSE 0.0 END AS required_monthly_run_rate_loy,
 
                 -- Ratios & Burn Rates
                 CASE WHEN b.ytd_budsjett_nok != 0 THEN (b.ytd_regnskap_nok / b.ytd_budsjett_nok) * 100.0 ELSE 100.0 END AS burn_rate_pct,

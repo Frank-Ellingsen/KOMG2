@@ -1165,7 +1165,7 @@
           <div class="panel-card">
             <div class="panel-title">
               <span>🎛️ Simuler Inndragningstiltak (Sep–Des / M9–M12)</span>
-              <span class="panel-subtitle">Påkrevd Mnd-Tak: 2 281 890 kr/mnd</span>
+              <span class="panel-subtitle">Påkrevd Mnd-Tak: 3 104 501 kr/mnd</span>
             </div>
             <div style="display:flex; flex-direction:column; gap:0.85rem;">
               <div class="field-group">
@@ -2540,12 +2540,12 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       document.getElementById("loy-val-konsulent").textContent = `${konsPct} %`;
       document.getElementById("loy-val-direkte").textContent = `${fmtNok(dirKutt)} kr`;
 
-      const budsjettEoy = 32488148;
-      const regnskapM8 = 23360587;
-      const remainingLoy = 9127560;
-      const forecastEoy = 35040881;
-      const baseVarianceEoy = 2552733;
-      const requiredMndRate = 2281890;
+      const budsjettEoy = 43942856;
+      const regnskapM8 = 31524851;
+      const remainingLoy = 12418004;
+      const forecastEoy = 47287277;
+      const baseVarianceEoy = 3344422;
+      const requiredMndRate = 3104501;
       const avgMnd = regnskapM8 / 8.0;
 
       const mndSaving = Math.round((avgMnd * (vikarPct / 100.0)) + (avgMnd * (konsPct / 100.0) * 0.3) + dirKutt);
