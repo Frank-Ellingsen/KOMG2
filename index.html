@@ -1160,34 +1160,73 @@
           <span>FAST &amp; Power BI-Style</span>
         </div>
 
-        <div class="filter-panel">
+        <div class="filter-panel" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.65rem; align-items:end;">
           <div class="field-group">
             <label for="flt-period">Velg Periode / Måned</label>
-            <select id="flt-period">
+            <select id="flt-period" style="width:100%; padding:0.32rem;">
               <option value="ALL">Akkumulert YTD (M01–M08 2024)</option>
               <option value="M08">Siste Bokførte Måned (2024_08 August)</option>
               <option value="M07">2024_07 Juli</option>
               <option value="M06">2024_06 Juni</option>
               <option value="M05">2024_05 Mai</option>
               <option value="M04">2024_04 April</option>
+              <option value="M03">2024_03 Mars</option>
+              <option value="M02">2024_02 Februar</option>
+              <option value="M01">2024_01 Januar</option>
             </select>
           </div>
           <div class="field-group">
             <label for="flt-sektor">Velg Rammeområde / Sektor</label>
-            <select id="flt-sektor">
+            <select id="flt-sektor" style="width:100%; padding:0.32rem;">
               <option value="ALL">Alle Sektorer</option>
               <option value="Oppvekst og Utdanning">Oppvekst og Utdanning</option>
               <option value="Helse og Omsorg">Helse og Omsorg</option>
             </select>
           </div>
           <div class="field-group">
-            <label for="flt-status">Filter på Avviksstatus</label>
-            <select id="flt-status">
+            <label for="flt-ansvar">Ansvarssted / Enhet (9 enheter)</label>
+            <select id="flt-ansvar" style="width:100%; padding:0.32rem;">
+              <option value="ALL">Alle Ansvarssteder (9 aktive)</option>
+              <option value="25310">25310 - Omsorgssenter / Sykehjem A (Helse, Fn 254)</option>
+              <option value="25320">25320 - Omsorgssenter / Sykehjem B (Helse, Fn 254)</option>
+              <option value="25710">25710 - Hjemmetjenesten Sone Nord (Helse, Fn 254)</option>
+              <option value="25720">25720 - Hjemmetjenesten Sone Sør (Helse, Fn 254)</option>
+              <option value="20210">20210 - Grunnskole A 1–10 trinn (Oppvekst, Fn 202)</option>
+              <option value="20220">20220 - Grunnskole B 1–10 trinn (Oppvekst, Fn 202)</option>
+              <option value="20230">20230 - Grunnskole C 1–10 trinn (Oppvekst, Fn 202)</option>
+              <option value="21310">21310 - Voksenopplæringssenter (Oppvekst, Fn 213)</option>
+              <option value="22110">22110 - PPT og pedagogisk oppfølging (Oppvekst, Fn 221)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="flt-funksjon">KOSTRA-Funksjon (10 funksjoner)</label>
+            <select id="flt-funksjon" style="width:100%; padding:0.32rem;">
+              <option value="ALL">Alle KOSTRA-Funksjoner (10)</option>
+              <option value="202">202 - Grunnskoleopplæring</option>
+              <option value="254">254 - Helse- og omsorgstjenester i institusjon</option>
+              <option value="214">214 - Skolefritidstilbud (SFO)</option>
+              <option value="221">221 - PPT</option>
+              <option value="213">213 - Voksenopplæring</option>
+              <option value="215">215 - Skolestatistikk og fellesoppgaver</option>
+              <option value="241">241 - Helse- og omsorgstjenester i hjemmet</option>
+              <option value="253">253 - Forebyggende helsetjenester</option>
+              <option value="261">261 - Sosiale tjenester og tiltak for voksne</option>
+              <option value="265">265 - Kommunalt disponerte boliger</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="flt-status">Filter på Avviksstatus (RAG)</label>
+            <select id="flt-status" style="width:100%; padding:0.32rem;">
               <option value="ALL">Alle Statuser</option>
               <option value="🔴 KRITISK AVVIK">🔴 KRITISK AVVIK</option>
               <option value="🟡 ADVARSEL">🟡 ADVARSEL</option>
               <option value="🟢 I RUTE">🟢 I RUTE</option>
             </select>
+          </div>
+          <div class="field-group">
+            <button type="button" id="btn-reset-filters" class="cockpit-btn" style="padding:0.38rem 0.75rem; font-size:0.75rem; width:100%;">
+              🔄 Nullstill Filter
+            </button>
           </div>
         </div>
 
@@ -1269,10 +1308,82 @@
       <section id="view-tidsserie" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Tidsserie og Årsprognose">
         <div class="section-bar">
           <span>2. Tidsserieanalyse &amp; Estimert Årsresultat (EOY / EAC per 31.12.2024)</span>
-          <span>03_CALCULATIONS &amp; 04_INPUTS</span>
+          <span>03_CALCULATIONS &amp; 04_INPUTS • 100 % Dynamisk Utsnittsfilter</span>
         </div>
 
-        <div class="filter-panel">
+        <!-- Filter Selections directly in Tidsserie & Årsprognose (EAC) -->
+        <div class="filter-panel" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:0.65rem; align-items:end; margin-bottom:0.65rem; background:var(--bg-subtle); border:1px solid var(--border-light); border-radius:6px; padding:0.75rem;">
+          <div class="field-group">
+            <label for="ts-flt-period" style="font-weight:700; color:var(--text-primary); font-size:0.75rem;">📅 Periode / Cut-off:</label>
+            <select id="ts-flt-period" style="width:100%; padding:0.32rem;">
+              <option value="ALL">Akkumulert YTD (M01–M08 2024)</option>
+              <option value="M08">Siste Bokførte Måned (2024_08 August)</option>
+              <option value="M07">2024_07 Juli</option>
+              <option value="M06">2024_06 Juni</option>
+              <option value="M05">2024_05 Mai</option>
+              <option value="M04">2024_04 April</option>
+              <option value="M03">2024_03 Mars</option>
+              <option value="M02">2024_02 Februar</option>
+              <option value="M01">2024_01 Januar</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="ts-flt-sektor" style="font-weight:700; color:var(--text-primary); font-size:0.75rem;">🏛️ Rammeområde / Sektor:</label>
+            <select id="ts-flt-sektor" style="width:100%; padding:0.32rem;">
+              <option value="ALL">Alle Sektorer (Totalutvalg)</option>
+              <option value="Oppvekst og Utdanning">Oppvekst og Utdanning</option>
+              <option value="Helse og Omsorg">Helse og Omsorg</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="ts-flt-ansvar" style="font-weight:700; color:var(--text-primary); font-size:0.75rem;">📍 Ansvarssted / Enhet:</label>
+            <select id="ts-flt-ansvar" style="width:100%; padding:0.32rem;">
+              <option value="ALL">Alle Ansvarssteder (9 enheter)</option>
+              <option value="25310">25310 - Omsorgssenter / Sykehjem A (Helse, Fn 254)</option>
+              <option value="25320">25320 - Omsorgssenter / Sykehjem B (Helse, Fn 254)</option>
+              <option value="25710">25710 - Hjemmetjenesten Sone Nord (Helse, Fn 254)</option>
+              <option value="25720">25720 - Hjemmetjenesten Sone Sør (Helse, Fn 254)</option>
+              <option value="20210">20210 - Grunnskole A 1–10 trinn (Oppvekst, Fn 202)</option>
+              <option value="20220">20220 - Grunnskole B 1–10 trinn (Oppvekst, Fn 202)</option>
+              <option value="20230">20230 - Grunnskole C 1–10 trinn (Oppvekst, Fn 202)</option>
+              <option value="21310">21310 - Voksenopplæringssenter (Oppvekst, Fn 213)</option>
+              <option value="22110">22110 - PPT og pedagogisk oppfølging (Oppvekst, Fn 221)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="ts-flt-funksjon" style="font-weight:700; color:var(--text-primary); font-size:0.75rem;">📂 KOSTRA-Funksjon:</label>
+            <select id="ts-flt-funksjon" style="width:100%; padding:0.32rem;">
+              <option value="ALL">Alle KOSTRA-Funksjoner (10)</option>
+              <option value="202">202 - Grunnskoleopplæring</option>
+              <option value="254">254 - Helse- og omsorgstjenester i institusjon</option>
+              <option value="214">214 - Skolefritidstilbud (SFO)</option>
+              <option value="221">221 - PPT</option>
+              <option value="213">213 - Voksenopplæring</option>
+              <option value="215">215 - Skolestatistikk og fellesoppgaver</option>
+              <option value="241">241 - Helse- og omsorgstjenester i hjemmet</option>
+              <option value="253">253 - Forebyggende helsetjenester</option>
+              <option value="261">261 - Sosiale tjenester og tiltak for voksne</option>
+              <option value="265">265 - Kommunalt disponerte boliger</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="ts-flt-status" style="font-weight:700; color:var(--text-primary); font-size:0.75rem;">🚦 RAG-Status:</label>
+            <select id="ts-flt-status" style="width:100%; padding:0.32rem;">
+              <option value="ALL">Alle Statuser</option>
+              <option value="🔴 KRITISK AVVIK">🔴 KRITISK AVVIK</option>
+              <option value="🟡 ADVARSEL">🟡 ADVARSEL</option>
+              <option value="🟢 I RUTE">🟢 I RUTE</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <button type="button" id="btn-reset-filters-ts" class="cockpit-btn" style="padding:0.38rem 0.75rem; font-size:0.75rem; width:100%;">
+              🔄 Nullstill Filter
+            </button>
+          </div>
+        </div>
+
+        <!-- Q4 Prognosefølsomhet & Sesongparametere -->
+        <div class="filter-panel" style="margin-bottom:0.75rem;">
           <div class="field-group">
             <label for="inp-wage-q4">Param_Lonnsvekst_Q4 (% påslag)</label>
             <input type="number" id="inp-wage-q4" class="fast-input" value="2.5" step="0.5" min="-5" max="15" />
@@ -1288,10 +1399,10 @@
         </div>
 
         <div class="kpi-grid">
-          <div class="kpi-card">
+          <div class="kpi-card" id="kpi-card-ytd-m2">
             <span class="kpi-label">Bokført YTD (Mnd 1–8)</span>
-            <span class="kpi-value">31 524 851 kr</span>
-            <span class="kpi-sub" style="color: var(--clr-err-text);">YTD Avvik: -2 229 614 kr</span>
+            <span class="kpi-value" id="kpi-ytd-reg-m2">31 524 851 kr</span>
+            <span class="kpi-sub" id="kpi-ytd-avvik-m2" style="color: var(--clr-err-text);">YTD Avvik: -2 229 614 kr</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-label">Projisert Q4 ETC (Mnd 9–12)</span>
@@ -3762,10 +3873,37 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       const eoyAvvik = eoyBud - eoyEac;
       const eoyRagKey = eoyAvvik < -200000 ? "red" : (eoyAvvik < 0 ? "amber" : "green");
 
-      if (document.getElementById("kpi-eac-m2")) document.getElementById("kpi-eac-m2").textContent = fmtNOK(eoyEac);
-      if (document.getElementById("kpi-eoy-bud")) document.getElementById("kpi-eoy-bud").textContent = `Vedtatt helårsbudsjett: ${fmtNOK(eoyBud)}`;
+      // Synchronize View 2 Filter Select values if needed
+      const syncTsFlt = (tsId, val) => {
+        const el = document.getElementById(tsId);
+        if (el && el.value !== val) el.value = val;
+      };
+      syncTsFlt("ts-flt-period", ctx.period);
+      syncTsFlt("ts-flt-sektor", ctx.sektor);
+      syncTsFlt("ts-flt-ansvar", ctx.ansvar);
+      syncTsFlt("ts-flt-funksjon", ctx.funksjon);
+      syncTsFlt("ts-flt-status", ctx.statusFlt);
+
+      // Dynamically update KPI Cards in View 2 (Tidsserie)
+      if (document.getElementById("kpi-ytd-reg-m2")) document.getElementById("kpi-ytd-reg-m2").textContent = fmtNOK(totYtdReg);
+      const ytdAvvikVal = totYtdBud - totYtdReg;
+      const ytdAvvikCls = getAvvikRagClass(ytdAvvikVal, totYtdBud, false);
+      const ytdRagKey = ytdAvvikCls.replace("rag-", "");
+      setKpiCardRag("kpi-card-ytd-m2", ytdRagKey);
+      if (document.getElementById("kpi-ytd-avvik-m2")) {
+        const el = document.getElementById("kpi-ytd-avvik-m2");
+        el.textContent = `YTD Avvik: ${fmtNOK(ytdAvvikVal, true)}`;
+        el.style.color = ytdRagKey === "red" ? "var(--clr-err-text)" : (ytdRagKey === "amber" ? "var(--clr-warn-text)" : "var(--clr-ok-text)");
+      }
+
       if (document.getElementById("kpi-etc-q4")) document.getElementById("kpi-etc-q4").textContent = fmtNOK(totQ4Etc);
       if (document.getElementById("kpi-etc-q4-sub")) document.getElementById("kpi-etc-q4-sub").textContent = `Budsjett Q4: ${fmtNOK(totQ4Bud)} | Avvik: ${fmtNOK(totQ4Bud - totQ4Etc, true)}`;
+      const etcAvvikVal = totQ4Bud - totQ4Etc;
+      setKpiCardRag("kpi-card-etc-q4", etcAvvikVal < -100000 ? "red" : (etcAvvikVal < 0 ? "amber" : "green"));
+
+      if (document.getElementById("kpi-eac-m2")) document.getElementById("kpi-eac-m2").textContent = fmtNOK(eoyEac);
+      if (document.getElementById("kpi-eoy-bud")) document.getElementById("kpi-eoy-bud").textContent = `Vedtatt helårsbudsjett: ${fmtNOK(eoyBud)}`;
+      setKpiCardRag("kpi-card-eac-m2", eoyRagKey);
 
       const elEoyAvvik = document.getElementById("kpi-eoy-avvik");
       if (elEoyAvvik) {
@@ -3773,6 +3911,10 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         elEoyAvvik.style.color = eoyRagKey === "red" ? "var(--clr-err-text)" : (eoyRagKey === "amber" ? "var(--clr-warn-text)" : "var(--clr-ok-text)");
       }
       setKpiCardRag("kpi-card-eoy-avvik-m2", eoyRagKey);
+      if (document.getElementById("ts-eoy-pct")) {
+        const burnRateEoy = eoyBud > 0 ? (eoyEac / eoyBud) * 100 : 0;
+        document.getElementById("ts-eoy-pct").textContent = `Forventet Burn Rate: ${burnRateEoy.toFixed(1).replace(".", ",")} %`;
+      }
 
       // Render Tidsserie Tabell
       const tsTbody = document.getElementById("ts-table-body");
@@ -4201,26 +4343,52 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       renderModule4And5(ctx);
     }
 
-    // Slicers Change Listeners
-    ["flt-period", "flt-sektor", "flt-ansvar", "flt-funksjon", "flt-status"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener("change", () => {
-        renderAllDynamicReports();
-        const ctx = getFilteredContext();
-        renderCitationDrawer(ctx.ansvar !== "ALL" ? ctx.ansvarMeta.name : ctx.sektor);
-      });
+    // Two-way Filter Synchronization between View 1 (flt-*) and View 2 (ts-flt-*)
+    const FILTER_PAIRS = [
+      { v1: "flt-period", v2: "ts-flt-period" },
+      { v1: "flt-sektor", v2: "ts-flt-sektor" },
+      { v1: "flt-ansvar", v2: "ts-flt-ansvar" },
+      { v1: "flt-funksjon", v2: "ts-flt-funksjon" },
+      { v1: "flt-status", v2: "ts-flt-status" }
+    ];
+
+    FILTER_PAIRS.forEach(({ v1, v2 }) => {
+      const el1 = document.getElementById(v1);
+      const el2 = document.getElementById(v2);
+
+      if (el1) {
+        el1.addEventListener("change", () => {
+          if (el2) el2.value = el1.value;
+          renderAllDynamicReports();
+          const ctx = getFilteredContext();
+          renderCitationDrawer(ctx.ansvar !== "ALL" ? ctx.ansvarMeta.name : ctx.sektor);
+        });
+      }
+
+      if (el2) {
+        el2.addEventListener("change", () => {
+          if (el1) el1.value = el2.value;
+          renderAllDynamicReports();
+          const ctx = getFilteredContext();
+          renderCitationDrawer(ctx.ansvar !== "ALL" ? ctx.ansvarMeta.name : ctx.sektor);
+        });
+      }
     });
 
-    // Reset filters
-    document.getElementById("btn-reset-filters")?.addEventListener("click", () => {
-      if (document.getElementById("flt-period")) document.getElementById("flt-period").value = "ALL";
-      if (document.getElementById("flt-sektor")) document.getElementById("flt-sektor").value = "ALL";
-      if (document.getElementById("flt-ansvar")) document.getElementById("flt-ansvar").value = "ALL";
-      if (document.getElementById("flt-funksjon")) document.getElementById("flt-funksjon").value = "ALL";
-      if (document.getElementById("flt-status")) document.getElementById("flt-status").value = "ALL";
+    // Reset filters handler (wired to both View 1 and View 2 buttons)
+    const resetAllFilterInputs = () => {
+      FILTER_PAIRS.forEach(({ v1, v2 }) => {
+        const el1 = document.getElementById(v1);
+        const el2 = document.getElementById(v2);
+        if (el1) el1.value = "ALL";
+        if (el2) el2.value = "ALL";
+      });
       renderAllDynamicReports();
       renderCitationDrawer();
-    });
+    };
+
+    document.getElementById("btn-reset-filters")?.addEventListener("click", resetAllFilterInputs);
+    document.getElementById("btn-reset-filters-ts")?.addEventListener("click", resetAllFilterInputs);
 
     // Q4 Forecast sensitivity sliders
     ["inp-wage-q4", "inp-eff-q4", "inp-dec-weight"].forEach(id => {
