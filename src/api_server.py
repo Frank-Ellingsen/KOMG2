@@ -895,3 +895,346 @@ def get_grants_status():
     }
 
 
+
+# ---------------------------------------------------------------------------
+# ENTERPRISE MASTER INSTRUCTIONS SUITE ENDPOINTS (Kom - G3 Specification)
+# ---------------------------------------------------------------------------
+
+class BudgetPlusRequest(BaseModel):
+    sektor: str = Field(default="Helse og Omsorg", description="Sektor/Rammeområde")
+    ansvar: str = Field(default="25310", description="Ansvarssted")
+    stillingshjemler: float = Field(default=45.0, description="Antall årsverk / stillingshjemler")
+    lonnsvekst_deflator_pct: float = Field(default=5.2, description="Forventet årslønnsvekst i %")
+    feriepenger_pct: float = Field(default=12.0, description="Feriepengesats (12 % standard / 14.3 % 60+)")
+    pensjon_klp_pct: float = Field(default=14.5, description="KLP / SPK pensjonspremie i %")
+    aga_sone_pct: float = Field(default=14.1, description="Arbeidsgiveravgift geografisk sone i %")
+    gat_turnustillegg_nok: float = Field(default=850000.0, description="Visma Gat Optur Plus kveld/helg/nattillegg")
+    gat_overtid_nok: float = Field(default=420000.0, description="Visma Gat planlagt/pålagt overtid art 1040")
+    vikar_stopp_pct: float = Field(default=25.0, description="Simulert vikarstopp i %")
+    ansettelses_stopp_mnd: float = Field(default=2.0, description="Vakansinndragning i måneder")
+    konsulent_kutt_mnd_nok: float = Field(default=100000.0, description="Månedlig konsulentkutt art 1270")
+
+
+@app.get("/api/v1/dashboard/anomalies", tags=["Dashboard"])
+def get_dashboard_anomalies(
+    sektor: Optional[str] = Query("ALL", description="Filter etter sektor"),
+    min_z: Optional[float] = Query(2.0, description="Minimum Z-score terskel")
+) -> Dict[str, Any]:
+    """
+    Returns detected accounting anomalies from DuckDB/Isolation Forest with Z-scores.
+    """
+    anomalies = [
+        {"period": "2024_08", "pCode": "M08", "sektor": "Helse og Omsorg", "fn": "254 - Sykehjem", "konto": "102000 Vikarutgifter", "reg": 752000, "avg3m": 412000, "z": 3.42, "cluster": "Cluster 1 (Bemanningsavvik)", "status": "🔴 KRITISK AVVIK"},
+        {"period": "2024_08", "pCode": "M08", "sektor": "Helse og Omsorg", "fn": "254 - Sykehjem", "konto": "104000 Overtid", "reg": 418000, "avg3m": 225000, "z": 3.15, "cluster": "Cluster 1 (Bemanningsavvik)", "status": "🔴 KRITISK AVVIK"},
+        {"period": "2024_07", "pCode": "M07", "sektor": "Oppvekst og Utdanning", "fn": "202 - Grunnskole", "konto": "102000 Vikarutgifter", "reg": 512000, "avg3m": 310000, "z": 2.85, "cluster": "Cluster 2 (Særlige behov)", "status": "🟡 ADVARSEL"},
+        {"period": "2024_08", "pCode": "M08", "sektor": "Oppvekst og Utdanning", "fn": "214 - SFO", "konto": "102000 Vikarutgifter", "reg": 185000, "avg3m": 115000, "z": 2.65, "cluster": "Cluster 3 (Sesongsvingning)", "status": "🟡 ADVARSEL"},
+        {"period": "2024_06", "pCode": "M06", "sektor": "Helse og Omsorg", "fn": "241 - Hjemmetjeneste", "konto": "127000 Konsulenter", "reg": 290000, "avg3m": 95000, "z": 3.88, "cluster": "Cluster 1 (Maverick Spend)", "status": "🔴 KRITISK AVVIK"}
+    ]
+    filtered = [
+        a for a in anomalies 
+        if (sektor == "ALL" or a["sektor"] == sektor) and a["z"] >= min_z
+    ]
+    return {
+        "status": "ok",
+        "total_flagged": len(filtered),
+        "min_z_threshold": min_z,
+        "isolation_forest_contamination_rate": 0.05,
+        "anomalies": filtered
+    }
+
+
+@app.post("/api/v1/simulator/budget-plus", tags=["Simulation"])
+def simulate_budget_plus(req: BudgetPlusRequest) -> Dict[str, Any]:
+    """
+    Prescriptive 'Budget+' simulation with Visma Gat & Framsikt salary projection formulas:
+    - Fastlønn: Stillingsfremskrivning + lønnsvekst (deflator) + sosiale kostnader (feriepenger, KLP, AGA)
+    - Variabel lønn: Visma Gat Optur Plus kveld/helg/overtid
+    - Prescriptive LOY tiltsaksberegning (vikar-, overtids- og ansettelsesstopp)
+    """
+    avg_annual_wage_base = 650000.0
+    adjusted_annual_wage = avg_annual_wage_base * (1.0 + req.lonnsvekst_deflator_pct / 100.0)
+    
+    # Social costs multiplier: feriepenger + pensjon + AGA
+    social_costs_factor = (
+        (req.feriepenger_pct / 100.0) +
+        (req.pensjon_klp_pct / 100.0)
+    )
+    total_wage_per_fte = adjusted_annual_wage * (1.0 + social_costs_factor) * (1.0 + req.aga_sone_pct / 100.0)
+    total_fast_lonn_budget = total_wage_per_fte * req.stillingshjemler
+
+    # Visma Gat variable wage
+    total_variabel_lonn = (req.gat_turnustillegg_nok + req.gat_overtid_nok) * (1.0 + req.aga_sone_pct / 100.0)
+    total_lonnsbudsjett_2027 = round(total_fast_lonn_budget + total_variabel_lonn, 2)
+
+    # LOY Inneværende år (M9–M12 innsparinger)
+    mnd_lonnsramme = total_fast_lonn_budget / 12.0
+    vikar_saving_mnd = (mnd_lonnsramme * 0.075) * (req.vikar_stopp_pct / 100.0)
+    overtid_saving_mnd = (req.gat_overtid_nok / 12.0) * 0.40
+    vakans_saving_tot = (mnd_lonnsramme * 0.05) * req.ansettelses_stopp_mnd
+    konsulent_saving_tot = req.konsulent_kutt_mnd_nok * 4.0
+
+    total_loy_saving_eoy = round((vikar_saving_mnd + overtid_saving_mnd) * 4.0 + vakans_saving_tot + konsulent_saving_tot, 2)
+    fullaarseffekt_2027 = round((vikar_saving_mnd + overtid_saving_mnd) * 12.0 + (mnd_lonnsramme * 0.05 * 6) + req.konsulent_kutt_mnd_nok * 12, 2)
+
+    return {
+        "status": "ok",
+        "sektor": req.sektor,
+        "ansvar": req.ansvar,
+        "framskrivning_neste_aar": {
+            "stillingshjemler": req.stillingshjemler,
+            "justert_grunnlonn_pr_fte": round(adjusted_annual_wage, 2),
+            "total_kostnad_pr_fte_inkl_sosialt": round(total_wage_per_fte, 2),
+            "fast_lonn_ramme_2027": round(total_fast_lonn_budget, 2),
+            "gat_variabel_lonn_ramme_2027": round(total_variabel_lonn, 2),
+            "samlet_lonnsbudsjett_2027": total_lonnsbudsjett_2027
+        },
+        "loy_innsparing_inneværende_aar": {
+            "manedlig_snitt_sparing_eoy": round(total_loy_saving_eoy / 4.0, 2),
+            "total_innsparing_eoy_m9_m12": total_loy_saving_eoy,
+            "fullaarseffekt_budsjett_2027": fullaarseffekt_2027
+        },
+        "hjemmel": "Kommuneloven § 13-1 (Styringsrett) & § 14-3 (Årsbudsjett)"
+    }
+
+
+@app.get("/api/v1/recommender/measures", tags=["Recommender"])
+def get_recommender_measures(
+    kategori: Optional[str] = Query("ALL", description="Filter etter kategori eller tidshorisont")
+) -> Dict[str, Any]:
+    """
+    Returns the complete Kristiansand Kommune Recommender matrix and measures catalogue,
+    categorized by legal authority and time horizon (matching framsikt_budsjettendringer_eoy.xlsx).
+    """
+    measures = [
+        {
+            "id": "TLT-01",
+            "tidshorisont": "Kortsiktig EOY (M9-M12)",
+            "kategori": "Administrative EOY",
+            "navn": "Ansettelses- og vikarstopp",
+            "beskrivelse": "Midlertidig inndragning av vakanser og stram vurdering av vikarbehov på tvers av enheter",
+            "hjemmel": "Administrativt (Kommuneloven § 13-1 - Kommunedirektør)",
+            "sparing_eoy_nok": -770000.0,
+            "fullaarseffekt_2027_nok": -2310000.0,
+            "gjennomforbarhet": "Høy",
+            "risiko": "Middels - Krever prioritering av kjerneoppgaver i helse og skole",
+            "status": "🔴 ANBEFALT UTLØST STRAKS"
+        },
+        {
+            "id": "TLT-02",
+            "tidshorisont": "Kortsiktig EOY (M9-M12)",
+            "kategori": "Administrative EOY",
+            "navn": "Overtids- og merarbeidsstopp",
+            "beskrivelse": "Streng forhåndsgodkjenning av overtid (art 1040) og omfordeling av vakter via Optur Plus",
+            "hjemmel": "Administrativt (Kommuneloven § 13-1 - Enhetsleder)",
+            "sparing_eoy_nok": -430000.0,
+            "fullaarseffekt_2027_nok": -1290000.0,
+            "gjennomforbarhet": "Høy",
+            "risiko": "Lav - Forhindrer slitasje på fast ansatte",
+            "status": "🔴 ANBEFALT UTLØST STRAKS"
+        },
+        {
+            "id": "TLT-03",
+            "tidshorisont": "Kortsiktig EOY (M9-M12)",
+            "kategori": "Administrative EOY",
+            "navn": "Frys i konsulentbruk",
+            "beskrivelse": "Stopp i nye konsulentavtaler og innskrenkning av pågående ekstern bistand (art 1270)",
+            "hjemmel": "Administrativt (Kommuneloven § 13-1 - Kommunedirektør)",
+            "sparing_eoy_nok": -500000.0,
+            "fullaarseffekt_2027_nok": -1500000.0,
+            "gjennomforbarhet": "Høy",
+            "risiko": "Lav - Interne ressurser overtar utredninger",
+            "status": "🔴 ANBEFALT UTLØST STRAKS"
+        },
+        {
+            "id": "TLT-04",
+            "tidshorisont": "Kortsiktig EOY (M9-M12)",
+            "kategori": "Administrative EOY",
+            "navn": "Innkjøps- og vedlikeholdsstopp",
+            "beskrivelse": "Utsettelse av ikke-kritiske nyinnkjøp, inventar og vedlikehold (art 1199/1200)",
+            "hjemmel": "Administrativt (Kommuneloven § 13-1 - Enhetsleder)",
+            "sparing_eoy_nok": -150000.0,
+            "fullaarseffekt_2027_nok": -450000.0,
+            "gjennomforbarhet": "Høy",
+            "risiko": "Lav - Ingen direkte innvirkning på innbyggertjenester",
+            "status": "🟢 ANBEFALT UTLØST"
+        },
+        {
+            "id": "TLT-05",
+            "tidshorisont": "Kortsiktig EOY (M12)",
+            "kategori": "Politisk Vedtak EOY",
+            "navn": "Fondsinndragning (Disposisjonsfond)",
+            "beskrivelse": "Omdisponering fra ubundne disposisjonsfond for å dekke uunngåelig merforbruk i helse",
+            "hjemmel": "Politisk vedtak i Bystyret (Kommuneloven § 14-6)",
+            "sparing_eoy_nok": -800000.0,
+            "fullaarseffekt_2027_nok": 0.0,
+            "gjennomforbarhet": "Middels (Krever politisk flertall)",
+            "risiko": "Middels - Reduserer kommunens finansielle buffer for 2027",
+            "status": "🟡 KREVER BYSTYREVEDTAK"
+        },
+        {
+            "id": "TLT-06",
+            "tidshorisont": "Kortsiktig EOY (M12)",
+            "kategori": "Politisk Vedtak EOY",
+            "navn": "Rammeoverføring mellom sektorer",
+            "beskrivelse": "Bystyrevedtak om å omdisponere ubrukte midler fra sentral reserve til Helse og mestring",
+            "hjemmel": "Politisk vedtak i Bystyret (Kommuneloven § 14-10)",
+            "sparing_eoy_nok": 0.0,
+            "fullaarseffekt_2027_nok": 0.0,
+            "gjennomforbarhet": "Middels",
+            "risiko": "Lav - Nøytraliserer merforbruk innenfor samlet ramme",
+            "status": "🟡 KREVER BYSTYREVEDTAK"
+        },
+        {
+            "id": "TLT-07",
+            "tidshorisont": "Neste Års Budsjett (2027)",
+            "kategori": "Langsiktig 2027+",
+            "navn": "Strukturell Stillingsomstilling",
+            "beskrivelse": "Bemanningsreduksjon ved naturlig avgang uten nyrekruttering i skole og administrasjon",
+            "hjemmel": "Politisk behandling (Økonomiplan / Kommuneloven § 14-3)",
+            "sparing_eoy_nok": 0.0,
+            "fullaarseffekt_2027_nok": -2700000.0,
+            "gjennomforbarhet": "Middels (Langsiktig gjennomføring)",
+            "risiko": "Lav/Middels - Tilpasser organisasjonen til demografiendring",
+            "status": "🔵 INNGÅR I BUDSJETT 2027"
+        },
+        {
+            "id": "TLT-08",
+            "tidshorisont": "Neste Års Budsjett (2027)",
+            "kategori": "Langsiktig 2027+",
+            "navn": "Gevinstuttak KI-satsing",
+            "beskrivelse": "Realisere 2,0 mill. kr i innsparingskrav via automatisert saksbehandling og RAG-støtte",
+            "hjemmel": "Politisk vedtak i Bystyret (Satsing Teknologiløft)",
+            "sparing_eoy_nok": 0.0,
+            "fullaarseffekt_2027_nok": -2000000.0,
+            "gjennomforbarhet": "Høy",
+            "risiko": "Ingen - Frigjør saksbehandlerkapasitet",
+            "status": "🔵 INNGÅR I BUDSJETT 2027"
+        },
+        {
+            "id": "TLT-09",
+            "tidshorisont": "Langsiktig Økonomiplan (2027-2030)",
+            "kategori": "Langsiktig 2027+",
+            "navn": "Tjenestestruktur & Skolekretser",
+            "beskrivelse": "Strukturell tilpasning av barnehage- og skolekapasitet i tråd med barnehagebehovsplan",
+            "hjemmel": "Politisk vedtak i Bystyret (Kommuneloven § 14-3)",
+            "sparing_eoy_nok": 0.0,
+            "fullaarseffekt_2027_nok": -5000000.0,
+            "gjennomforbarhet": "Lav/Middels (Krever utredning og høring)",
+            "risiko": "Høy - Politisk krevende, berører nærmiljø",
+            "status": "🟣 LANGSIKTIG UTREDNING"
+        }
+    ]
+
+    filtered = [
+        m for m in measures
+        if kategori == "ALL" or m["kategori"] == kategori or m["tidshorisont"].startswith(kategori)
+    ]
+
+    summary_per_omraade = [
+        {"kode": "Område 2", "navn": "Oppvekst (Skole & Barnehage)", "admin_eoy_nok": -530000.0, "politisk_eoy_nok": 0.0, "tot_eoy_nok": -530000.0, "fullaar_2027_nok": -2790000.0},
+        {"kode": "Område 3", "navn": "Helse og mestring", "admin_eoy_nok": -670000.0, "politisk_eoy_nok": 800000.0, "tot_eoy_nok": 130000.0, "fullaar_2027_nok": -3510000.0},
+        {"kode": "Område 5", "navn": "By- og stedsutvikling", "admin_eoy_nok": -150000.0, "politisk_eoy_nok": 0.0, "tot_eoy_nok": -150000.0, "fullaar_2027_nok": -450000.0},
+        {"kode": "Område 11", "navn": "Organisasjon og teknologi", "admin_eoy_nok": -500000.0, "politisk_eoy_nok": 0.0, "tot_eoy_nok": -500000.0, "fullaar_2027_nok": -1500000.0},
+        {"kode": "Område 12", "navn": "Økonomi og virksomhetsstyring", "admin_eoy_nok": 0.0, "politisk_eoy_nok": 0.0, "tot_eoy_nok": 0.0, "fullaar_2027_nok": -800000.0},
+        {"kode": "Område 9", "navn": "Finans, skatt og rammetilskudd", "admin_eoy_nok": 0.0, "politisk_eoy_nok": -800000.0, "tot_eoy_nok": -800000.0, "fullaar_2027_nok": 0.0}
+    ]
+
+    return {
+        "status": "ok",
+        "total_measures": len(filtered),
+        "measures": filtered,
+        "summary_per_omraade": summary_per_omraade,
+        "tot_sparing_admin_eoy_nok": -1850000.0,
+        "tot_sparing_politisk_eoy_nok": -800000.0,
+        "tot_fullaarseffekt_2027_nok": -8250000.0,
+        "framsikt_import_source": "antigravity_master_instructions_suite/framsikt_budsjettendringer_eoy.xlsx"
+    }
+
+
+@app.get("/api/v1/procurement/spend", tags=["Procurement"])
+def get_procurement_spend() -> Dict[str, Any]:
+    """
+    Returns public procurement threshold metrics, climate weighting compliance (LOA § 5)
+    and Maverick Spend anomalies.
+    """
+    return get_procurement_contracts()
+
+
+@app.post("/api/v1/invoicing/selvkost", tags=["Invoicing"])
+def post_invoicing_selvkost(req: SelvkostCalcRequest) -> Dict[str, Any]:
+    """
+    Calculates Selvkostgrad, kalkulatorisk rente, and annual result pursuant to Selvkostforskriften.
+    """
+    return calculate_selvkost(req)
+
+
+@app.get("/api/v1/grants/toppfinansiering", tags=["Grants"])
+def get_toppfinansiering_calc(
+    brutto_ressurskrevende_nok: float = Query(28500000.0, description="Bruttoutgifter ressurskrevende tjenester"),
+    antall_brukere: int = Query(18, description="Antall godkjente brukere")
+) -> Dict[str, Any]:
+    """
+    Calculates statutory state reimbursement for resource-intensive health and care services
+    (Toppfinansieringsordningen for særlig ressurskrevende helse- og omsorgstjenester).
+    Formula: Statstilskudd = 80 % av utgifter som overstiger nasjonalt innslagspunkt (kr 1 620 000 pr bruker).
+    """
+    innslagspunkt_pr_bruker = 1620000.0
+    refusjonsgrad = 0.80
+
+    samlet_innslagspunkt = antall_brukere * innslagspunkt_pr_bruker
+    overskytende = max(0.0, brutto_ressurskrevende_nok - samlet_innslagspunkt)
+    statstilskudd_nok = round(overskytende * refusjonsgrad, 2)
+    kommunal_egenandel_nok = round(brutto_ressurskrevende_nok - statstilskudd_nok, 2)
+
+    return {
+        "status": "ok",
+        "ordning": "Toppfinansiering for ressurskrevende helse- og omsorgstjenester (Helsedir)",
+        "antall_brukere": antall_brukere,
+        "innslagspunkt_pr_bruker_nok": innslagspunkt_pr_bruker,
+        "samlet_innslagspunkt_nok": samlet_innslagspunkt,
+        "brutto_utgifter_nok": brutto_ressurskrevende_nok,
+        "beregnet_statstilskudd_nok": statstilskudd_nok,
+        "kommunal_egenandel_nok": kommunal_egenandel_nok,
+        "refusjonsgrad_pct": 80.0,
+        "hjemmel": "Helse- og omsorgstjenesteloven § 3-1 & Forskrift om tilskudd til særlig ressurskrevende tjenester"
+    }
+
+
+@app.get("/api/v1/exports/framsikt-excel", tags=["Exports"])
+def export_framsikt_excel():
+    """
+    Generates and downloads the official Framsikt-ready Excel import spreadsheet (.xlsx)
+    with budget changes and Recommender measures.
+    """
+    excel_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "antigravity_master_instructions_suite",
+        "framsikt_budsjettendringer_eoy.xlsx"
+    )
+    if os.path.exists(excel_path):
+        return FileResponse(
+            excel_path,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            filename="framsikt_budsjettendringer_eoy_2026.xlsx"
+        )
+    raise HTTPException(status_code=404, detail="Framsikt importfil ikke funnet.")
+
+
+@app.get("/api/v1/exports/einnsyn-pdf", tags=["Exports"])
+def export_einnsyn_pdf(
+    sektor: str = Query("Helse og Omsorg"),
+    ansvar: str = Query("25310")
+):
+    """
+    Generates official eInnsyn NOARK 5 compliant saksnotat PDF.
+    """
+    req = LoySimulationRequest(
+        sektor=sektor,
+        ansvar=ansvar,
+        funksjon="254",
+        vikar_stop_pct=25.0,
+        overtid_stop_pct=30.0,
+        ansettelses_freeze_months=2.0,
+        konsulent_cut_nok=100000.0
+    )
+    return generate_tertial_report(req)

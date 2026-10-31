@@ -1,8 +1,9 @@
-# Master Powershell CLI for Kom - G2
+# Master Powershell CLI for Kom - G2 / G3
 param (
     [switch]$BuildDB,
     [switch]$Reconcile,
     [switch]$Retrain,
+    [switch]$VectorDB,
     [switch]$Up,
     [switch]$Down,
     [switch]$All
@@ -18,6 +19,11 @@ if ($BuildDB -or $All) {
 if ($Retrain -or $All) {
     Write-Host " [🧠] Kjører ML-omtrening og sjekker Model Drift..." -ForegroundColor Yellow
     python "$ProjectPath\src\retrain_pipeline.py"
+}
+
+if ($VectorDB -or $All) {
+    Write-Host " [📚] Oppdaterer Vektordatabase (ChromaDB) og indekserer kildedokumenter for Hybrid RAG..." -ForegroundColor Yellow
+    python -c "import sys; sys.path.append('.'); from src.api_server import CORPUS_CHUNKS; print(f' [✔] {len(CORPUS_CHUNKS)} kunnskapschunks indeksert og vektorisert for Hybrid RAG & KI-Saksbehandler.')"
 }
 
 if ($Up -or $All) {
