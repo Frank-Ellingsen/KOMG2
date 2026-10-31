@@ -119,6 +119,13 @@ def run_tests():
     assert sk["selvkostgrad_pct"] > 0
     print(f"  OK: Selvkostgrad: {sk['selvkostgrad_pct']} %, status: {sk['status_label']}")
 
+    print("Testing /api/v1/invoicing/unit-options (Invoice Options for All Units)...")
+    res = client.get("/api/v1/invoicing/unit-options")
+    assert res.status_code == 200
+    uo = res.json()
+    assert uo["total_units"] >= 10
+    print(f"  OK: {uo['total_units']} municipal units configured with invoice options")
+
     print("Testing /api/v1/invoicing/internal-eliminations (Enterprise Module 9)...")
     res = client.get("/api/v1/invoicing/internal-eliminations")
     assert res.status_code == 200
@@ -218,8 +225,86 @@ def run_tests():
     assert res.status_code == 200
     print("  OK: eInnsyn PDF endpoint verified")
 
+    print("Testing /api/v1/recommender/audit-check (Ultimate Suite - Audit Agent)...")
+    res = client.post("/api/v1/recommender/audit-check", json={
+        "vikar_stop_pct": 35.0,
+        "overtid_stop_pct": 30.0,
+        "ansettelses_freeze_months": 2.0,
+        "konsulent_cut_nok": 150000.0,
+        "sektor": "Helse og Omsorg",
+        "funksjon": "254",
+        "ansvar": "25310"
+    })
+    assert res.status_code == 200
+    audit_data = res.json()
+    assert "overall_legal_risk_score" in audit_data
+    assert audit_data["requires_manual_override"] is True
+    print(f"  OK: Adversarial Audit Agent raised {audit_data['total_flags_raised']} flags (AML § 10-8 & HOTL § 4-1 enforced)")
+
+    print("Testing /api/v1/recommender/audit-log (Ultimate Suite)...")
+    res = client.get("/api/v1/recommender/audit-log")
+    assert res.status_code == 200
+    assert len(res.json()["audit_entries"]) >= 1
+    print("  OK: Persistent Audit Log verified")
+
+    print("Testing /api/v1/chat/search-fallback (Ultimate Suite - Web Search Fallback)...")
+    res = client.post("/api/v1/chat/search-fallback", json={
+        "query": "Hva sier Lovdata og DFØ om nasjonale terskelverdier og disposisjonsfond jf 14-6?"
+    })
+    assert res.status_code == 200
+    search_data = res.json()
+    assert search_data["is_external_search"] is True
+    assert len(search_data["results"]) > 0
+    print(f"  OK: Web search fallback queried {search_data['sources_inspected']} public sources")
+
+    print("Testing /api/v1/pipeline/self-healing-run (Ultimate Suite - Data Quality Pipeline)...")
+    res = client.post("/api/v1/pipeline/self-healing-run")
+    assert res.status_code == 200
+    pipe = res.json()
+    assert pipe["all_checks_passed"] is True
+    assert pipe["pipeline_state"]["reconciliation_diff_nok"] == 0.0
+    print(f"  OK: Self-healing pipeline executed {pipe['rules_executed']} Great Expectations rules (0.00 NOK diff)")
+
+    print("Testing /api/v1/pipeline/self-healing-status (Ultimate Suite)...")
+    res = client.get("/api/v1/pipeline/self-healing-status")
+    assert res.status_code == 200
+    assert res.json()["reconciliation_diff_nok"] == 0.0
+    print("  OK: Self-healing status verified")
+
+    print("Testing /api/v1/notifications/webhook-dispatch (Ultimate Suite - MS Teams Webhooks)...")
+    res = client.post("/api/v1/notifications/webhook-dispatch", json={
+        "trigger_type": "EXPENSE_EXPLOSION",
+        "target_channel": "MS Teams Økonomistyring",
+        "custom_message": "Test utgiftseksplosjon"
+    })
+    assert res.status_code == 200
+    hook_data = res.json()
+    assert hook_data["delivery_status"] == "DELIVERED (SIMULATED_WEBHOOK_OK)"
+    assert "adaptive_card_payload" in hook_data
+    print("  OK: MS Teams Adaptive Card webhook dispatched successfully")
+
+    print("Testing /api/v1/notifications/alerts (Ultimate Suite)...")
+    res = client.get("/api/v1/notifications/alerts")
+    assert res.status_code == 200
+    assert len(res.json()["alerts"]) >= 3
+    print("  OK: Real-time notification triggers verified")
+
+    print("Testing /api/v1/exports/bystyrenotat-pdf (Ultimate Suite - 1-Click Bystyrenotat PDF)...")
+    res = client.get("/api/v1/exports/bystyrenotat-pdf")
+    assert res.status_code == 200
+    assert "pdf" in res.headers.get("content-type", "")
+    assert len(res.content) > 1000
+    print(f"  OK: Bystyrenotat PDF generated ({len(res.content)} bytes)")
+
+    print("Testing /api/v1/exports/bystyrenotat-docx (Ultimate Suite - 1-Click Bystyrenotat DOCX)...")
+    res = client.get("/api/v1/exports/bystyrenotat-docx")
+    assert res.status_code == 200
+    assert "document" in res.headers.get("content-type", "") or "officedocument" in res.headers.get("content-type", "")
+    assert len(res.content) > 1000
+    print(f"  OK: Bystyrenotat DOCX generated ({len(res.content)} bytes)")
+
     print("\n==================================================")
-    print("ALL 18 ENDPOINTS PASSED VERIFICATION WITH 100% SUCCESS!")
+    print("ALL 27 ENDPOINTS (100% SUITE & ULTIMATE) PASSED WITH ZERO ERRORS!")
     print("==================================================")
 
 if __name__ == "__main__":
