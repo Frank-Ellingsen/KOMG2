@@ -1,5 +1,4 @@
 import os
-import sys
 import duckdb
 import numpy as np
 import pandas as pd
@@ -8,12 +7,6 @@ from sklearn.tree import DecisionTreeClassifier, export_text
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, f1_score
-
-if hasattr(sys.stdout, "reconfigure"):
-    try:
-        sys.stdout.reconfigure(encoding="utf-8")
-    except Exception:
-        pass
 
 def run_retrain_pipeline(db_path: str = "data/database/kostra_prod.duckdb"):
     """
