@@ -54,13 +54,33 @@ st.markdown("""
 
 DB_PATH = os.path.abspath("data/database/kostra_prod.duckdb")
 
-def run_query(query: str) -> pd.DataFrame:
+
+def run_query(query: str, params: list | tuple | None = None) -> pd.DataFrame:
     db_file = DB_PATH if os.path.exists(DB_PATH) else "data/database/kostra_prod.duckdb"
     conn = duckdb.connect(db_file, read_only=True)
     try:
-        return conn.execute(query).fetchdf()
+        return conn.execute(query, params or []).fetchdf()
     finally:
         conn.close()
+
+
+def build_filter_sql(selected_sektor: str, selected_funksjon: str, selected_ansvar: str) -> tuple[str, list]:
+    clauses = ["1=1"]
+    params: list = []
+
+    if selected_sektor != "Alle Sektorer":
+        clauses.append("sektor_navn = ?")
+        params.append(selected_sektor)
+    if selected_funksjon != "Alle Funksjoner":
+        f_code = selected_funksjon.split(" - ", 1)[0]
+        clauses.append("funksjon_code = ?")
+        params.append(f_code)
+    if selected_ansvar != "Alle Ansvarssteder":
+        clauses.append("ansvar_code = ?")
+        params.append(selected_ansvar)
+
+    return "WHERE " + " AND ".join(clauses), params
+
 
 if not os.path.exists(DB_PATH) and not os.path.exists("data/database/kostra_prod.duckdb"):
     st.error(f"⚠️ Kunne ikke koble til DuckDB (`{DB_PATH}`). Kjør `python src/db_manager.py` først.")
@@ -74,32 +94,29 @@ df_sektorer = run_query("SELECT DISTINCT sektor_navn FROM modelready_fact WHERE 
 sektorer = ["Alle Sektorer"] + df_sektorer["sektor_navn"].tolist()
 selected_sektor = st.sidebar.selectbox("Velg Sektor / Hovedområde:", sektorer)
 
-funksjon_query = "SELECT DISTINCT funksjon_code, funksjon_navn FROM modelready_fact WHERE 1=1"
+funksjon_query = "SELECT DISTINCT funksjon_code, funksjon_navn FROM modelready_fact"
+funksjon_params: list = []
 if selected_sektor != "Alle Sektorer":
-    funksjon_query += f" AND sektor_navn = '{selected_sektor}'"
+    funksjon_query += " WHERE sektor_navn = ?"
+    funksjon_params.append(selected_sektor)
 funksjon_query += " ORDER BY funksjon_code"
 
-df_funksjoner = run_query(funksjon_query)
+df_funksjoner = run_query(funksjon_query, funksjon_params)
 funksjon_options = ["Alle Funksjoner"] + [f"{r['funksjon_code']} - {r['funksjon_navn']}" for _, r in df_funksjoner.iterrows()]
 selected_funksjon = st.sidebar.selectbox("Velg KOSTRA Funksjon:", funksjon_options)
 
-ansvar_query = "SELECT DISTINCT ansvar_code FROM modelready_fact WHERE 1=1"
+ansvar_query = "SELECT DISTINCT ansvar_code FROM modelready_fact"
+ansvar_params: list = []
 if selected_sektor != "Alle Sektorer":
-    ansvar_query += f" AND sektor_navn = '{selected_sektor}'"
+    ansvar_query += " WHERE sektor_navn = ?"
+    ansvar_params.append(selected_sektor)
 ansvar_query += " ORDER BY ansvar_code"
-df_ansvar = run_query(ansvar_query)
+df_ansvar = run_query(ansvar_query, ansvar_params)
 ansvar_options = ["Alle Ansvarssteder"] + [str(r["ansvar_code"]) for _, r in df_ansvar.iterrows()]
 selected_ansvar = st.sidebar.selectbox("Velg Ansvarssted / Enhet:", ansvar_options)
 
 # Data Query
-where_clause = "WHERE 1=1"
-if selected_sektor != "Alle Sektorer":
-    where_clause += f" AND sektor_navn = '{selected_sektor}'"
-if selected_funksjon != "Alle Funksjoner":
-    f_code = selected_funksjon.split(" - ")[0]
-    where_clause += f" AND funksjon_code = '{f_code}'"
-if selected_ansvar != "Alle Ansvarssteder":
-    where_clause += f" AND ansvar_code = '{selected_ansvar}'"
+where_clause, where_params = build_filter_sql(selected_sektor, selected_funksjon, selected_ansvar)
 
 summary_sql = f"""
 SELECT 
@@ -116,7 +133,7 @@ FROM modelready_fact
 {where_clause};
 """
 
-df_sum = run_query(summary_sql)
+df_sum = run_query(summary_sql, where_params)
 
 budsjett_eoy = float(df_sum['total_budsjett_eoy'].iloc[0] or 0.0)
 regnskap_m8 = float(df_sum['total_regnskap_m8'].iloc[0] or 0.0)
@@ -225,7 +242,7 @@ with tab1:
     ORDER BY "Helårsavvik EOY" DESC;
     """
     
-    df_detail = run_query(detail_sql)
+    df_detail = run_query(detail_sql, where_params)
     
     col_chart1, col_chart2 = st.columns([1, 1])
     
@@ -317,7 +334,7 @@ with tab2:
     GROUP BY month
     ORDER BY month;
     """
-    df_mnd = run_query(mnd_sql)
+    df_mnd = run_query(mnd_sql, where_params)
     
     hist_values = df_mnd['mnd_regnskap'].tolist() if not df_mnd.empty else [avg_mnd_historical]*8
     future_values = [required_rate] * 4
@@ -425,7 +442,7 @@ with tab4:
 
 with tab5:
     st.subheader("🌲 Machine Learning Prognoser (`R² = 0,9758`) & Anomaly Detection (`IsolationForest`)")
-    df_ml = run_query(f"SELECT * FROM modelready_fact {where_clause}")
+    df_ml = run_query("SELECT * FROM modelready_fact " + where_clause, where_params)
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("RandomForest R²", "0,9758", delta="MAE: 1 655 NOK")
     m2.metric("DecisionTree Accuracy", "100,0 %", delta="F1: 1,0000")
