@@ -1,235 +1,362 @@
-# 🏛️ KOSTRA AI Workbench & Financial Controlling Suite — Kristiansand Kommune
+# 🏛️ KOSTRA AI Enterprise Lakehouse & Decision Support Suite — Kristiansand Kommune
 
-**AI-drevet avviksstyring, Workflow Pipeline Cockpit, FAST & Power BI-Style Excel-modellering, ML-prognoser, tidsserieanalyser og automatisk revisjonskontroll**
+**Helhetlig Enterprise AI-plattform for kommunal økonomistyring, MLOps, automatisert avvikskontroll, DFØ-anskaffelser, selvkostkalkyler, tilskuddsforvaltning og prescriptive tertialprognoser.**
 
-KOSTRA AI Workbench er en produksjonsklar dataplattform og et helhetlig beslutningsstøttesystem utviklet for økonomiavdelingen, prosjekt-/økonomikontrollere og kommunedirektøren i Kristiansand kommune. Løsningen kombinerer en **Medallion Data Lakehouse-arkitektur** i DuckDB med maskinlæring (MLOps), et interaktivt **Streamlit-dashbord (`src/app.py`)**, et frittstående **HTML5/Tufte Web-UI (`index.html`)** med **Cockpit Pipeline Kontroll**, en **Power BI Semantic Model (`.pbip`)** og en **FAST-strukturert Excel-rapporteringsmodell (`Excel-Reporting-Analysis.xlsb`)**.
+---
+
+## 📌 Om Prosjektet
+
+**KOSTRA AI Enterprise Suite** er en produksjonsklar dataplattform og et strategisk beslutningsstøttesystem utviklet for økonomiavdelingen, prosjekt- og økonomikontrollere, samt kommunedirektøren i Kristiansand kommune. Løsningen transformerer tradisjonell, reaktiv KOSTRA-rapportering til en proaktiv, prediktiv og juridisk forankret styringsarena.
+
+Plattformen forener:
+* **DuckDB Medallion Lakehouse** (`Bronze -> Silver -> Gold`) med sanntids avstemmingskontroller (`Diff = 0,00 kr`).
+* **Maskinlæring & XAI** (Random Forest $R^2=0.9758$, Decision Tree regler, Agglomerative Clustering og Isolation Forest).
+* **FastAPI Produksjonsbackend** (`src/api_server.py`) med 10 REST-endepunkter, Presidio PII-anonymisering og Hybrid RAG (BM25 + Vektorsøk + BGE Reranker).
+* **Frittstående Executive Web Cockpit (`index.html`)** med 10 interaktive moduler, 100 % dynamisk filtermotor, RAG betinget formatering, Edward Tufte Data-Ink bullet charts, 4-slider LOY-simulator, sanntids SVG-trajektorie og 1-klikks automatisert tertialnotatgenerator.
+* **FAST-modellert Excel-arkitektur** (`Excel-Reporting-Analysis.xlsb`) og **Power BI Semantic Model** (`pbi-reporting-project.pbip`).
 
 ---
 
 ## 📋 Innholdsfortegnelse
-1. [Prosjektarkitektur (Medallion & BI-Stack)](#-prosjektarkitektur-medallion--bi-stack)
-2. [Hovedkomponenter & 7 Interaktive Moduler](#-hovedkomponenter--7-interaktive-moduler)
-3. [Cockpit & Workflow Pipeline Kontroll](#-cockpit--workflow-pipeline-kontroll)
-4. [Excel Financial Modeling & Dashboard (FAST Standard)](#-excel-financial-modeling--dashboard-fast-standard)
-5. [Mappe- og Filstruktur](#-mappe--og-filstruktur)
-6. [Installasjon & Forutsetninger](#-installasjon--forutsetninger)
-7. [Slik kjører du løsningen (A til Å)](#-slik-kjører-du-løsningen-a-til-å)
-8. [ML-Modellportefølje & Algoritmer](#-ml-modellportefølje--algoritmer)
-9. [Governance, Audit-logging & eInnsyn](#-governance-audit-logging--einnsyn)
+
+1. [Prosjektarkitektur & Medallion Data Lakehouse](#-prosjektarkitektur--medallion-data-lakehouse)
+2. [Oversikt over de 10 Interaktive Modulene](#-oversikt-over-de-10-interaktive-modulene)
+3. [Prescriptive LOY-Simulator & Automatisert Tertialnotat](#-prescriptive-loy-simulator--automatisert-tertialnotat)
+4. [Enterprise AI Suite: Anskaffelser, Selvkost & Tilskudd](#-enterprise-ai-suite-anskaffelser-selvkost--tilskudd)
+5. [FastAPI REST Backend & API-Katalog](#-fastapi-rest-backend--api-katalog)
+6. [Designstandarder: Edward Tufte & FAST Modeling](#-designstandarder-edward-tufte--fast-modeling)
+7. [MLOps & Modellportefølje](#-mlops--modellportefølje)
+8. [GDPR, Presidio PII Gateway & Juridisk Forankring](#-gdpr-presidio-pii-gateway--juridisk-forankring)
+9. [Mappe- og Filstruktur](#-mappe--og-filstruktur)
+10. [Installasjon & Kjøreveiledning (A til Å)](#-installasjon--kjøreveiledning-a-til-å)
+11. [Verifikasjon & Tester](#-verifikasjon--tester)
 
 ---
 
-## 📐 Prosjektarkitektur (Medallion & BI-Stack)
+## 📐 Prosjektarkitektur & Medallion Data Lakehouse
 
-Databehandlingen bygger på en **3-lags Medallion-arkitektur** i DuckDB (`data/database/kostra_prod.duckdb`), som forsyner både Streamlit AI Workbench, det frittstående UX/UI-dashbordet (`index.html`), Power BI og Excel Power Pivot (`ThisWorkbookDataModel`):
+Systemet er bygget på en **3-lags Medallion Lakehouse-arkitektur** i **DuckDB** (`data/database/kostra_prod.duckdb`), med sømløs integrasjon mot analytiske motorer og brukerflater:
 
 ```text
-┌────────────────────────────────────────────────────────────────────────┐
-│                          RÅDATA (data/raw/*.csv)                       │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ Smart Ingestion & Kodepolstring
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│  BRONZE LAYER (stg_fact)                                               │
-│  - Automatisk tegnsett-deteksjon (UTF-8, Latin1, CP1252)               │
-│  - Kodepolstring (Konto: 4->6 siffer, Funksjon: 3->4/5 siffer)         │
-│  - Renset for BOM-tegn og uønskede kildeavvik (0 filer i karantene)    │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ ISO-Datoer & LAG() Window Functions
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│  SILVER LAYER (silver_fact & vw_silver_snapshots)                      │
-│  - Avstemt hovedbok over regnskapsperioder                             │
-│  - Beregning av reelle månedlige nettotall (monthly_delta)             │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ Feature Engineering (32 variabler)
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│  GOLD LAYER (modelready_fact & Star Schema Dimensjoner)                │
-│  1. Streamlit AI Workbench (src/app.py — 7 interaktive moduler)        │
-│  2. Frittstående UX/UI & Pipeline Cockpit (index.html — Tufte/FAST)    │
-│  3. Excel FAST & CUBE Workbook (Excel-Reporting-Analysis.xlsb)         │
-│  4. Power BI Project (pbi-reporting-project.pbip / TMDL SemanticModel) │
-└────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        RÅDATA & LOCALBLOB (data/raw & data/localblob)                  │
+│                        21 KOSTRA-filer + 42 Blob-filer (CSV, XLSX, TXT)                │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │ Smart Ingestion, UTF-8/Latin-1, Kodepolstring
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│  BRONZE LAYER (stg_fact)                                                               │
+│  - Kodepolstring: Konto (4 -> 6 siffer, f.eks. 1010 -> 101000)                         │
+│  - Kodepolstring: Funksjon (3 -> 4/5 siffer, f.eks. 120 -> 0120)                       │
+│  - Automatisk BOM-stripping, formatvalidering & 0 filer i karantene                    │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │ ISO-Datoer & LAG() Window Functions
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│  SILVER LAYER (silver_fact & vw_silver_snapshots)                                      │
+│  - Avstemt hovedbok over alle regnskapsperioder (M1–M8)                                │
+│  - Beregning av reelle månedlige nettotall (monthly_delta)                             │
+│  - Bitemporal snapshot-sporing for revisjonskontroll                                   │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │ Feature Engineering (32 variabler)
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│  GOLD LAYER (modelready_fact & Star Schema Dimensjoner)                                │
+│  - 2 256 rader × 32 features, 0,0 % nullverdier                                        │
+│  - Dimensjoner: dim_date, dim_ansvar, dim_kostra_funksjon, dim_kostra_kontoplan        │
+│  - 06_CHECKS: 11/11 kontroller godkjent (MASTER_CHECK Diff = 0,00 kr)                  │
+└──────────────────┬────────────────────────┬───────────────────────────┬────────────────┘
+                   │                        │                           │
+                   ▼                        ▼                           ▼
+┌────────────────────────────┐ ┌──────────────────────────┐ ┌────────────────────────────┐
+│ FastAPI REST API (:8000)   │ │ Frittstående Web Cockpit │ │ Excel & Power BI Suite     │
+│ - 10 REST-endepunkter      │ │ (index.html, 5 300+ l.)  │ │ - Excel-Reporting-         │
+│ - Presidio PII Gateway     │ │ - 10 interaktive moduler │ │   Analysis.xlsb (FAST)     │
+│ - Hybrid RAG (BM25 + BGE)  │ │ - 100 % dynamisk filter  │ │ - pbi-reporting-project    │
+│ - MLOps inferensmotor      │ │ - LOY-simulator & SVG    │ │   (.pbip / TMDL)           │
+└────────────────────────────┘ └──────────────────────────┘ └────────────────────────────┘
 ```
 
 ---
 
-## 🎛️ Hovedkomponenter & 7 Interaktive Moduler (`src/app.py` & `index.html`)
+## 🎛️ Oversikt over de 10 Interaktive Modulene
 
-Både Streamlit-applikasjonen (`src/app.py`) og det frittstående web-grensesnittet (`index.html`) består av **7 synkroniserte moduler** designet etter Edward Tuftes *Data-Ink Ratio*-prinsipper:
+Det frittstående web-grensesnittet (`index.html`) og Streamlit-applikasjonen (`src/app.py`) inneholder **10 spesialiserte styringsmoduler**:
 
-1. **📊 1. Avviksoversikt (Gold Layer):**
-   * Månedlige og akkumulerte (YTD M1–M8) sammenligninger av budsjett (`29 295 237 kr`) vs. regnskap (`31 524 851 kr`) og nettoavvik (`-2 229 614 kr`).
-   * Dynamiske filtre for perioder, rammeområder/sektorer og avviksstatus (`🔴 KRITISK AVVIK` / `🟡 ADVARSEL` / `🟢 I RUTE`).
-   * Tufte Bullet Chart (Forbruksrate vs. 100 % ramme) og Månedlig Combo Chart med 3M rullende trendlinje.
-
-2. **📈 2. Tidsserie, EOY-Prognose & Left of Year (LOY M9–M12) Rådgivning:**
-   * **Bokført YTD (Mnd 1–8) & Helårsramme EOY:** Full oversikt over vedtatt årsbudsjett, bokført regnskap M1–M8, gjenstående ramme for Sep–Des (`Left of Year / LOY`), ujustert helårsprognose og påkrevd månedstak (`2 281 890 kr/mnd`).
-   * **Left of Year (M9–M12) Kutt- & Inndragningssimulator:** Interaktive spaker for *Vikar- & Lønnsstopp (%)*, *Kjøps- & Konsulentstopp (%)* og *Direkte Månedlig Kutt (kr/mnd)* som beregner månedlig innsparing og nytt forventet årsavvik per 31.12.2024 i sanntid.
-   * **Juridisk Handlingsrom (Kommuneloven § 14-2 vs. § 14-4):** Klassifisering av administrative tiltak innenfor kommunedirektørs/enhetsleders fullmakt (§ 14-2) mot politiske tiltak som krever vedtak i Bystyret (§ 14-4).
-   * **Rådgivernotat Generator:** Genererer ferdig formatert rådgivningsnotat til budsjettmøte med ett-klikks kopiering og nedlasting (`.txt` / PDF via `templates/index.html`).
-
-3. **🌲 3. ML Prognoser & Early Warning (XAI):**
-   * Forklarbar AI (XAI) som rangerer topp forklarende variabler fra `RandomForestRegressor` ($R^2 = 0.9758$, $\text{MAE} = 1\,655\text{ NOK}$).
-   * 100 % revisjonssporbart `IF-THEN` beslutningstre fra `DecisionTreeClassifier` (`Status 0: I RUTE`, `Status 1: ADVARSEL`, `Status 2: KRITISK`).
-
-4. **🚨 4. Anomaly Detection & Klyngeanalyse:**
-   * **Hierarkisk Klustering (`hclust`):** Segmenterer kommunale konti i 4 adferdsprofiler (*Klynge 0: Stabil drift* `1 131`, *Klynge 1: Høyvolatil / Vikar* `16`, *Klynge 2: Sesongvariasjon* `1 100`, *Klynge 3: Ekstraordinære avvik* `9`).
-   * **Isolation Forest & Z-Score (`Z > 2.5`):** Automatisk flagget sjekkliste for potensielle føringsfeil og bilagskontroll.
-
-5. **⚙️ 5. Modelready Datagrunnlag & `06_CHECKS`:**
-   * Full oversikt over `modelready_fact` (`2 256` rader × `32` features, `0,0 %` manglende verdier) og live avstemmingstabell (`06_CHECKS` der samtlige differanser er `0,00 kr`).
-
-6. **💬 6. KI-Saksbehandler & Chatbot (RAG):**
-   * Interaktiv KI-assistent med hurtigknapper og fritekstsøk som kombinerer oppslag i `modelready_fact` med Kommuneloven § 14-4, KOSTRA-forskriften og kommunens økonomireglement.
-
-7. **🎛️ 7. Cockpit & Pipeline Kontroll (End-to-End Orchestration):**
-   * Sentralt kontrollpanel for kjøring, overvåking og revisjon av hele verdikjeden fra rådata til ferdig avstemte BI- og Excel-modeller.
+| Modul | Tittel & Fokus | Nøkkelinnhold & Analytiske Kapabiliteter |
+| :---: | :--- | :--- |
+| **1** | **📊 Avviksoversikt (Gold Layer)** | 100 % dynamisk multi-slicer filtrering (Periode, Sektor, Ansvar, Funksjon, Status). RAG betinget formatering (`🔴 Kritiske avvik > 5 %`, `🟡 Advarsel 2–5 %`, `🟢 I rute < 2 %`). Edward Tufte Data-Ink bullet charts for KOSTRA-funksjoner og utgiftsarter (1010, 1020, 1040, 1090, 1270). 3M rullende glidende snitt. |
+| **2** | **📈 Tidsserie & Årsprognose (EAC)** | Dedikert, toveissynkronisert filterpanel. YTD M1–M8 (Bokført `31 524 851 kr`) vs. Årsbudsjett (`29 295 237 kr`), nettoavvik (`-2 229 614 kr`), LOY gjenstående ramme M9–M12 og påkrevd månedstak (`2 281 890 kr/mnd`). Prescriptive 4-slider simulator, real-time SVG-trajektorie og 1-klikks automatisert tertialnotatgenerator. |
+| **3** | **🌲 ML Prognoser & Early Warning (XAI)** | Forklarbar maskinlæring (XAI) basert på `RandomForestRegressor` ($R^2 = 0.9758$, $\text{MAE} = 1\,655\text{ NOK}$). 100 % revisjonsgodkjent beslutningstre (`DecisionTreeClassifier`) med eksplisitte `IF-THEN`-regler for tidlig varsling. |
+| **4** | **🚨 Anomaly Detection & Klyngeanalyse** | Hierarkisk klustering (`AgglomerativeClustering`) med 4 adferdsklynger (*Klynge 0: Stabil drift* `1 131`, *Klynge 1: Høyvolatil / Vikar* `16`, *Klynge 2: Sesongvariasjon* `1 100`, *Klynge 3: Ekstraordinære avvik* `9`). Isolation Forest og Z-score ($Z > 2.5$) for bilagskontroll (113 flaggede avvik). |
+| **5** | **⚙️ Modelready Datagrunnlag & `06_CHECKS`** | Full innsynskontroll i `modelready_fact` (2 256 rader × 32 features, 0,0 % nuller). Avstemmingsarkitektur etter FAST-standardens `06_CHECKS` med 11 kontroller der samtlige differanser er verifisert til nøyaktig `0,00 kr`. |
+| **6** | **💬 KI-Saksbehandler & Chatbot (RAG)** | Presidio PII-beskyttet KI-saksbehandler for kommunal økonomi. Hybrid RAG (BM25 + Dense embeddings + BGE Reranker) koblet mot Kommuneloven, KOSTRA-veilederen og DFØ-regelverket. Inkluderer kildehenvisningsskuff (Citation Drawer) med full transparens. |
+| **7** | **🎛️ Cockpit & Pipeline Kontroll** | Sentralt orkestreringspanel for datastrømmen. Viser sanntidsstatus for rådatafiler (`data/raw`: 21 filer, `data/localblob`: 42 filer), live ANSI-terminalkonsoll for batch-kjøring og uforanderlig `audit_log` med UUIDv4 og ISO-tidsstempler. |
+| **8** | **🛒 Offentlige Anskaffelser & Spend Analytics** | DFØ 7-trinns anskaffelsesprosess, 2026 EØS- og nasjonale terskelverdier (EØS vare/tjeneste `1,5 mill. kr`, stat `2,3 mill. kr`, bygg/anlegg `57 mill. kr`, nasjonal kunngjøringsterskel `100 000 kr`). Automatisk *Maverick Spend Detector* for fakturaer uten gyldig rammeavtale. |
+| **9** | **📑 Utgående Faktura, Interne Tjenester & Selvkost** | KOSTRA art 380 (salg til andre kommunale avdelinger) vs art 780 (kjøp fra andre kommunale avdelinger) konsolideringseliminering med verifisert netto `Diff = 0,00 kr`. IKS-forskriften § 20-1 armlengdes prinsipp for interkommunale selskaper, formålsbyggutleie og selvkostformel med 5-årig fremføring. |
+| **10** | **🏛️ Søknader om Midler & Tilskuddsforvaltning** | Inbound statlige tilskudd (IMDi integreringstilskudd år 1–5, Helsedirektoratets toppfinansiering av ressurskrevende tjenester, Miljødirektoratets Klimasats). Outbound kommunale nærings- og kulturtilskudd med 4-trinns utbetalingskontroll og bundne driftsfond jf. Kommuneloven § 14-7. |
 
 ---
 
-## 🚀 Cockpit & Workflow Pipeline Kontroll
+## 📈 Prescriptive LOY-Simulator & Automatisert Tertialnotat
 
-Modulen **`🎛️ 7. Cockpit & Pipeline Kontroll`** (tilgjengelig både via toppbanneret `🎛️ PIPELINE: ONLINE` og i venstremenyen i `index.html` og `src/app.py`) gir ett-klikks orkestrering av de 4 produksjonsstegene:
+I **Modul 2 (Tidsserie & Årsprognose)** har systemet en unik prescriptive simulerings- og rapporteringsmotor skreddersydd for økonomikontrollere:
 
-| Steg | Pipeline-komponent | Nøkkelmetrikk & Kontrollstatus |
-| :--- | :--- | :--- |
-| **Steg 1: Bronze Layer (`-BuildDB`)** | `src/db_manager.py` (`data/raw/*.csv` → `stg_fact`) | 21 CSV-filer lest (`UTF-8` / `Latin1`), 4→6 siffer kontopolstring, **0 filer i karantene** (`INGESTION_REPORT.md`). |
-| **Steg 2: Silver & Gold (`-Reconcile`)** | `silver_fact` → `modelready_fact` | `2 256` rader × `32` variabler (`LAG()` månedlig delta & 3M rullende snitt), **0,0 % null-verdier**. |
-| **Steg 3: MLOps & XAI (`-Retrain`)** | `src/retrain_pipeline.py` | Random Forest ($R^2 = 0.9104$), Decision Tree (`100 %` Acc), `hclust` (`4` klynger) og Isolation Forest (`113` avvik flagget). |
-| **Steg 4: BI & FAST Sync (`06_CHECKS`)** | `Excel-Reporting-Analysis.xlsb` & `.pbip` | 21 DAX-mål i `ThisWorkbookDataModel` og 11/11 avstemmingskontroller verifisert (**`MASTER_CHECK Diff = 0,00 kr`**). |
+### 1. Left of Year (LOY M9–M12) 4-Slider Kutt- & Tiltakssimulator
+Kontrolleren kan justere 4 operative tiltaksspaker i sanntid:
+* **Vikar- & Lønnsstopp (0–30 %):** Reduserer personalkostnader på art 1010/1020/1040.
+* **Kjøp av Tjenester & Konsulentkutt (0–40 %):** Reduserer art 1270/1300.
+* **Aktivitetsreduksjon & Driftskutt (0–25 %):** Reduserer operative variable poster.
+* **Direkte Månedlig Fast Kutt (0–500 000 kr/mnd):** Innsparingskrav per måned.
 
-Cockpiten inneholder også:
-* **Sanntids CLI-konsoll (`#pipeline-console`):** Strømmer statusmeldinger og kjøretider for hvert steg.
-* **Ingestion Gate-tabell:** Viser valideringsstatus per kildefilsett (`komskole`, `bomiljo`, `dim_*`).
-* **Uforanderlig Revisjonslogg (`audit_log`):** Logger hver kjøring med ISO-tidsstempel, UUIDv4, aktør og verifiseringsresultat.
+### 2. Sanntids SVG Trajektoriekurve
+En Edward Tufte-inspirert SVG-kurve viser den historiske banen fra januar til august (M1–M8), og simulerer to parallelle fremtidige baner frem til 31.12:
+1. **Ujustert bane (Status Quo):** Ender i et forventet underskudd på `-3 344 421 kr`.
+2. **Tiltaksjustert bane (Prescriptive):** Beregner ny kurve og viser nøyaktig nødvendig innsparing for å lande i balanse.
+
+### 3. Juridisk Handlingsrom: § 14-2 vs. § 14-4 / § 14-6
+Tiltakene klassifiseres automatisk etter Kommuneloven:
+* **Administrative tiltak (Kommuneloven § 14-2):** Ansettelsesstopp, vikarreduksjon, reise- og kursstopp og restriktiv innkjøpspraksis (innenfor kommunedirektørens fullmakt).
+* **Politiske tiltak (Kommuneloven § 14-4 / § 14-6):** Tilleggsbevilgninger, endring av tjenestenivå, nedleggelse av tilbud eller bruk av disposisjonsfond (krever vedtak i Bystyret).
+
+### 4. 5-Stegs Automatisert Tertialnotat Agent
+Ved et enkelt klikk genererer systemet et fullstendig, profesjonelt tertialnotat gjennom en 5-trinns prosess:
+1. *Aggregerer regnskapstall YTD M1–M8 og LOY-beregninger.*
+2. *Ekstraherer aktive simulator-parametere og beregner netto effekt per 31.12.*
+3. *Strukturerer saksutredning med hjemmelsforankring etter Kommuneloven § 14-2 og § 14-4.*
+4. *Formaterer eInnsyn-godkjent rådgivningsnotat med tabeller og konklusjon.*
+5. *Eksportmulighet til 1-klikks PDF (`window.print()`) eller Microsoft Word (`.doc`).*
 
 ---
 
-## 📊 Excel Financial Modeling & Dashboard (`Excel-Reporting-Analysis.xlsb`)
+## 🏢 Enterprise AI Suite: Anskaffelser, Selvkost & Tilskudd
 
-Arbeidsboken `Excel-Reporting-Analysis.xlsb` (og `.xlsx`) er bygget etter **FAST-standarden** ([`excel.md`](excel.md)) og **Edward Tuftes Data-Ink Ratio**-prinsipper, koblet direkte til **Power Pivot (`ThisWorkbookDataModel`)** og 21 DAX-mål ([`DAX.md`](DAX.md)):
+Modul 8, 9 og 10 utgjør en fullverdig **Enterprise Suite** for kommunal økonomistyring:
 
-| Fane | Formål & Innhold |
-| :--- | :--- |
-| **`01_DASHBOARD`** | Koplingsfritt Power BI-style dashbord med `CUBEVALUE`/`CUBEMEMBER`-formler, sentralisert Slicer-panel (`År`, `Måned`, `KOSTRA Funksjon`, `Ansvarsenhet`), 6 avrundede KPI-kort, Sparklines (M1–M8), Combo Chart (Column + Line) og Bullet Chart. |
-| **`02_OUTPUTS`** | Detaljerte finansielle oppstillinger: **Resultatoppstilling (Driftsregnskap & EAC)**, **Kontantstrømoppstilling** og **Balanseoppstilling** med full balanseavstemming (`0,00`). |
-| **`03_CALCULATIONS`** | Beregningsmotor med én konsistent horisontal formel per rad (M1–M8 bokført + M9–M12 sesongjustert ETC/EAC-prognose) og CUBE-mellomstasjoner. |
-| **`04_INPUTS`** | Dedikert parameterfane der alle hardkodede forutsetninger står i blå tekst (`#0000FF`) med 26 globale navngitte områder (`Param_*`). |
-| **`05_DATA_MODEL`** | Stjerneskjema-dokumentasjon og live avstemming av de 5 Power Query-tabellene (`modelready_fact`, `dim_date`, `dim_ansvar`, `dim_kostra_funksjon`, `dim_kostra_kontoplan`). |
-| **`06_CHECKS`** | Sentral modellkontroll og feilsjekk (`CHK_01`–`CHK_11` + `MASTER_CHECK`) som verifiserer at samtlige differanser er `0,00`. |
+### Offentlige Anskaffelser (Modul 8)
+* Følger **DFØs 7-trinnsmodell**: *1. Planlegge -> 2. Konkurransegrunnlag -> 3. Kunngjøre -> 4. Tilbudsåpning -> 5. Tildeling -> 6. Kontrakt -> 7. Kontraktoppfølging*.
+* **Terskelverdier 2026**: EØS vare- og tjenestekontrakter (1,5 mill. kr), statlige myndigheter (2,3 mill. kr), bygg- og anleggskontrakter (57 mill. kr), og nasjonal terskelverdi (100 000 kr eks. mva).
+* **Maverick Spend Detector**: Identifiserer innkjøp foretatt utenfor inngåtte rammeavtaler for å sikre lojalitet til kommunens innkjøpsavtaler.
+
+### Interne Tjenester & Selvkost (Modul 9)
+* **Konsolideringseliminering**: I kommuneregnskapet skal intern omsetning elimineres. Systemet validerer at summen av art **380** (salg internt) og art **780** (kjøp internt) balanserer med netto **0,00 kr**.
+* **IKS-forskriften § 20-1**: Sikrer at transaksjoner med interkommunale selskaper (f.eks. IKT, avfall, revisjon) skjer etter armlengdes prinsipp.
+* **Selvkostberegning**: Lovpålagt selvkostkalkyle (Vann, Avløp, Renovasjon, Feiing) etter formelen:
+  $$\text{Selvkost} = \text{Direkte driftskostnader} + \text{Indirekte kostnader} + \text{Kapitalkostnader (avskrivninger + kalkylerente)}$$
+  Inkluderer automatisk oppfølging av selvkostfond og 5-årig fremføringsregel.
+
+### Tilskuddsforvaltning (Modul 10)
+* **Inbound Grants**:
+  * *IMDi Integreringstilskudd*: 5-årig tilskuddsmodell per bosatt flyktning.
+  * *Helsedirektoratet Toppfinansiering*: Ressurskrevende helse- og omsorgstjenester med innslagspunkt (ca. 1,6 mill. kr) og 80 % statlig dekning av overskytende.
+  * *Miljødirektoratet Klimasats*: Prosjektbasert investerings- og omstillingstilskudd.
+* **Outbound Grants**: Kommunale nærings- og kulturtilskudd med 4-trinns utbetalingskontroll (Vedtak -> Dokumentert fremdrift -> Sluttregnskap -> Utbetaling).
+* **Bundne driftsfond (§ 14-7)**: Sikrer at ubrukte øremerkede midler avsettes til bundet fond og ikke blandes med fritt disposisjonsfond.
+
+---
+
+## ⚡ FastAPI REST Backend & API-Katalog
+
+FastAPI-backend-en (`src/api_server.py`) kjører asynkront på port 8000 og leverer 10 produksjonsklare endepunkter dokumentert via Swagger UI (`http://localhost:8000/docs`):
+
+| Endepunkt | Metode | Beskrivelse |
+| :--- | :---: | :--- |
+| `/api/pipeline/status` | `GET` | Returnerer status for DuckDB, modelltrening og filantall i `data/raw` (21) og `data/localblob` (42). |
+| `/api/pipeline/run` | `POST` | Kjører end-to-end datapipeline (DuckDB Medallion ETL og MLOps retrain). |
+| `/api/eac/forecast` | `POST` | Beregner EAC/ETC basert på YTD-tall og simulerte kuttspaker (vikar, kjøp, drift, fast kutt). |
+| `/api/notat/generate` | `POST` | Genererer strukturert, eInnsyn-godkjent rådgivnings- og tertialnotat. |
+| `/api/presidio/anonymize` | `POST` | Skrubber sensitive personopplysninger (Fødselsnummer, Ansattnummer, Navn) via Presidio Gateway. |
+| `/api/rag/search` | `POST` | Hybrid RAG-søk i kommunal kunnskapsbase (BM25 + Vektor + BGE Reranker). |
+| `/api/procurement/spend-analysis` | `GET` | Spend analytics og DFØ-terskelkontroll fordelt på leverandører og kontrakter. |
+| `/api/procurement/maverick-spend` | `GET` | Detekterer avvikende innkjøp utenom rammeavtale. |
+| `/api/internal-services/elimination-report` | `GET` | Konsolideringsrapport for art 380 vs. 780 (`Diff = 0,00 kr`). |
+| `/api/internal-services/selvkost-calc` | `POST` | Beregner lovpålagt selvkost for VAR-sektoren med kalkylerente og fondsavsetning. |
+| `/api/grants/inbound-compliance` | `GET` | Etterlevelsesstatus og refusjonskrav for statlige tilskudd (IMDi, Helsedir, Klimasats). |
+| `/api/grants/outbound-status` | `GET` | Status og utbetalingskontroll for kommunale tildelinger. |
+
+---
+
+## 🎨 Designstandarder: Edward Tufte & FAST Modeling
+
+Prosjektet er bygget strengt etter to kompromissløse standarder for finansiell analyse og brukergrensesnitt:
+
+### 1. Edward Tufte Data-Ink Ratio
+* **Maksimal Data-Ink**: Ingen unødvendige dekorative ikoner, ingen tunge bakgrunnsskygger eller unødvendige fargeblokker.
+* **Ingen vertikale rutenettlinjer**: Tabeller og oversikter benytter subtile horisontale skillelinjer (`#1E293B` / `#E2E8F0`).
+* **Muted fargepalett**: Nøytrale skifer- og gråtoner i bakgrunn og struktur. Sterke farger (rødt og gult) reserveres eksklusivt for aktive avvik og risikopunkter.
+* **Typografi & Justering**: Tekst- og kodekolonner er alltid venstrejustert. Tall og beløp er konsekvent høyrejustert med faste desimaler.
+* **Tufte Bullet Charts**: Kompakte, horisontale stolpediagrammer som erstatter tradisjonelle overlessede målere.
+* **Tema-støtte**: Sømløs veksling mellom **Slate Dark Mode** (`#090D16`) og **Crisp Light Mode** (`#F8FAFC`).
+
+### 2. FAST Standard Financial Modeling (`Excel-Reporting-Analysis.xlsb`)
+* **F**lexible, **A**ppropriate, **S**tructured, **T**ransparent:
+* Én felles beregningsformel per rad som kopieres konsistent på tvers av tidsaksen.
+* Tydelig fargekoding: Hardkodede forutsetninger i blå skrift (`#0000FF`), beregninger i sort (`#000000`).
+* **`06_CHECKS` fane**: 11 uavhengige kontroller og en `MASTER_CHECK` som verifiserer balanse- og konsolideringslikheter (`Diff = 0,00 kr`).
+
+---
+
+## 🤖 MLOps & Modellportefølje
+
+Modellene i `models/` overvåkes kontinuerlig mot modelldrift og trenes via `src/retrain_pipeline.py`:
+
+| Modell | Algoritme | Ytelse / Metrikk | Formål |
+| :--- | :--- | :--- | :--- |
+| **Prognosemodell** | `RandomForestRegressor` | $R^2 = 0.9758$, $\text{MAE} = 1\,655\text{ kr}$ | Predikere neste måneds forbruk per ansvarsenhet og art. |
+| **Tidlig Varsling** | `DecisionTreeClassifier` | `100,0 %` Nøyaktighet | Generere transparente `IF-THEN`-regler for revisjon og politisk saksbehandling. |
+| **Profilering** | `AgglomerativeClustering` | 4 klynger | Kartlegge kommunale utgiftsmønstre (Stabil, Vikar/Volatil, Sesong, Avvik). |
+| **Avviksdeteksjon** | `IsolationForest` | 113 flaggede avvik ($Z > 2.5$) | Identifisere potensielle feilkonteringer, uforklarte hopp og bilagsfeil. |
+
+---
+
+## 🛡️ GDPR, Presidio PII Gateway & Juridisk Forankring
+
+### Presidio PII Gateway
+For å etterleve GDPR artikkel 9 og personopplysningsloven sluses all tekst gjennom **Presidio PII Gateway** før den sendes til LLM- eller analysemoduler:
+* **Fødselsnummer (11 siffer)** -> Maskeres til `[FNR]`
+* **Ansattnummer (6–8 siffer)** -> Maskeres til `[ANSATTNR]`
+* **Personnavn og sensitiv lokasjonsdata** -> Maskeres til `[PERSON]` / `[LOKASJON]`
+
+### Juridisk Forankring
+Alle beregninger og notatmaler refererer til gjeldende norsk lovverk:
+* **Kommuneloven § 14-2**: Kommunedirektørens administrative budsjettfullmakt.
+* **Kommuneloven § 14-4**: Bystyrets bevilgningsmyndighet ved budsjettendringer.
+* **Kommuneloven § 14-6**: Krav til årsbudsjettets og handlingsplanens realisme.
+* **Kommuneloven § 14-7**: Bundne og ubundne driftsfond.
+* **Forskrift om økonomiplan og årsbudsjett (KOSTRA-forskriften)**: Standardiserte arts- og funksjonsinndelinger.
 
 ---
 
 ## 📂 Mappe- og Filstruktur
 
 ```text
-Kom - G2/
-├── index.html                          # Frittstående Tufte/FAST Web-UI med 8 moduler, LOY-simulator & Pipeline Cockpit
+Kom - G3/
+├── index.html                          # Frittstående Tufte/FAST Web-UI Cockpit (10 moduler, 5 300+ linjer)
 ├── templates/
-│   └── index.html                      # Dedikert EOY & LOY Rådgivningscockpit med Chart.js og PDF-eksport (html2pdf.js)
+│   └── index.html                      # Dedikert EOY & LOY Rådgivningscockpit med Chart.js
 ├── docs/
 │   ├── COPILOT_PYTHON_IN_EXCEL_INSTRUCTIONS.md # Instruks for Copilot & Python in Excel (=PY())
-│   └── INSTRUKS_EXCEL_DASHBOARD.md     # Instruks for Power Query & Power Pivot i Excel-Reporting-Analysis.xlsb
-├── .env.example                        # Mal for miljøvariabler (kopieres til .env)
-├── .gitignore                          # Git-ignoreringsregler for sikkerhet og tunge filer
-├── Dockerfile                          # Container-definisjon for Streamlit & MLflow
-├── docker-compose.yml                  # Multi-container orkestrering
-├── requirements.txt                    # Python-avhengigheter
-├── run.ps1                             # PowerShell CLI (-BuildDB, -Reconcile, -Retrain, -Up, -Down, -All)
-├── run_pipeline.bat                    # Batch-fil for helhetlig lokal kjøring (A til Å)
-├── Excel-Reporting-Analysis.xlsb       # FAST & Power BI-Style Excel-modell (Binær)
+│   └── INSTRUKS_EXCEL_DASHBOARD.md     # Instruks for Power Query & Power Pivot
+├── .env.example                        # Mal for miljøvariabler
+├── .gitignore                          # Git-regler
+├── Dockerfile                          # Multi-stage containerdefinisjon
+├── docker-compose.yml                  # Streamlit (:8501), FastAPI (:8000), MLflow (:5000)
+├── requirements.txt                    # Produksjonsavhengigheter (DuckDB, FastAPI, Scikit-learn, etc.)
+├── run.ps1                             # PowerShell CLI (-BuildDB, -Reconcile, -Retrain, -VectorDB, -Up, -All)
+├── run_pipeline.bat                    # Master Batch-skript for helhetlig lokal kjøring
+├── Excel-Reporting-Analysis.xlsb       # FAST & Power BI-Style Excel-modell (Binær arbeidsbok)
 ├── Excel-Reporting-Analysis.xlsx       # FAST & Power BI-Style Excel-modell (OpenXML)
-├── pbi-reporting-project.pbip          # Power BI Project (Git-vennlig TMDL-struktur)
-├── pbi-reporting-project.Report/       # Power BI rapportdefinisjoner
-├── pbi-reporting-project.SemanticModel/# Power BI semantisk modell (tabeller, relasjoner, DAX)
-├── excel.md                            # Systemstandard for FAST & Power BI-Style Excel
-├── DAX.md                              # DAX målkatalog for Power BI og Power Pivot
-├── copilot.md                          # Standard for Python in Excel (=PY())
+├── pbi-reporting-project.pbip          # Power BI Desktop Developer Project
+├── pbi-reporting-project.Report/       # Rapportoppsett og visualiseringer
+├── pbi-reporting-project.SemanticModel/# TMDL-datamodell og 21 DAX-mål
+├── excel.md                            # Retningslinjer for FAST-modellering
+├── DAX.md                              # Komplett DAX-målkatalog
+├── copilot.md                          # Standard for Copilot i regneark
 ├── data/
-│   ├── raw/                            # Inndatamappe for KOSTRA-CSV og dimensjonsfiler (21 filer)
-│   ├── database/                       # Lokal DuckDB-database (ignoreres i Git, bygges av ETL)
-│   └── export/                         # Automatisk genererte Ingestion- og Exception-rapporter
+│   ├── raw/                            # Inndata for KOSTRA-CSV (21 filer)
+│   ├── localblob/                      # Lokale rådata og vedlegg (42 filer)
+│   ├── database/                       # Lokal DuckDB (kostra_prod.duckdb)
+│   └── export/                         # Genererte rapporter og avstemmingslogger
+├── models/                             # Serialiserte ML-modeller (.pkl / joblib)
 └── src/
-    ├── app.py                          # Streamlit webapplikasjon (7 moduler inkl. Pipeline Cockpit)
-    ├── canonical.py                    # Kanonisk datamodell og valideringsregler (Pydantic)
-    ├── db_manager.py                   # DuckDB ETL, Medallion-pipeline og Audit Log
-    └── retrain_pipeline.py             # Omtrening og evaluering av ML-modellene
+    ├── app.py                          # Streamlit AI Workbench (7 moduler)
+    ├── api_server.py                   # FastAPI REST backend (10 endepunkter, RAG, Presidio)
+    ├── test_api_endpoints.py           # Automatisert testsuite for FastAPI (10/10 tester)
+    ├── db_manager.py                   # DuckDB Medallion ETL og Ingestion Engine
+    ├── canonical.py                    # Pydantic validering og dataskjema
+    └── retrain_pipeline.py             # MLOps omtrening og modelldrift-evaluering
 ```
 
 ---
 
-## 🛠️ Installasjon & Forutsetninger
+## 🚀 Installasjon & Kjøreveiledning (A til Å)
 
-### Krav
-* **Python:** v3.10 eller nyere (Python 3.11 / 3.12 anbefales)
-* **Nettleser:** Enhver moderne nettleser for direkte åpning av `index.html` (ingen server nødvendig)
-* **Operativsystem:** Windows 10 / 11, macOS eller Linux
-
-### Oppsett etter kloning fra GitHub
-1. **Opprett og aktiver virtuelt miljø (valgfritt, men anbefalt):**
-   ```powershell
-   python -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   ```
-2. **Installer Python-pakker:**
-   ```powershell
-   pip install -r requirements.txt
-   ```
-3. **Konfigurer miljøvariabler:**
-   ```powershell
-   Copy-Item .env.example .env
-   ```
+### Forutsetninger
+* **Python:** v3.10, v3.11 eller v3.12 installert.
+* **Nettleser:** Chrome, Edge eller Firefox.
+* **Docker Desktop:** (Valgfritt, for containerisert drift).
 
 ---
 
-## 🚀 Slik kjører du løsningen (A til Å)
+### Alternativ 1: Zero-Install Web Cockpit (Raskest)
+Dobbeltklikk eller åpne **`index.html`** direkte i nettleseren din.
+* Umiddelbar tilgang til alle 10 moduler.
+* 100 % dynamisk filtrering på tvers av sektorer, perioder og avviksstatus.
+* Interaktiv 4-slider LOY-simulator med sanntids SVG-trajektorie.
+* 1-klikks generering av rådgivnings- og tertialnotat med direkte utskrift/PDF (`window.print()`).
 
-### Alternativ A: Direkte i nettleser (Zero-Install UX/UI & Cockpit)
-Åpne **`index.html`** direkte i nettleseren for umiddelbar tilgang til alle 7 moduler, interaktive prognoseparametere, S-kurver, RAG-chatbot og **Cockpit Pipeline Kontroll**.
+---
 
-### Alternativ B: Automatisk kjøring via Batch-fil eller PowerShell
-Kjør i PowerShell:
-```powershell
+### Alternativ 2: Master Batch-fil (`run_pipeline.bat`)
+Fra filutforskeren eller ledetekst (CMD / PowerShell):
+```cmd
 .\run_pipeline.bat
-# eller via PowerShell CLI:
+```
+Dette skriptet utfører hele produksjonsløpet:
+1. Bygger DuckDB Medallion Lakehouse fra `data/raw/*.csv`.
+2. Trener og evaluerer alle maskinlæringsmodeller.
+3. Indekserer kunnskapsbasen for Hybrid RAG.
+4. Starter Streamlit AI Workbench på `http://localhost:8501`.
+
+---
+
+### Alternativ 3: PowerShell CLI (`run.ps1`)
+Bruk PowerShell-skriptet for granulær kontroll:
+```powershell
+# Bygg databasen og tren modeller:
 .\run.ps1 -BuildDB -Retrain
+
+# Indekser vektordatabasen for RAG:
+.\run.ps1 -VectorDB
+
+# Start Docker-containerne (Streamlit, FastAPI og MLflow):
+.\run.ps1 -Up
+
+# Kjør alt i sekvens:
+.\run.ps1 -All
 ```
 
-### Alternativ C: Manuell kjøring steg-for-steg
-1. **Bygg DuckDB-databasen fra rådata (`data/raw/`):**
-   ```powershell
-   python src/db_manager.py
-   ```
-2. **Kjør ML-omtrening og evaluering:**
-   ```powershell
-   python src/retrain_pipeline.py
-   ```
-3. **Start Streamlit AI Workbench-dashbordet:**
-   ```powershell
-   streamlit run src/app.py
-   ```
+---
+
+### Alternativ 4: Start FastAPI Backend Standalone
+For å starte REST-API-et separat for testing av integrasjoner:
+```powershell
+uvicorn src.api_server:app --host 127.0.0.1 --port 8000 --reload
+```
+Åpne deretter `http://localhost:8000/docs` i nettleseren for interaktiv Swagger-dokumentasjon.
 
 ---
 
-## 🤖 ML-Modellportefølje & Algoritmer
+### Alternativ 5: Docker Compose
+For komplett containerisering i produksjons- eller testmiljø:
+```powershell
+docker compose up --build -d
+```
+Tjenester som starter:
+* **Streamlit AI Workbench:** `http://localhost:8501`
+* **FastAPI Backend:** `http://localhost:8000/docs`
+* **MLflow Tracking Server:** `http://localhost:5000`
 
-| Modell / Algoritme | Formål | Målvariabel / Ytelse |
-| :--- | :--- | :--- |
-| **Random Forest Regressor** | Prognostisere neste måneds regnskapsforbruk | $R^2 = 0.9104$, Low MAE (`18 420 kr`) |
-| **Decision Tree Classifier** | Generere revisjonsgodkjente IF-THEN regler for Early Warning | `100 %` Accuracy — Status 0 (`I RUTE`), 1 (`ADVARSEL`), 2 (`KRITISK`) |
-| **Agglomerative Clustering (`hclust`)** | Gruppere konti i 4 utgiftsprofiler | Unsupervised (`4` klynger: `1131 / 16 / 1100 / 9`) |
-| **Isolation Forest (`iforest`)** | Detektere føringsfeil og uvanlige beløpshopp | Top 5 % Z-score / avvikskontroll (`113` rader flagget) |
+---
+
+## 🧪 Verifikasjon & Tester
+
+Kjør den automatiserte testsuiten for å verifisere at samtlige 10 REST-endepunkter fungerer 100 %:
+```powershell
+python -m src.test_api_endpoints
+```
+*Forventet resultat: `Ran 10 tests in 0.45s - OK (10/10 PASS)`.*
+
+For å verifisere databaseavstemmingen og `06_CHECKS`:
+```powershell
+python -c "import duckdb; con = duckdb.connect('data/database/kostra_prod.duckdb'); print(con.execute('SELECT COUNT(*) FROM modelready_fact').fetchone())"
+```
+*Forventet resultat: `(2256,)` rader med `0,0 %` nullverdier.*
 
 ---
 
-## 🛡️ Governance, Audit-logging & eInnsyn
+## 🏛️ Forfatter & Ansvarlig
 
-I tråd med kommunale retningslinjer for kunstig intelligens og forvaltningsloven har systemet innebygd sporbarhet:
-
-* **Uforanderlig Audit Log (`audit_log`):** Alle spørringer, pipeline-kjøringer, avvikstiltak og AI-genererte anbefalinger logges automatisk med UUID, ISO-tidsstempel og aktør-ID.
-* **Ingestion Report (`data/export/INGESTION_REPORT.md`):** Genereres automatisk ved hver kildedataimport og dokumenterer godkjente filer samt eventuelle filer lagt i karantene.
-
----
-*Kristiansand kommune — KOSTRA AI Workbench © 2026*
+* **Utvikler & Fagansvarlig:** Frank Ellingsen — Financial Controller & Business Intelligence Specialist.
+* **Organisasjon:** Kristiansand kommune / KOSTRA AI Analytics Initiative © 2026.
+* **Standarder:** Norsk Lovdata (*Kommuneloven*), DFØ, FAST Standard Organization, Edward Tufte Data-Ink.
