@@ -281,12 +281,14 @@ Kom - G3/
 
 ---
 
-### Alternativ 1: Zero-Install Web Cockpit (Raskest)
-Dobbeltklikk eller åpne **`index.html`** direkte i nettleseren din.
-* Umiddelbar tilgang til alle 10 moduler.
-* 100 % dynamisk filtrering på tvers av sektorer, perioder og avviksstatus.
-* Interaktiv 4-slider LOY-simulator med sanntids SVG-trajektorie.
-* 1-klikks generering av rådgivnings- og tertialnotat med direkte utskrift/PDF (`window.print()`).
+### Alternativ 1: Web Cockpit med live månedsrapport (Anbefalt)
+Dobbeltklikk **`start_web_cockpit.bat`** fra prosjektmappen, eller kjør den i PowerShell:
+```powershell
+.\start_web_cockpit.bat
+```
+Skriptet gjenbruker et fungerende månedsrapport-API på `127.0.0.1:8000`; hvis det ikke kjører, starter det FastAPI i et eget konsollvindu. Det venter på at rapportendepunktet svarer før dashboardet åpnes. La API-konsollvinduet stå åpent mens rapporten brukes; stopp serveren med `Ctrl+C` i dette vinduet. Hvis port 8000 er opptatt av en annen tjeneste, viser skriptet en tydelig feil i stedet for å åpne en rapport som ikke kan hente data.
+
+`index.html` kan også åpnes direkte, men den dynamiske månedsrapporten krever at FastAPI kjører. Åpning direkte som `file://` bruker `http://localhost:8000` for API-kall.
 
 ---
 

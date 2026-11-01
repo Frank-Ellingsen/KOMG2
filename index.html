@@ -4751,7 +4751,8 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         document.getElementById("min-assessment").className = "panel-card rag-card-red";
         document.getElementById("min-assessment").textContent =
           `Månedsrapporten kunne ikke oppdateres fra økonomidatabasen: ${error.message}. ` +
-          "Kontroller at FastAPI og DuckDB kjører. Ingen eksempelverdier vises som om de var oppdaterte.";
+          "Start FastAPI fra prosjektmappen med .\\start_web_cockpit.ps1, og kontroller at DuckDB finnes. " +
+          "Ingen eksempelverdier vises som om de var oppdaterte.";
       }
     }
 
