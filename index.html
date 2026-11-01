@@ -4734,7 +4734,12 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
           { cache: "no-store" }
         );
         if (!response.ok) {
-          const detail = await response.text();
+          let detail = await response.text();
+          if (detail.includes("<!DOCTYPE") || detail.includes("<html")) {
+            const titleMatch = detail.match(/<title>([^<]+)<\/title>/i);
+            const title = titleMatch ? titleMatch[1].replace(/&middot;/g, "·").trim() : "HTML-side mottatt";
+            detail = `Mottok nettside (${title}) i stedet for JSON. På GitHub Pages kreves lokal FastAPI: start med .\\start_web_cockpit.ps1 og åpne http://127.0.0.1:8000/`;
+          }
           throw new Error(`API svarte ${response.status}: ${detail}`);
         }
         const report = await response.json();
