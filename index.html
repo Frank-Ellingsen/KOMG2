@@ -19,6 +19,8 @@
       --border-hairline: #E2E8F0;
       --clr-input-blue: #0000FF;
       --clr-link-green: #008000;
+      --clr-fig-budget: #334155;    /* Dark Slate Grey for Budget figures */
+      --clr-fig-regnskap: #1E3A8A;  /* Deep Dark Navy Blue for Regnskap figures */
       --clr-ok-text: #065F46;
       --clr-ok-bg: #D1FAE5;
       --clr-warn-text: #92400E;
@@ -700,6 +702,35 @@
       color: var(--clr-link-green) !important;
     }
 
+    /* Distinct financial figure styling: Budget (Dark Grey) vs. Regnskap (Dark Blue) */
+    .col-budget,
+    .fig-budget,
+    .val-budget {
+      color: var(--clr-fig-budget, #334155) !important;
+      font-weight: 600;
+    }
+
+    .col-regnskap,
+    .fig-regnskap,
+    .val-regnskap {
+      color: var(--clr-fig-regnskap, #1E3A8A) !important;
+      font-weight: 600;
+    }
+
+    th.col-budget,
+    td.col-budget,
+    span.col-budget,
+    div.col-budget {
+      color: var(--clr-fig-budget, #334155) !important;
+    }
+
+    th.col-regnskap,
+    td.col-regnskap,
+    span.col-regnskap,
+    div.col-regnskap {
+      color: var(--clr-fig-regnskap, #1E3A8A) !important;
+    }
+
     /* Chatbot UI (Module 6) */
     .chat-prompt-bar {
       display: flex;
@@ -1017,6 +1048,8 @@
       --bg-card: #151D33;
       --bg-subtle: #1C2642;
       --header-dark: #070A11;
+      --clr-fig-budget: #94A3B8;    /* High-contrast readable slate grey in dark mode */
+      --clr-fig-regnskap: #60A5FA;  /* High-contrast readable vibrant blue in dark mode */
       --text-primary: #F8FAFC;
       --text-secondary: #94A3B8;
       --text-muted: #64748B;
@@ -1234,12 +1267,12 @@
         <div class="kpi-grid">
           <div class="kpi-card">
             <span class="kpi-label">Totalt Budsjett (CUBE)</span>
-            <span class="kpi-value fast-link" id="kpi-bud">29 295 237 kr</span>
+            <span class="kpi-value col-budget" id="kpi-bud">29 295 237 kr</span>
             <span class="kpi-sub">Rapporteringsår: 2024</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-label">Bokført Regnskap (CUBE)</span>
-            <span class="kpi-value fast-link" id="kpi-reg">31 524 851 kr</span>
+            <span class="kpi-value col-regnskap" id="kpi-reg">31 524 851 kr</span>
             <span class="kpi-sub" id="kpi-r3m">Rullende 3M snitt: 3 734 353 kr</span>
           </div>
           <div class="kpi-card">
@@ -1290,8 +1323,8 @@
             <thead>
               <tr>
                 <th>KOSTRA Funksjon</th>
-                <th class="num-col">Budsjett (NOK)</th>
-                <th class="num-col">Regnskap (NOK)</th>
+                <th class="num-col col-budget">Budsjett (NOK)</th>
+                <th class="num-col col-regnskap">Regnskap (NOK)</th>
                 <th class="num-col">Netto Avvik (NOK)</th>
                 <th class="num-col">Avvik %</th>
                 <th class="num-col">Burn Rate %</th>
@@ -1401,18 +1434,18 @@
         <div class="kpi-grid">
           <div class="kpi-card" id="kpi-card-ytd-m2">
             <span class="kpi-label">Bokført YTD (Mnd 1–8)</span>
-            <span class="kpi-value" id="kpi-ytd-reg-m2">31 524 851 kr</span>
+            <span class="kpi-value col-regnskap" id="kpi-ytd-reg-m2">31 524 851 kr</span>
             <span class="kpi-sub" id="kpi-ytd-avvik-m2" style="color: var(--clr-err-text);">YTD Avvik: -2 229 614 kr</span>
           </div>
-          <div class="kpi-card">
+          <div class="kpi-card" id="kpi-card-etc-q4">
             <span class="kpi-label">Projisert Q4 ETC (Mnd 9–12)</span>
-            <span class="kpi-value" id="ts-q4-etc">15 727 975 kr</span>
-            <span class="kpi-sub">Sesongkorrigert 3M run-rate</span>
+            <span class="kpi-value col-regnskap" id="ts-q4-etc">15 727 975 kr</span>
+            <span class="kpi-sub" id="kpi-etc-q4-sub">Sesongkorrigert 3M run-rate</span>
           </div>
-          <div class="kpi-card">
+          <div class="kpi-card" id="kpi-card-eac-m2">
             <span class="kpi-label">Estimert Årsregnskap EAC (31.12)</span>
-            <span class="kpi-value" id="ts-eoy-eac">47 252 826 kr</span>
-            <span class="kpi-sub">Årsbudsjett: 43 942 856 kr</span>
+            <span class="kpi-value col-regnskap" id="ts-eoy-eac">47 252 826 kr</span>
+            <span class="kpi-sub col-budget" id="kpi-eoy-bud">Vedtatt helårsbudsjett: 43 942 856 kr</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-label">Forventet Årsavvik (31.12)</span>
@@ -1437,10 +1470,10 @@
                 <th>Periode</th>
                 <th>Type</th>
                 <th class="num-col">Sesongfaktor</th>
-                <th class="num-col">Månedlig Budsjett (NOK)</th>
-                <th class="num-col">Regnskap / ETC (NOK)</th>
+                <th class="num-col col-budget">Månedlig Budsjett (NOK)</th>
+                <th class="num-col col-regnskap">Regnskap / ETC (NOK)</th>
                 <th class="num-col">Månedlig Avvik (NOK)</th>
-                <th class="num-col">Akkumulert EAC (NOK)</th>
+                <th class="num-col col-regnskap">Akkumulert EAC (NOK)</th>
               </tr>
             </thead>
             <tbody id="ts-table-body"></tbody>
@@ -1647,7 +1680,7 @@
                 <th>Periode</th>
                 <th>KOSTRA Funksjon</th>
                 <th>Konto (6-siffer)</th>
-                <th class="num-col">Månedlig Regnskap (NOK)</th>
+                <th class="num-col col-regnskap">Månedlig Regnskap (NOK)</th>
                 <th class="num-col">3-Mnd Snitt (NOK)</th>
                 <th class="num-col">Z-Score Volatilitet</th>
                 <th>Klyngeprofil</th>
@@ -2377,8 +2410,8 @@
                 <tr>
                   <th>Tilskuddsordning</th>
                   <th>Konto / Fn</th>
-                  <th class="num-col">Innvilget (NOK)</th>
-                  <th class="num-col">Mottatt YTD</th>
+                  <th class="num-col col-budget">Innvilget (NOK)</th>
+                  <th class="num-col col-regnskap">Mottatt YTD</th>
                   <th>Bundet Fond</th>
                 </tr>
               </thead>
@@ -2386,37 +2419,37 @@
                 <tr>
                   <th scope="row">IMDi Integreringstilskudd</th>
                   <td>Art 810 / Fn 273</td>
-                  <td class="num-col fast-link">13 850 000</td>
-                  <td class="num-col">9 233 000</td>
+                  <td class="num-col col-budget">13 850 000</td>
+                  <td class="num-col col-regnskap">9 233 000</td>
                   <td><span class="rag-badge rag-green">1 420 000 kr</span></td>
                 </tr>
                 <tr>
                   <th scope="row">Toppfinansiering Helsedir</th>
                   <td>Art 800 / Fn 254</td>
-                  <td class="num-col fast-link">36 900 000</td>
-                  <td class="num-col">24 600 000</td>
+                  <td class="num-col col-budget">36 900 000</td>
+                  <td class="num-col col-regnskap">24 600 000</td>
                   <td><span class="rag-badge rag-green">Løpende drift</span></td>
                 </tr>
                 <tr>
                   <th scope="row">Klimasats (Miljødir)</th>
                   <td>Art 810 / Fn 360</td>
-                  <td class="num-col fast-link">2 000 000</td>
-                  <td class="num-col">1 000 000</td>
+                  <td class="num-col col-budget">2 000 000</td>
+                  <td class="num-col col-regnskap">1 000 000</td>
                   <td><span class="rag-badge rag-amber">800 000 kr</span></td>
                 </tr>
                 <tr>
                   <th scope="row">Voksenopplæring (Agder Fylke)</th>
                   <td>Art 830 / Fn 213</td>
-                  <td class="num-col fast-link">1 800 000</td>
-                  <td class="num-col">1 800 000</td>
+                  <td class="num-col col-budget">1 800 000</td>
+                  <td class="num-col col-regnskap">1 800 000</td>
                   <td><span class="rag-badge rag-green">250 000 kr</span></td>
                 </tr>
               </tbody>
               <tfoot>
                 <tr>
                   <th colspan="2">Sum Inngående Tilskuddsrammer</th>
-                  <td class="num-col rag-green">54 550 000</td>
-                  <td class="num-col">36 633 000</td>
+                  <td class="num-col col-budget" style="font-weight:700;">54 550 000</td>
+                  <td class="num-col col-regnskap" style="font-weight:700;">36 633 000</td>
                   <td><strong>2 470 000 kr</strong></td>
                 </tr>
               </tfoot>
@@ -2435,8 +2468,8 @@
               <thead>
                 <tr>
                   <th>Kommunal Ordning</th>
-                  <th class="num-col">Ramme</th>
-                  <th class="num-col">Disponert</th>
+                  <th class="num-col col-budget">Ramme</th>
+                  <th class="num-col col-regnskap">Disponert</th>
                   <th>Mottakere</th>
                   <th>Utbetalingsregel</th>
                 </tr>
@@ -2444,22 +2477,22 @@
               <tbody>
                 <tr>
                   <th scope="row">Kultur- og Idrettstilskudd</th>
-                  <td class="num-col">4 500 000</td>
-                  <td class="num-col rag-green">3 950 000</td>
+                  <td class="num-col col-budget">4 500 000</td>
+                  <td class="num-col col-regnskap rag-green">3 950 000</td>
                   <td>42 lag</td>
                   <td>4 rater for &ge; 500k</td>
                 </tr>
                 <tr>
                   <th scope="row">Frivillighet &amp; Nærmiljø</th>
-                  <td class="num-col">2 100 000</td>
-                  <td class="num-col rag-green">1 850 000</td>
+                  <td class="num-col col-budget">2 100 000</td>
+                  <td class="num-col col-regnskap rag-green">1 850 000</td>
                   <td>28 org.</td>
                   <td>100 % engangsutbetaling</td>
                 </tr>
                 <tr>
                   <th scope="row">Bydelsfond Grønn Omstilling</th>
-                  <td class="num-col">1 500 000</td>
-                  <td class="num-col rag-amber">980 000</td>
+                  <td class="num-col col-budget">1 500 000</td>
+                  <td class="num-col col-regnskap rag-amber">980 000</td>
                   <td>9 prosjekter</td>
                   <td>Milepælsbasert rate</td>
                 </tr>
@@ -2467,8 +2500,8 @@
               <tfoot>
                 <tr>
                   <th>Sum Utgående Rammer</th>
-                  <td class="num-col">8 100 000</td>
-                  <td class="num-col">6 780 000</td>
+                  <td class="num-col col-budget" style="font-weight:700;">8 100 000</td>
+                  <td class="num-col col-regnskap" style="font-weight:700;">6 780 000</td>
                   <td colspan="2"><span class="rag-badge rag-green">🟢 83,7 % Disponert</span></td>
                 </tr>
               </tfoot>
@@ -2661,16 +2694,16 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
               <tr>
                 <th>CHK_01</th>
                 <td>Data Model [Sum Budsjett] vs. Faktatabell SUM(ytd_budsjett_nok)</td>
-                <td class="num-col fast-link">29 295 237,00</td>
-                <td class="num-col fast-link">29 295 237,00</td>
+                <td class="num-col col-budget">29 295 237,00</td>
+                <td class="num-col col-budget">29 295 237,00</td>
                 <td class="num-col cell-pos">0,00</td>
                 <td>OK (0,00)</td>
               </tr>
               <tr>
                 <th>CHK_02</th>
                 <td>Data Model [Sum Regnskap] vs. Faktatabell SUM(ytd_regnskap_nok)</td>
-                <td class="num-col fast-link">31 524 851,42</td>
-                <td class="num-col fast-link">31 524 851,42</td>
+                <td class="num-col col-regnskap">31 524 851,42</td>
+                <td class="num-col col-regnskap">31 524 851,42</td>
                 <td class="num-col cell-pos">0,00</td>
                 <td>OK (0,00)</td>
               </tr>
@@ -3597,8 +3630,8 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
             const eacCls = r.eac_avvik < -200000 ? "rag-red" : (r.eac_avvik < 0 ? "rag-amber" : "rag-green");
             return `<tr>
               <th scope="row">${r.name} <span style="font-weight:400; font-size:0.74rem; color:var(--text-muted);">(${r.sektor})</span></th>
-              <td class="num-col fast-link">${fmtNum(r.bud)}</td>
-              <td class="num-col fast-link">${fmtNum(r.reg)}</td>
+              <td class="num-col col-budget">${fmtNum(r.bud)}</td>
+              <td class="num-col col-regnskap">${fmtNum(r.reg)}</td>
               <td class="num-col ${avvikCls}">${fmtNum(r.avvik, true)}</td>
               <td class="num-col ${avvikCls}">${r.avvikPct >= 0 ? "+" : ""}${r.avvikPct.toFixed(1).replace(".", ",")}%</td>
               <td class="num-col ${burnCls}">${r.burnPct.toFixed(1).replace(".", ",")}%</td>
@@ -3613,8 +3646,8 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       if (tfoot) {
         tfoot.innerHTML = `<tr>
           <th scope="row">Sum Valgt Utvalg (${filteredFns.length} funksjoner — ${pMeta.short})</th>
-          <td class="num-col">${fmtNum(totBud)}</td>
-          <td class="num-col">${fmtNum(totReg)}</td>
+          <td class="num-col col-budget" style="font-weight:700;">${fmtNum(totBud)}</td>
+          <td class="num-col col-regnskap" style="font-weight:700;">${fmtNum(totReg)}</td>
           <td class="num-col ${avvikRagCls}">${fmtNum(totAvvik, true)}</td>
           <td class="num-col ${avvikRagCls}">${totAvvikPct >= 0 ? "+" : ""}${totAvvikPct.toFixed(1).replace(".", ",")}%</td>
           <td class="num-col ${burnRagCls}">${totBurn.toFixed(1).replace(".", ",")}%</td>
@@ -3645,7 +3678,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
               <div class="tufte-bullet-actual ${barRagClass}" style="width:${actWidth.toFixed(1)}%;"></div>
               <div class="tufte-bullet-target-line" style="left:${budWidth.toFixed(1)}%;"></div>
             </div>
-            <div class="num-col" style="font-size:0.76rem;">${fmtNum(r.reg)}</div>
+            <div class="num-col col-regnskap" style="font-size:0.76rem; font-weight:600;">${fmtNum(r.reg)}</div>
             <div class="num-col ${cellRagClass}" style="font-size:0.75rem; border-radius:3px; padding:0.1rem 0.3rem; text-align:right;">${icon} ${r.burnPct.toFixed(1).replace(".", ",")}%</div>
           </div>`;
         }).join("");
@@ -3672,7 +3705,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
               <div class="tufte-bullet-actual ${barRag}" style="width:${actWidth.toFixed(1)}%;"></div>
               <div class="tufte-bullet-target-line" style="left:${budWidth.toFixed(1)}%;"></div>
             </div>
-            <div class="num-col" style="font-size:0.76rem;">${fmtNum(reg)}</div>
+            <div class="num-col col-regnskap" style="font-size:0.76rem; font-weight:600;">${fmtNum(reg)}</div>
             <div class="num-col ${cellRag}" style="font-size:0.75rem; border-radius:3px; padding:0.1rem 0.3rem; text-align:right;">${icon} ${burnPct.toFixed(1).replace(".", ",")}%</div>
           </div>`;
         }).join("");
@@ -3720,8 +3753,8 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         <div class="clustered-bullet-header">
           <span>KOSTRA Funksjon</span>
           <span>Bullet (Årsbudsjett vs. YTD)</span>
-          <span class="num-col">Budsjett (År)</span>
-          <span class="num-col">Regnskap YTD</span>
+          <span class="num-col col-budget">Budsjett (År)</span>
+          <span class="num-col col-regnskap">Regnskap YTD</span>
           <span class="num-col">Avvik YTD (RAG)</span>
         </div>
 
@@ -3732,8 +3765,8 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
             <div class="clustered-bar-actual-ytd ${totalBarCls}" style="width:${totalActPct.toFixed(1)}%;"></div>
             <div class="clustered-target-ytd-line" style="left:${totalYtdTargetPct.toFixed(1)}%;"></div>
           </div>
-          <div class="num-col fast-link" style="font-weight:700;">${fmtNum(totalAnnualBud)}</div>
-          <div class="num-col fast-link" style="font-weight:700;">${fmtNum(totalYtdReg)}</div>
+          <div class="num-col col-budget" style="font-weight:700;">${fmtNum(totalAnnualBud)}</div>
+          <div class="num-col col-regnskap" style="font-weight:700;">${fmtNum(totalYtdReg)}</div>
           <div class="num-col ${totalRagCls}" style="font-weight:700;">${totalIcon} ${fmtNum(totalAvvik, true)}</div>
         </div>
       `;
@@ -3779,8 +3812,8 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
                 <div class="clustered-bar-actual-ytd ${barRag}" style="width:${actPct.toFixed(1)}%;"></div>
                 <div class="clustered-target-ytd-line" style="left:${ytdTargetPct.toFixed(1)}%;"></div>
               </div>
-              <div class="num-col fast-link">${fmtNum(annualBud)}</div>
-              <div class="num-col fast-link">${fmtNum(regYtd)}</div>
+              <div class="num-col col-budget">${fmtNum(annualBud)}</div>
+              <div class="num-col col-regnskap">${fmtNum(regYtd)}</div>
               <div class="num-col ${cellRag}" style="font-weight:700;">${icon} ${fmtNum(avvik, true)}</div>
             </div>
           `;
@@ -3927,10 +3960,10 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
             <th scope="row">${r.label} <span style="font-weight:400; font-size:0.72rem; color:var(--text-muted);">(${r.period})</span></th>
             <td><span class="rag-badge ${r.isEtc ? 'rag-amber' : 'rag-green'}" style="font-size:0.68rem;">${r.type}</span></td>
             <td class="num-col">${r.seasonIdx.toFixed(2).replace(".", ",")}</td>
-            <td class="num-col fast-link">${fmtNum(r.bud)}</td>
-            <td class="num-col fast-link ${r.isEtc ? 'fast-input' : ''}">${fmtNum(r.reg)}</td>
+            <td class="num-col col-budget">${fmtNum(r.bud)}</td>
+            <td class="num-col col-regnskap ${r.isEtc ? 'fast-input' : ''}">${fmtNum(r.reg)}</td>
             <td class="num-col ${avvikCls}">${fmtNum(r.avvik, true)}</td>
-            <td class="num-col" style="font-weight:700;">${fmtNum(r.cumReg)}</td>
+            <td class="num-col col-regnskap" style="font-weight:700;">${fmtNum(r.cumReg)}</td>
           </tr>`;
         }).join("");
       }
@@ -3978,7 +4011,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
         const etcStroke = eoyRagKey === "red" ? "#EF4444" : (eoyRagKey === "amber" ? "#F59E0B" : "#10B981");
         sHtml += `<polyline fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="3 3" points="${budPts.join(" ")}" />`;
-        sHtml += `<polyline fill="none" stroke="#1E293B" stroke-width="3" points="${actPts.join(" ")}" />`;
+        sHtml += `<polyline fill="none" stroke="#1E3A8A" stroke-width="3" points="${actPts.join(" ")}" />`;
         sHtml += `<polyline fill="none" stroke="${etcStroke}" stroke-width="3" stroke-dasharray="6 4" points="${etcPts.join(" ")}" />`;
 
         svg.innerHTML = sHtml;
@@ -4057,7 +4090,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
             <th scope="row">${r.period} (${r.pCode})</th>
             <td>${r.fn}</td>
             <td>${r.konto}</td>
-            <td class="num-col">${fmtNOK(r.reg)}</td>
+            <td class="num-col col-regnskap">${fmtNOK(r.reg)}</td>
             <td class="num-col">${fmtNOK(r.avg3m)}</td>
             <td class="num-col ${zRagCls}">${r.z >= 3.0 ? "🔴" : (r.z >= 2.0 ? "🟡" : "🟢")} ${r.z.toFixed(2).replace(".", ",")}</td>
             <td>${r.cluster}</td>
@@ -4068,24 +4101,27 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
       // Module 5: 06_CHECKS Asserting Diff = 0,00 kr
       const dynamicChecks = [
-        { id: "CHK_01", desc: `Data Model [Sum Budsjett (${pMeta.short})] vs. DuckDB SUM(budsjett_nok)`, srcA: fmtDec(ctx.totBud), srcB: fmtDec(ctx.totBud) },
-        { id: "CHK_02", desc: `Data Model [Sum Regnskap (${pMeta.short})] vs. DuckDB SUM(regnskap_nok)`, srcA: fmtDec(ctx.totReg), srcB: fmtDec(ctx.totReg) },
-        { id: "CHK_03", desc: `01_DASHBOARD Netto Avvik (${pMeta.short}) vs. 03_CALCULATIONS`, srcA: fmtDec(ctx.totAvvik), srcB: fmtDec(ctx.totAvvik) },
-        { id: "CHK_08", desc: "04_INPUTS Inngående Balanse (IB 01.01): Sum Eiendeler vs. Sum EK & Gjeld", srcA: "450 000 000,00", srcB: "450 000 000,00" },
-        { id: "CHK_09", desc: "02_OUTPUTS Utgående Balanse (UB M08): Sum Eiendeler vs. Sum EK & Gjeld", srcA: "472 000 000,00", srcB: "472 000 000,00" },
-        { id: "CHK_11", desc: "05_DATA_MODEL KOSTRA Eliminering Art 780 vs. Art 380 (Diff = 0,00 kr)", srcA: "14 310 000,00", srcB: "14 310 000,00" }
+        { id: "CHK_01", desc: `Data Model [Sum Budsjett (${pMeta.short})] vs. DuckDB SUM(budsjett_nok)`, srcA: fmtDec(ctx.totBud), srcB: fmtDec(ctx.totBud), type: "bud" },
+        { id: "CHK_02", desc: `Data Model [Sum Regnskap (${pMeta.short})] vs. DuckDB SUM(regnskap_nok)`, srcA: fmtDec(ctx.totReg), srcB: fmtDec(ctx.totReg), type: "reg" },
+        { id: "CHK_03", desc: `01_DASHBOARD Netto Avvik (${pMeta.short}) vs. 03_CALCULATIONS`, srcA: fmtDec(ctx.totAvvik), srcB: fmtDec(ctx.totAvvik), type: "avvik" },
+        { id: "CHK_08", desc: "04_INPUTS Inngående Balanse (IB 01.01): Sum Eiendeler vs. Sum EK & Gjeld", srcA: "450 000 000,00", srcB: "450 000 000,00", type: "balanse" },
+        { id: "CHK_09", desc: "02_OUTPUTS Utgående Balanse (UB M08): Sum Eiendeler vs. Sum EK & Gjeld", srcA: "472 000 000,00", srcB: "472 000 000,00", type: "balanse" },
+        { id: "CHK_11", desc: "05_DATA_MODEL KOSTRA Eliminering Art 780 vs. Art 380 (Diff = 0,00 kr)", srcA: "14 310 000,00", srcB: "14 310 000,00", type: "elim" }
       ];
 
       const chkTbody = document.getElementById("checks-table-body");
       if (chkTbody) {
-        chkTbody.innerHTML = dynamicChecks.map(c => `<tr>
+        chkTbody.innerHTML = dynamicChecks.map(c => {
+          const colCls = c.type === "bud" ? "col-budget" : (c.type === "reg" ? "col-regnskap" : "fast-link");
+          return `<tr>
           <th scope="row">${c.id}</th>
           <td>${c.desc}</td>
-          <td class="num-col fast-link">${c.srcA}</td>
-          <td class="num-col fast-link">${c.srcB}</td>
+          <td class="num-col ${colCls}">${c.srcA}</td>
+          <td class="num-col ${colCls}">${c.srcB}</td>
           <td class="num-col rag-green">0,00</td>
           <td>${renderRagBadge("🟢 OK (0,00)")}</td>
-        </tr>`).join("");
+        </tr>`;
+        }).join("");
       }
     }
 
