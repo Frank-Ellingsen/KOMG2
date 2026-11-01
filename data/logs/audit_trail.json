@@ -196,5 +196,59 @@
     ],
     "tokens_used": 340,
     "reconciled_check_diff_nok": 0.0
+  },
+  {
+    "timestamp": "2026-11-01T21:15:55.624485+00:00",
+    "endpoint": "/api/v1/chat",
+    "user_id": "controller@kristiansand.kommune.no",
+    "query_anonymized": "Hva er styringsretten etter § 13-1 og fnr [REDACTED_FNR]?",
+    "pii_detected": true,
+    "redacted_entities": [
+      "NO_FODSELSNUMMER"
+    ],
+    "retrieved_sources": [
+      "LOV-2018-06-22-83-§13-1",
+      "GAT-FRAMSIKT-SAMarbeid-2024",
+      "LOV-2018-06-22-83-§14-6",
+      "KRISTIANSAND-OKREG-2024-§4"
+    ],
+    "tokens_used": 340,
+    "reconciled_check_diff_nok": 0.0
+  },
+  {
+    "timestamp": "2026-11-01T21:28:28.806380+00:00",
+    "endpoint": "/api/v1/chat",
+    "user_id": "controller@kristiansand.kommune.no",
+    "query_anonymized": "Hva er styringsretten etter § 13-1 og fnr [REDACTED_FNR]?",
+    "pii_detected": true,
+    "redacted_entities": [
+      "NO_FODSELSNUMMER"
+    ],
+    "retrieved_sources": [
+      "LOV-2018-06-22-83-§13-1",
+      "GAT-FRAMSIKT-SAMarbeid-2024",
+      "LOV-2018-06-22-83-§14-6",
+      "KRISTIANSAND-OKREG-2024-§4"
+    ],
+    "tokens_used": 340,
+    "reconciled_check_diff_nok": 0.0
+  },
+  {
+    "timestamp": "2026-11-01T21:31:50.055586+00:00",
+    "endpoint": "/api/v1/chat",
+    "user_id": "controller@kristiansand.kommune.no",
+    "query_anonymized": "Hva er styringsretten etter § 13-1 og fnr [REDACTED_FNR]?",
+    "pii_detected": true,
+    "redacted_entities": [
+      "NO_FODSELSNUMMER"
+    ],
+    "retrieved_sources": [
+      "LOV-2018-06-22-83-§13-1",
+      "GAT-FRAMSIKT-SAMarbeid-2024",
+      "LOV-2018-06-22-83-§14-6",
+      "KRISTIANSAND-OKREG-2024-§4"
+    ],
+    "tokens_used": 340,
+    "reconciled_check_diff_nok": 0.0
   }
 ]

@@ -49,6 +49,7 @@ st.sidebar.title("Navigasjon")
 page = st.sidebar.radio(
     "Velg modul:",
     [
+        "💼 Rådgiveroversikt",
         "📊 Avviksoversikt (Gold Layer)",
         "📈 Tidsserie & Årsprognose",
         "🌲 ML Prognoser & Early Warning",
@@ -63,6 +64,23 @@ def fmt_nok(val):
     if pd.isna(val):
         return "0 NOK"
     return f"{val:,.0f} NOK".replace(",", " ")
+
+
+def first_existing_column(df, candidates):
+    return next((column for column in candidates if column in df.columns), None)
+
+
+def sum_numeric_column(df, column):
+    if column is None:
+        return None
+    return pd.to_numeric(df[column], errors="coerce").sum()
+
+
+def fmt_optional_nok(value):
+    if value is None or pd.isna(value):
+        return "Ikke tilgjengelig"
+    return fmt_nok(value)
+
 
 # ----------------------------------------------------
 # HELPER: DYNAMISK KOLONNEMAPPING FOR MEDALLION / RAW SCHEMA
@@ -86,7 +104,275 @@ def resolve_columns(df):
 # ----------------------------------------------------
 # MODUL 1: AVVIKSOVERSIKT
 # ----------------------------------------------------
-if page == "📊 Avviksoversikt (Gold Layer)":
+if page == "💼 Rådgiveroversikt":
+    st.header("💼 Rådgiveroversikt")
+    st.caption(
+        "Arbeidsflate for økonomirådgivere: filtrer på rammeområde og ansvarssted, "
+        "følg status og prognose, og bruk avviksdriverne som grunnlag for dialog og oppfølging."
+    )
+
+    df_ml = run_query("SELECT * FROM modelready_fact")
+
+    if df_ml is None or df_ml.empty:
+        st.warning(f"Fant ikke data i `modelready_fact` i `{DB_PATH}`. Kjør `python src/db_manager.py` først.")
+    else:
+        period_col = first_existing_column(df_ml, ["accounting_period"])
+        responsibility_col = first_existing_column(df_ml, ["ansvar_code", "Ansvar_Kode"])
+        sector_col = first_existing_column(df_ml, ["sektor_navn", "Sektor"])
+        budget_ytd_col = first_existing_column(
+            df_ml,
+            ["ytd_budsjett_nok", "cum_budsjett_ytd_nok"],
+        )
+        actual_ytd_col = first_existing_column(
+            df_ml,
+            ["cum_regnskap_ytd_nok", "ytd_regnskap_nok"],
+        )
+        annual_budget_col = first_existing_column(df_ml, ["annual_budget_eoy_nok"])
+        forecast_col = first_existing_column(df_ml, ["eoy_forecast_unadjusted_nok"])
+        forecast_variance_col = first_existing_column(df_ml, ["eoy_variance_projected_nok"])
+
+        if period_col is None:
+            st.error("Datagrunnlaget mangler kolonnen `accounting_period`, som trengs for periodevalg.")
+        else:
+            df_dashboard = df_ml.copy()
+            df_dashboard["_period"] = pd.to_datetime(df_dashboard[period_col], errors="coerce")
+            df_dashboard = df_dashboard.dropna(subset=["_period"])
+            df_dashboard["_period_key"] = df_dashboard["_period"].dt.strftime("%Y-%m")
+
+            if df_dashboard.empty:
+                st.warning("Fant ingen gyldige regnskapsperioder i datagrunnlaget.")
+            else:
+                filter_cols = st.columns(3)
+
+                if sector_col is not None:
+                    sectors = sorted(df_dashboard[sector_col].dropna().astype(str).unique().tolist())
+                    selected_sector = filter_cols[0].selectbox(
+                        "Rammeområde",
+                        ["Alle rammeområder"] + sectors,
+                    )
+                else:
+                    selected_sector = "Alle rammeområder"
+                    filter_cols[0].caption("Rammeområde er ikke tilgjengelig i datagrunnlaget.")
+
+                df_scope = df_dashboard
+                if selected_sector != "Alle rammeområder" and sector_col is not None:
+                    df_scope = df_scope[df_scope[sector_col].astype(str) == selected_sector]
+
+                if responsibility_col is not None:
+                    responsibilities = sorted(
+                        df_scope[responsibility_col].dropna().astype(str).unique().tolist()
+                    )
+                    selected_responsibility = filter_cols[1].selectbox(
+                        "Ansvarssted / enhet",
+                        ["Alle ansvarssteder"] + responsibilities,
+                    )
+                else:
+                    selected_responsibility = "Alle ansvarssteder"
+                    filter_cols[1].caption("Ansvarssted er ikke tilgjengelig i datagrunnlaget.")
+
+                if selected_responsibility != "Alle ansvarssteder" and responsibility_col is not None:
+                    df_scope = df_scope[
+                        df_scope[responsibility_col].astype(str) == selected_responsibility
+                    ]
+
+                available_periods = sorted(df_scope["_period_key"].unique().tolist())
+                if not available_periods:
+                    st.info("Ingen regnskapsperioder finnes for dette utvalget.")
+                else:
+                    selected_period = filter_cols[2].selectbox(
+                        "Regnskapsperiode",
+                        available_periods,
+                        index=len(available_periods) - 1,
+                    )
+                    df_period = df_scope[df_scope["_period_key"] == selected_period].copy()
+
+                    latest_date = df_period["_period"].max()
+                    available_sectors = (
+                        ", ".join(sorted(df_dashboard[sector_col].dropna().astype(str).unique()))
+                        if sector_col is not None
+                        else "ikke tilgjengelig"
+                    )
+                    st.caption(
+                        f"Grunnlag per {latest_date.strftime('%m.%Y')}. "
+                        f"Datagrunnlaget inneholder: {available_sectors}. "
+                        "Kontroller at utvalget er komplett mot autoritative kildesystemer. "
+                        "Beløpene for hittil i år bruker siste tilgjengelige regnskapssnapshot "
+                        "i den valgte perioden."
+                    )
+
+                    ytd_budget = sum_numeric_column(df_period, budget_ytd_col)
+                    ytd_actual = sum_numeric_column(df_period, actual_ytd_col)
+                    annual_budget = sum_numeric_column(df_period, annual_budget_col)
+                    forecast = sum_numeric_column(df_period, forecast_col)
+                    forecast_variance = sum_numeric_column(df_period, forecast_variance_col)
+                    if forecast_variance is None and forecast is not None and annual_budget is not None:
+                        forecast_variance = forecast - annual_budget
+
+                    if ytd_budget is not None and ytd_actual is not None:
+                        ytd_variance = ytd_actual - ytd_budget
+                        utilization = (
+                            ytd_actual / ytd_budget * 100
+                            if ytd_budget != 0
+                            else None
+                        )
+                    else:
+                        ytd_variance = None
+                        utilization = None
+
+                    if annual_budget is not None and ytd_actual is not None:
+                        remaining_budget = annual_budget - ytd_actual
+                    else:
+                        remaining_budget = None
+
+                    st.subheader("Status og forventet årsresultat")
+                    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+                    kpi1.metric("Regnskap hittil i år", fmt_optional_nok(ytd_actual))
+                    kpi2.metric("Budsjett hittil i år", fmt_optional_nok(ytd_budget))
+                    kpi3.metric(
+                        "Avvik hittil i år",
+                        fmt_optional_nok(ytd_variance),
+                        help="Positivt avvik betyr at regnskapet er høyere enn budsjettet hittil i år.",
+                    )
+                    kpi4.metric(
+                        "Forbruk av budsjett hittil",
+                        f"{utilization:.1f} %" if utilization is not None else "Ikke tilgjengelig",
+                    )
+
+                    forecast_kpis = st.columns(3)
+                    forecast_kpis[0].metric("Vedtatt årsbudsjett", fmt_optional_nok(annual_budget))
+                    forecast_kpis[1].metric("Prognose årsregnskap", fmt_optional_nok(forecast))
+                    forecast_kpis[2].metric(
+                        "Forventet årsavvik",
+                        fmt_optional_nok(forecast_variance),
+                        help="Positivt avvik betyr forventet merforbruk; negativt avvik betyr forventet mindreforbruk.",
+                    )
+                    if forecast is None:
+                        st.info(
+                            "Årsprognose er ikke tilgjengelig i dette datagrunnlaget. "
+                            "Det vises derfor ingen beregnet prognose."
+                        )
+                    elif forecast_variance is not None and forecast_variance > 0:
+                        st.warning(
+                            f"Prognosen viser forventet merforbruk på {fmt_nok(forecast_variance)}. "
+                            "Kontroller driverne nedenfor og avklar om avviket skyldes engangskostnader, "
+                            "varig aktivitetsnivå eller manglende budsjettjustering."
+                        )
+                    elif forecast_variance is not None:
+                        st.success(
+                            f"Prognosen viser ikke forventet merforbruk "
+                            f"(forventet årsavvik {fmt_nok(forecast_variance)})."
+                        )
+
+                    st.subheader("Utvikling gjennom året")
+                    if budget_ytd_col is not None and actual_ytd_col is not None:
+                        trend = (
+                            df_scope.groupby("_period", as_index=False)[[budget_ytd_col, actual_ytd_col]]
+                            .sum()
+                            .sort_values("_period")
+                        )
+                        trend = trend.rename(
+                            columns={
+                                budget_ytd_col: "Budsjett hittil i år",
+                                actual_ytd_col: "Regnskap hittil i år",
+                            }
+                        )
+                        trend_plot = trend.melt(
+                            id_vars="_period",
+                            var_name="Beløpstype",
+                            value_name="NOK",
+                        )
+                        fig_trend = px.line(
+                            trend_plot,
+                            x="_period",
+                            y="NOK",
+                            color="Beløpstype",
+                            markers=True,
+                            labels={"_period": "Regnskapsperiode", "NOK": "NOK"},
+                        )
+                        fig_trend.update_layout(height=360, legend_title_text="")
+                        st.plotly_chart(fig_trend, use_container_width=True)
+                    else:
+                        st.info("Kan ikke vise utvikling: budsjett eller regnskap mangler i datagrunnlaget.")
+
+                    st.subheader("Hva driver forventet årsavvik?")
+                    if forecast_variance_col is None and (
+                        forecast_col is None or annual_budget_col is None
+                    ):
+                        st.info("Driveranalyse krever prognose for årsregnskap i datagrunnlaget.")
+                    else:
+                        driver_variance_col = forecast_variance_col
+                        if driver_variance_col is None:
+                            df_period["_forecast_variance"] = (
+                                pd.to_numeric(df_period[forecast_col], errors="coerce")
+                                - pd.to_numeric(df_period[annual_budget_col], errors="coerce")
+                            )
+                            driver_variance_col = "_forecast_variance"
+
+                        group_columns = [
+                            column
+                            for column in [
+                                "funksjon_code",
+                                "funksjon_navn",
+                                "konto_code",
+                                "kontonavn",
+                            ]
+                            if column in df_period.columns
+                        ]
+                        if not group_columns:
+                            group_columns = [responsibility_col] if responsibility_col is not None else []
+
+                        if group_columns:
+                            driver_data = (
+                                df_period.groupby(group_columns, dropna=False, as_index=False)[driver_variance_col]
+                                .sum()
+                                .rename(columns={driver_variance_col: "Forventet årsavvik (NOK)"})
+                            )
+                            driver_data["_abs_variance"] = driver_data["Forventet årsavvik (NOK)"].abs()
+                            positive_drivers = driver_data[
+                                driver_data["Forventet årsavvik (NOK)"] > 0
+                            ].sort_values("Forventet årsavvik (NOK)", ascending=False)
+                            if positive_drivers.empty:
+                                driver_data = driver_data.sort_values("_abs_variance", ascending=False)
+                                st.info(
+                                    "Ingen poster viser forventet merforbruk. Tabellen viser i stedet "
+                                    "postene med størst forventet avvik i begge retninger."
+                                )
+                            else:
+                                driver_data = positive_drivers
+
+                            driver_data = driver_data.drop(columns="_abs_variance").head(15)
+                            driver_data = driver_data.rename(
+                                columns={
+                                    "funksjon_code": "Funksjonskode",
+                                    "funksjon_navn": "Funksjon",
+                                    "konto_code": "Kontokode",
+                                    "kontonavn": "Konto",
+                                    responsibility_col: "Ansvarssted",
+                                }
+                            )
+                            st.caption(
+                                "Rangert etter forventet merforbruk på konto/funksjon. "
+                                "Positivt avvik betyr prognose over årsbudsjett; negative beløp er mindreforbruk."
+                            )
+                            st.dataframe(
+                                driver_data,
+                                use_container_width=True,
+                                hide_index=True,
+                                column_config={
+                                    "Forventet årsavvik (NOK)": st.column_config.NumberColumn(
+                                        format="%.0f NOK"
+                                    )
+                                },
+                            )
+                        else:
+                            st.info("Datagrunnlaget mangler dimensjoner som kan brukes til å forklare avviket.")
+
+                    st.caption(
+                        "Prognosen er hentet fra modelready_fact og er et estimat, ikke et vedtak. "
+                        "Vurder lokale forhold og kvaliteten på budsjett- og regnskapsdata før beslutninger."
+                    )
+
+elif page == "📊 Avviksoversikt (Gold Layer)":
     st.header("📊 Månedlig Avviksoversikt & Trendanalyse")
     st.markdown("""
     Dette dashbordet gir **revisjonssikker og pedagogisk oversikt** over kommunens regnskap vs. budsjett. 
@@ -686,4 +972,3 @@ elif page == "🎛️ Cockpit & Pipeline Kontroll":
         st.dataframe(df_audit, use_container_width=True)
     else:
         st.info("Revisjonsloggen (`audit_log`) er klar og oppdateres automatisk ved hver pipeline-kjøring.")
-

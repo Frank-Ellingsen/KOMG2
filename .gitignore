@@ -67,3 +67,6 @@ data/einnsyn_import/*.json
 data/export/*
 !data/export/.gitkeep
 KOM_G2_oppdateringer/
+
+# Google Drive shortcut placeholders are not readable as regular files.
+/index.gdoc

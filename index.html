@@ -294,7 +294,8 @@
 
     .field-group select,
     .field-group input[type="text"],
-    .field-group input[type="number"] {
+    .field-group input[type="number"],
+    .field-group textarea {
       font-family: inherit;
       font-size: 0.86rem;
       padding: 0.45rem 0.6rem;
@@ -302,6 +303,11 @@
       border-radius: 4px;
       background-color: var(--bg-surface);
       color: var(--text-primary);
+    }
+
+    .field-group textarea {
+      min-block-size: 5rem;
+      resize: vertical;
     }
 
     .field-group input.fast-input {
@@ -1116,9 +1122,12 @@
       <div class="brand-sub">Medallion Lakehouse, ML &amp; FAST Controlling</div>
     </div>
 
-    <div class="nav-section-label">Velg modul (app.py)</div>
+    <div class="nav-section-label">Økonomi og analyse</div>
     <nav class="module-nav" role="navigation">
-      <button type="button" class="nav-btn" data-target="view-avvik" aria-current="page">
+      <button type="button" class="nav-btn" data-target="view-min-okonomi" aria-current="page">
+        <span>💼</span> <span>Rådgiveroversikt</span>
+      </button>
+      <button type="button" class="nav-btn" data-target="view-avvik">
         <span>📊</span> <span>Avviksoversikt (Gold Layer)</span>
       </button>
       <button type="button" class="nav-btn" data-target="view-tidsserie">
@@ -1185,9 +1194,144 @@
 
     <div class="views-host">
       <!-- ===================================================================
+           RÅDGIVERENS ARBEIDSFLATE
+           =================================================================== -->
+      <section id="view-min-okonomi" class="spa-view" tabindex="-1" aria-label="Rådgiveroversikt">
+        <div class="section-bar">
+          <span>Rådgiveroversikt — økonomistyring</span>
+          <span id="min-data-status" role="status" aria-live="polite">Kobler til regnskapsdata …</span>
+        </div>
+
+        <div class="filter-panel" style="grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));">
+          <div class="field-group">
+            <label for="min-sector">Rammeområde</label>
+            <select id="min-sector">
+              <option value="ALL">Alle rammeområder i datagrunnlaget</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="min-ansvar">Ansvarssted / enhet</label>
+            <select id="min-ansvar">
+              <option value="ALL">Alle ansvarssteder i utvalget</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Dataperiode</label>
+            <div id="min-period-label" class="kpi-sub" aria-live="polite">Henter siste bokførte periode …</div>
+          </div>
+          <div class="field-group" style="display:flex; flex-direction:row; align-items:end; gap:0.5rem;">
+            <button type="button" class="cockpit-btn" id="min-refresh" style="padding:0.45rem 0.75rem;">↻ Oppdater rapport</button>
+            <button type="button" class="cockpit-btn" id="min-print" style="padding:0.45rem 0.75rem;">🖨️ Skriv ut</button>
+          </div>
+        </div>
+        <p id="min-coverage-note" class="kpi-sub" role="note">
+          Viser kun sektorer og perioder som finnes i datagrunnlaget. Kontroller fullstendighet mot autoritative kildesystemer før rapportering eller beslutning.
+        </p>
+
+        <div class="kpi-grid" aria-live="polite">
+          <div class="kpi-card">
+            <span class="kpi-label">Regnskap hittil i år</span>
+            <span class="kpi-value col-regnskap" id="min-ytd-reg">—</span>
+            <span class="kpi-sub">Akkumulert per siste tilgjengelige periode</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Budsjett hittil i år</span>
+            <span class="kpi-value col-budget" id="min-ytd-bud">—</span>
+            <span class="kpi-sub">Periodisert budsjett hittil</span>
+          </div>
+          <div class="kpi-card" id="min-ytd-variance-card">
+            <span class="kpi-label">Avvik hittil i år</span>
+            <span class="kpi-value" id="min-ytd-variance">—</span>
+            <span class="kpi-sub" id="min-ytd-variance-sub">Positivt beløp betyr merforbruk</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Vedtatt årsbudsjett</span>
+            <span class="kpi-value col-budget" id="min-annual-budget">—</span>
+            <span class="kpi-sub">Årsramme fra siste snapshot</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Prognose årsregnskap</span>
+            <span class="kpi-value" id="min-eac">—</span>
+            <span class="kpi-sub">Databasens ujusterte EOY-prognose</span>
+          </div>
+          <div class="kpi-card" id="min-eac-variance-card">
+            <span class="kpi-label">Prognoseavvik</span>
+            <span class="kpi-value" id="min-eac-variance">—</span>
+            <span class="kpi-sub" id="min-eac-variance-sub">Positivt beløp betyr forventet merforbruk</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Nødvendig innsparing per måned</span>
+            <span class="kpi-value" id="min-monthly-gap">—</span>
+            <span class="kpi-sub" id="min-months-remaining">For å komme i EOY-balanse</span>
+          </div>
+        </div>
+
+        <div class="panel-card" id="min-assessment" role="status" aria-live="polite">
+          Åpne rapporten via API-et for å hente oppdaterte tall.
+        </div>
+
+        <div class="grid-2col">
+          <div class="panel-card">
+            <div class="panel-title">
+              <span>Utvikling hittil i år</span>
+              <span class="panel-subtitle">Faktisk mot budsjett per måned</span>
+            </div>
+            <div class="table-wrapper">
+              <table class="data-table">
+                <caption id="min-trend-caption">Månedlig regnskap og periodisert budsjett</caption>
+                <thead>
+                  <tr><th>Periode</th><th class="num-col">Budsjett</th><th class="num-col">Regnskap</th><th class="num-col">Avvik</th></tr>
+                </thead>
+                <tbody id="min-trend-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel-card">
+            <div class="panel-title">
+              <span>Hva driver prognoseavviket?</span>
+              <span class="panel-subtitle">Kontoer med størst forventet merforbruk</span>
+            </div>
+            <div class="table-wrapper">
+              <table class="data-table">
+                <caption id="min-drivers-caption">Største prognosedrivere i siste periode</caption>
+                <thead>
+                  <tr><th>Rammeområde</th><th>KOSTRA-funksjon</th><th>Konto</th><th class="num-col">Prognose</th><th class="num-col">Årsbudsjett</th><th class="num-col">Avvik</th></tr>
+                </thead>
+                <tbody id="min-drivers-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-title"><span>Møteoppsummering og tiltak mot årsbalanse</span><span id="min-meeting-period" class="panel-subtitle">—</span></div>
+          <ul id="min-actions" style="padding-inline-start:1.25rem; display:grid; gap:0.45rem;"></ul>
+          <div id="min-measure-editor" class="filter-panel" style="grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));">
+            <div class="field-group">
+              <label for="min-measure-text">Avtalte tiltak / vurderinger</label>
+              <textarea id="min-measure-text" rows="3" placeholder="Beskriv tiltak, ansvar og forventet virkning …"></textarea>
+            </div>
+            <div class="field-group">
+              <label for="min-measure-effect">Forventet effekt resten av året (NOK)</label>
+              <input id="min-measure-effect" type="number" min="0" step="1000" value="0" />
+            </div>
+            <div class="field-group">
+              <label for="min-measure-owner">Ansvarlig / frist</label>
+              <input id="min-measure-owner" type="text" placeholder="Navn/rolle og dato" />
+            </div>
+            <div class="field-group" style="display:flex; flex-direction:row; align-items:end;">
+              <button type="button" class="cockpit-btn" id="min-save-measure" style="padding:0.45rem 0.75rem;">Lagre møteoppfølging</button>
+            </div>
+          </div>
+          <div id="min-adjusted-forecast" class="kpi-sub" aria-live="polite"></div>
+          <p class="kpi-sub">Oppfølging lagres lokalt i denne nettleseren, separat per rammeområde, enhet og måned. Den deles ikke med kollegaer eller mellom enheter. Tiltak er ikke automatisk godkjent; kontroller tjenestekonsekvenser, periodisering og fullmakter før beslutning.</p>
+        </div>
+      </section>
+
+      <!-- ===================================================================
            MODUL 1: AVVIKSOVERSIKT (GOLD LAYER)
            =================================================================== -->
-      <section id="view-avvik" class="spa-view" tabindex="-1" aria-label="Avviksoversikt Gold Layer">
+      <section id="view-avvik" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Avviksoversikt Gold Layer">
         <div class="section-bar">
           <span>1. Filtrering, Utsnittskuttere (Slicers) &amp; Periodevelger</span>
           <span>FAST &amp; Power BI-Style</span>
@@ -2602,6 +2746,12 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
             </thead>
             <tbody>
               <tr>
+                <th>💼 Rådgiveroversikt</th>
+                <td>Økonomirådgiver / budsjettansvarlig</td>
+                <td>Avgrens live månedsrapport på tilgjengelig rammeområde og ansvarssted. Følg YTD-status, EOY-prognose, prognosedrivere og møteoppfølging. Siden viser datoperiode og hvilke sektorer som finnes i DuckDB; kontroller fullstendighet mot autoritative kilder.</td>
+                <td>FastAPI <code>/api/v1/monthly-report</code>; lokal møteoppfølging i nettleseren</td>
+              </tr>
+              <tr>
                 <th>1. 📊 Avviksoversikt</th>
                 <td>Økonomikontroller / Enhetsleder</td>
                 <td>Velg måned eller sektor i filterpanelet. Identifiser KOSTRA-funksjoner med <code>🔴 KRITISK AVVIK</code> (f.eks. <em>254 Helse og omsorg</em> på <code>-1,29 MNOK</code> og <em>202 Grunnskole</em> på <code>-0,85 MNOK</code>) og sjekk Burn Rate i Bullet-diagrammet.</td>
@@ -3331,12 +3481,12 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     // =========================================================================
     // 3. CENTRAL FILTER CONTEXT ENGINE (Drives 100% of Modules 1–10)
     // =========================================================================
-    function getFilteredContext() {
-      const period = document.getElementById("flt-period")?.value || "ALL";
-      let sektor = document.getElementById("flt-sektor")?.value || "ALL";
-      const ansvar = document.getElementById("flt-ansvar")?.value || "ALL";
-      let funksjon = document.getElementById("flt-funksjon")?.value || "ALL";
-      const statusFlt = document.getElementById("flt-status")?.value || "ALL";
+    function getFilteredContext(overrides = {}) {
+      const period = overrides.period ?? document.getElementById("flt-period")?.value ?? "ALL";
+      let sektor = overrides.sektor ?? document.getElementById("flt-sektor")?.value ?? "ALL";
+      const ansvar = overrides.ansvar ?? document.getElementById("flt-ansvar")?.value ?? "ALL";
+      let funksjon = overrides.funksjon ?? document.getElementById("flt-funksjon")?.value ?? "ALL";
+      const statusFlt = overrides.statusFlt ?? document.getElementById("flt-status")?.value ?? "ALL";
 
       const ansvarMeta = ANSVAR_UNITS[ansvar] || ANSVAR_UNITS.ALL;
       const ansvarScale = ansvar === "ALL" ? 1.0 : ansvarMeta.share;
@@ -4371,6 +4521,280 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     // =========================================================================
     // 12. MASTER ORCHESTRATION & EVENT HOOKS
     // =========================================================================
+    let monthlyReportData = null;
+    let monthlyReportRequestId = 0;
+
+    function setMonthlyReportStatus(message, isError = false) {
+      const status = document.getElementById("min-data-status");
+      if (!status) return;
+      status.textContent = message;
+      status.className = isError ? "status-badge status-err" : "panel-subtitle";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[character]);
+    }
+
+    function monthlyReportStorageKey(report) {
+      return `kostra-radgiveroversikt:${report.data_as_of}:${report.source_sector}:${report.responsibility}`;
+    }
+
+    function loadMonthlyMeasure(report) {
+      const key = monthlyReportStorageKey(report);
+      let saved;
+      try {
+        saved = JSON.parse(localStorage.getItem(key) || "null");
+        if (!saved && report.source_sector === "Helse og Omsorg") {
+          const legacyKey = `kostra-min-okonomi:${report.data_as_of}:${report.responsibility}`;
+          saved = JSON.parse(localStorage.getItem(legacyKey) || "null");
+        }
+      } catch {
+        saved = null;
+      }
+      document.getElementById("min-measure-text").value = saved?.text || "";
+      document.getElementById("min-measure-effect").value = saved?.effect_nok || 0;
+      document.getElementById("min-measure-owner").value = saved?.owner || "";
+      renderAdjustedForecast();
+    }
+
+    function renderAdjustedForecast() {
+      const output = document.getElementById("min-adjusted-forecast");
+      if (!output || !monthlyReportData) return;
+      const effect = Math.max(0, Number(document.getElementById("min-measure-effect").value) || 0);
+      const adjustedVariance = monthlyReportData.summary.eoy_variance_nok - effect;
+      output.textContent = effect > 0
+        ? `Med registrert forventet effekt på ${fmtNOK(effect)} blir beregnet EOY-avvik ${fmtNOK(adjustedVariance, true)}. ` +
+          (adjustedVariance > 0 ? `Gjenstående gap: ${fmtNOK(adjustedVariance)}.` : "Beregningen viser balanse eller mindreforbruk.")
+        : "Registrer kun forventet, dokumenterbar effekt for resten av året. Dette er en enkel scenariojustering, ikke en godkjent prognose.";
+    }
+
+    function renderMonthlyReport(report) {
+      monthlyReportData = report;
+      const summary = report.summary;
+      const ytdStatus = summary.ytd_variance_nok > 0 ? "red" : "green";
+      const forecastStatus = summary.eoy_variance_nok > 0 ? "red" : "green";
+      const monthLabel = new Intl.DateTimeFormat("nb-NO", { month: "long", year: "numeric" })
+        .format(new Date(`${report.data_as_of}T12:00:00`));
+
+      const sectorSelect = document.getElementById("min-sector");
+      const selectedSector = report.source_sector;
+      sectorSelect.innerHTML = '<option value="ALL">Alle rammeområder i datagrunnlaget</option>' +
+        report.available_sectors.map(sector =>
+          `<option value="${escapeHtml(sector)}">${escapeHtml(sector)}</option>`
+        ).join("");
+      sectorSelect.value = selectedSector;
+      document.getElementById("min-coverage-note").textContent =
+        `Siste regnskapsperiode per rammeområde: ${report.sector_coverage
+          .map(item => `${item.sector}: ${item.latest_period}`)
+          .join(" • ") || "ingen sektorverdier"}. ` +
+        "Utvalget dekker bare data som faktisk finnes i DuckDB; " +
+        "bekreft fullstendighet mot autoritative kildesystemer før rapportering eller beslutning.";
+      document.getElementById("min-period-label").textContent =
+        `Siste bokførte periode: ${monthLabel} (${report.data_as_of})`;
+      document.getElementById("min-meeting-period").textContent =
+        `Møtegrunnlag per ${monthLabel}`;
+      document.getElementById("min-trend-caption").textContent =
+        `Månedlig budsjett og regnskap ${report.year} til og med ${monthLabel}`;
+      document.getElementById("min-drivers-caption").textContent =
+        `Kontoer med forventet merforbruk per ${monthLabel}`;
+      document.getElementById("min-ytd-reg").textContent = fmtNOK(summary.ytd_actual_nok);
+      document.getElementById("min-ytd-bud").textContent = fmtNOK(summary.ytd_budget_nok);
+      document.getElementById("min-ytd-variance").textContent = fmtNOK(summary.ytd_variance_nok, true);
+      document.getElementById("min-ytd-variance").className = `kpi-value rag-${ytdStatus}`;
+      document.getElementById("min-ytd-variance-sub").textContent =
+        `Forbruk ${summary.ytd_burn_rate_pct.toFixed(1).replace(".", ",")} % av periodisert budsjett`;
+      document.getElementById("min-annual-budget").textContent = fmtNOK(summary.annual_budget_nok);
+      document.getElementById("min-eac").textContent = fmtNOK(summary.eoy_forecast_nok);
+      document.getElementById("min-eac-variance").textContent = fmtNOK(summary.eoy_variance_nok, true);
+      document.getElementById("min-eac-variance").className = `kpi-value rag-${forecastStatus}`;
+      document.getElementById("min-eac-variance-sub").textContent =
+        "Mot vedtatt årsbudsjett; positivt = forventet merforbruk";
+      document.getElementById("min-monthly-gap").textContent =
+        report.months_remaining > 0 && summary.eoy_variance_nok > 0
+          ? fmtNOK(summary.monthly_adjustment_needed_nok)
+          : report.months_remaining === 0 && summary.eoy_variance_nok > 0
+            ? "Ingen måneder igjen"
+            : fmtNOK(0);
+      document.getElementById("min-months-remaining").textContent =
+        report.months_remaining > 0
+          ? `${report.months_remaining} måneder igjen til årsslutt`
+          : "Årets siste regnskapsperiode";
+      setKpiCardRag("min-ytd-variance-card", ytdStatus);
+      setKpiCardRag("min-eac-variance-card", forecastStatus);
+
+      document.getElementById("min-assessment").className =
+        `panel-card rag-card-${forecastStatus}`;
+      document.getElementById("min-assessment").textContent =
+        summary.eoy_variance_nok > 0
+          ? `Prognosen viser forventet merforbruk på ${fmtNOK(summary.eoy_variance_nok)} per ${monthLabel}. ` +
+            (report.months_remaining > 0
+              ? `For å nå årsbalanse må prognosen forbedres med om lag ${fmtNOK(summary.monthly_adjustment_needed_nok)} per gjenstående måned.`
+              : "Det er ingen regnskapsmåneder igjen for å hente inn avviket.")
+          : `Prognosen viser ikke merforbruk mot årsbudsjettet per ${monthLabel} ` +
+            `(${fmtNOK(summary.eoy_variance_nok, true)}). Følg utviklingen og kvalitetssikre forutsetningene.`;
+
+      const trendBody = document.getElementById("min-trend-body");
+      trendBody.innerHTML = report.monthly_trend.map(row => {
+        const period = new Date(`${row.period}T12:00:00`);
+        const label = new Intl.DateTimeFormat("nb-NO", { month: "short" }).format(period);
+        const varianceClass = row.variance_nok > 0 ? "rag-red" : "rag-green";
+        return `<tr>
+          <th scope="row">${escapeHtml(label)}</th>
+          <td class="num-col">${fmtNOK(row.budget_nok)}</td>
+          <td class="num-col">${fmtNOK(row.actual_nok)}</td>
+          <td class="num-col ${varianceClass}">${fmtNOK(row.variance_nok, true)}</td>
+        </tr>`;
+      }).join("");
+
+      const driversBody = document.getElementById("min-drivers-body");
+      driversBody.innerHTML = report.drivers.length
+        ? report.drivers.map(row => `
+            <tr>
+              <td>${escapeHtml(row.sektor_navn)}</td>
+              <th scope="row">${escapeHtml(row.funksjon_code)} — ${escapeHtml(row.funksjon_navn)}</th>
+              <td>${escapeHtml(row.konto_code)} — ${escapeHtml(row.kontonavn)}</td>
+              <td class="num-col">${fmtNOK(row.eoy_forecast_nok)}</td>
+              <td class="num-col">${fmtNOK(row.annual_budget_nok)}</td>
+              <td class="num-col rag-red">${fmtNOK(row.eoy_variance_nok, true)}</td>
+            </tr>`).join("")
+        : '<tr><td colspan="6">Ingen kontoer har forventet merforbruk i valgt utvalg.</td></tr>';
+
+      const actions = [];
+      if (summary.ytd_variance_nok > 0) {
+        actions.push(
+          `YTD ligger ${fmtNOK(summary.ytd_variance_nok)} over periodisert budsjett. ` +
+          "Avklar om avviket skyldes aktivitet, bemanning, periodisering eller engangskostnader."
+        );
+      } else {
+        actions.push(
+          `YTD ligger ${fmtNOK(Math.abs(summary.ytd_variance_nok))} under periodisert budsjett. ` +
+          "Kontroller om dette skyldes forsinket aktivitet eller manglende fakturaer før mindreforbruk vurderes som varig."
+        );
+      }
+      if (report.drivers.some(row => /^(101|102|104)/.test(row.konto_code))) {
+        actions.push("Gå gjennom fastlønn, vikarbruk og overtid mot bemanningsplan, fravær og faktisk aktivitet.");
+      }
+      if (report.drivers.some(row => /^(127|130)/.test(row.konto_code))) {
+        actions.push("Vurder innleie og kjøp av tjenester: bekreft behov, varighet, avtale og omfang for resten av året.");
+      }
+      if (report.drivers.some(row => /^171/.test(row.konto_code))) {
+        actions.push("Avstem forventede refusjoner mot fravær, dokumentasjon og periodisering; ikke legg inn usikre inntekter som tiltak.");
+      }
+      if (!actions.some(action => action.includes("Gå gjennom") || action.includes("Vurder") || action.includes("Avstem"))) {
+        actions.push("Kontroller de største prognosekontoene mot kontrakter, bestillinger, fakturaperiodisering og forventet aktivitetsnivå.");
+      }
+      actions.push("Avtal ansvarlig, frist og dokumenterbar kroneeffekt for hvert tiltak; vurder tjenestekonsekvenser og nødvendige fullmakter.");
+      document.getElementById("min-actions").innerHTML =
+        actions.map(action => `<li>${escapeHtml(action)}</li>`).join("");
+
+      const unitSelect = document.getElementById("min-ansvar");
+      unitSelect.innerHTML = '<option value="ALL">Alle ansvarssteder i utvalget</option>' +
+        report.available_responsibilities.map(code => {
+          return `<option value="${escapeHtml(code)}">Ansvar ${escapeHtml(code)}</option>`;
+        }).join("");
+      unitSelect.value = report.responsibility;
+
+      loadMonthlyMeasure(report);
+      setMonthlyReportStatus(`DuckDB • oppdatert ${new Intl.DateTimeFormat("nb-NO", {
+        dateStyle: "short",
+        timeStyle: "short"
+      }).format(new Date())} • ${report.report_name}`);
+    }
+
+    async function refreshMonthlyReport() {
+      const requestId = ++monthlyReportRequestId;
+      const sector = document.getElementById("min-sector").value || "ALL";
+      const responsibility = document.getElementById("min-ansvar").value || "ALL";
+      const status = document.getElementById("min-data-status");
+      monthlyReportData = null;
+      document.getElementById("min-save-measure").disabled = true;
+      ["min-ytd-reg", "min-ytd-bud", "min-ytd-variance", "min-annual-budget", "min-eac", "min-eac-variance", "min-monthly-gap"]
+        .forEach(id => { document.getElementById(id).textContent = "—"; });
+      document.getElementById("min-trend-body").replaceChildren();
+      document.getElementById("min-drivers-body").replaceChildren();
+      document.getElementById("min-assessment").textContent = "Oppdaterer månedsrapport fra DuckDB …";
+      document.getElementById("min-coverage-note").textContent =
+        "Oppdaterer utvalg og datadekning …";
+      status.textContent = "Henter oppdatert månedsrapport …";
+      status.className = "panel-subtitle";
+
+      try {
+        const apiBase = window.location.protocol === "file:"
+          ? "http://localhost:8000"
+          : window.location.origin;
+        const params = new URLSearchParams({ sektor: sector, ansvar: responsibility });
+        const response = await fetch(
+          `${apiBase}/api/v1/monthly-report?${params.toString()}`,
+          { cache: "no-store" }
+        );
+        if (!response.ok) {
+          const detail = await response.text();
+          throw new Error(`API svarte ${response.status}: ${detail}`);
+        }
+        const report = await response.json();
+        if (requestId !== monthlyReportRequestId) return;
+        if (
+          report.source_sector !== document.getElementById("min-sector").value ||
+          report.responsibility !== document.getElementById("min-ansvar").value
+        ) return;
+        renderMonthlyReport(report);
+        document.getElementById("min-save-measure").disabled = false;
+      } catch (error) {
+        if (requestId !== monthlyReportRequestId) return;
+        setMonthlyReportStatus("Live data ikke tilgjengelig", true);
+        document.getElementById("min-assessment").className = "panel-card rag-card-red";
+        document.getElementById("min-assessment").textContent =
+          `Månedsrapporten kunne ikke oppdateres fra økonomidatabasen: ${error.message}. ` +
+          "Kontroller at FastAPI og DuckDB kjører. Ingen eksempelverdier vises som om de var oppdaterte.";
+      }
+    }
+
+    document.getElementById("min-sector")?.addEventListener("change", () => {
+      document.getElementById("min-ansvar").value = "ALL";
+      refreshMonthlyReport();
+    });
+    document.getElementById("min-ansvar")?.addEventListener("change", refreshMonthlyReport);
+    document.getElementById("min-refresh")?.addEventListener("click", refreshMonthlyReport);
+    document.getElementById("min-print")?.addEventListener("click", () => window.print());
+    document.getElementById("min-measure-effect")?.addEventListener("input", renderAdjustedForecast);
+    document.getElementById("min-save-measure")?.addEventListener("click", () => {
+      if (!monthlyReportData) {
+        setMonthlyReportStatus("Kan ikke lagre: månedsrapporten er ikke lastet.", true);
+        return;
+      }
+      if (
+        monthlyReportData.source_sector !== document.getElementById("min-sector").value ||
+        monthlyReportData.responsibility !== document.getElementById("min-ansvar").value
+      ) {
+        setMonthlyReportStatus("Kan ikke lagre: vent til rapporten for valgt utvalg er oppdatert.", true);
+        return;
+      }
+      const effect = Number(document.getElementById("min-measure-effect").value);
+      if (!Number.isFinite(effect) || effect < 0) {
+        setMonthlyReportStatus("Forventet tiltakskroner må være et gyldig, positivt beløp.", true);
+        return;
+      }
+      const saved = {
+        text: document.getElementById("min-measure-text").value.trim(),
+        effect_nok: effect,
+        owner: document.getElementById("min-measure-owner").value.trim(),
+        saved_at: new Date().toISOString()
+      };
+      try {
+        localStorage.setItem(monthlyReportStorageKey(monthlyReportData), JSON.stringify(saved));
+        renderAdjustedForecast();
+        setMonthlyReportStatus("Møteoppfølging lagret lokalt i nettleseren.");
+      } catch (error) {
+        setMonthlyReportStatus(`Kunne ikke lagre møteoppfølging: ${error.message}`, true);
+      }
+    });
+
     function renderAllDynamicReports() {
       const ctx = getFilteredContext();
       renderModule1(ctx);
@@ -4973,6 +5397,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     renderAllDynamicReports();
     renderCitationDrawer();
     updateSelvkostCalc();
+    refreshMonthlyReport();
     // Invoicing Unit Options (Module 9)
     initInvoicingUnitOptions();
 
@@ -5351,4 +5776,3 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
   </script>
 </body>
 </html>
-

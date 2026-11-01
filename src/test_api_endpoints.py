@@ -46,6 +46,67 @@ def run_tests():
     assert data["reconciled_check_diff_nok"] == 0.00
     print("  OK: summary reconciled 0.00 NOK")
 
+    print("Testing /api/v1/monthly-report...")
+    res = client.get(
+        "/api/v1/monthly-report",
+        params={"sektor": "Helse og Omsorg", "ansvar": "25310"},
+    )
+    assert res.status_code == 200, f"Monthly report failed: {res.text}"
+    report = res.json()
+    assert report["status"] == "ok"
+    assert report["report_name"] == "Helse og Omsorg"
+    assert report["source_sector"] == "Helse og Omsorg"
+    assert report["responsibility"] == "25310"
+    assert report["summary"]["ytd_actual_nok"] > 0
+    assert report["summary"]["annual_budget_nok"] > 0
+    assert report["monthly_trend"]
+    assert report["available_responsibilities"]
+    assert "Helse og Omsorg" in report["available_sectors"]
+    assert "Oppvekst og Utdanning" in report["available_sectors"]
+    assert report["sector_coverage"]
+    print(
+        f"  OK: report current through {report['data_as_of']} "
+        f"with {len(report['drivers'])} overrun drivers"
+    )
+
+    print("Testing /api/v1/monthly-report across available sectors...")
+    all_report_res = client.get(
+        "/api/v1/monthly-report",
+        params={"sektor": "ALL", "ansvar": "ALL"},
+    )
+    assert all_report_res.status_code == 200, f"All-sector report failed: {all_report_res.text}"
+    all_report = all_report_res.json()
+    assert all_report["source_sector"] == "ALL"
+    assert all_report["responsibility"] == "ALL"
+    assert all_report["summary"]["ytd_actual_nok"] >= report["summary"]["ytd_actual_nok"]
+    assert len(all_report["available_sectors"]) >= 2
+    assert all(
+        coverage["latest_period"] == all_report["data_as_of"]
+        for coverage in all_report["sector_coverage"]
+    )
+    education_res = client.get(
+        "/api/v1/monthly-report",
+        params={"sektor": "Oppvekst og Utdanning", "ansvar": "ALL"},
+    )
+    assert education_res.status_code == 200, f"Education report failed: {education_res.text}"
+    education_report = education_res.json()
+    assert education_report["source_sector"] == "Oppvekst og Utdanning"
+    health_res = client.get(
+        "/api/v1/monthly-report",
+        params={"sektor": "Helse og Omsorg", "ansvar": "ALL"},
+    )
+    assert health_res.status_code == 200, f"Health report failed: {health_res.text}"
+    health_report = health_res.json()
+    assert abs(
+        all_report["summary"]["ytd_actual_nok"]
+        - health_report["summary"]["ytd_actual_nok"]
+        - education_report["summary"]["ytd_actual_nok"]
+    ) < 0.01
+    print(
+        f"  OK: all-sector report covers {len(all_report['available_sectors'])} "
+        f"available sectors through {all_report['data_as_of']}"
+    )
+
     print("Testing /api/v1/deviations...")
     res = client.get("/api/v1/deviations")
     assert res.status_code == 200, f"Deviations failed: {res.text}"
@@ -304,7 +365,7 @@ def run_tests():
     print(f"  OK: Bystyrenotat DOCX generated ({len(res.content)} bytes)")
 
     print("\n==================================================")
-    print("ALL 27 ENDPOINTS (100% SUITE & ULTIMATE) PASSED WITH ZERO ERRORS!")
+    print("ALL 28 ENDPOINTS (100% SUITE & ULTIMATE) PASSED WITH ZERO ERRORS!")
     print("==================================================")
 
 if __name__ == "__main__":

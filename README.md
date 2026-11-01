@@ -81,10 +81,12 @@ Systemet er bygget på en **3-lags Medallion Lakehouse-arkitektur** i **DuckDB**
 
 ## 🎛️ Oversikt over de 10 Interaktive Modulene
 
-Det frittstående web-grensesnittet (`index.html`) og Streamlit-applikasjonen (`src/app.py`) inneholder **10 spesialiserte styringsmoduler**:
+Det frittstående web-grensesnittet (`index.html`) inneholder **10 spesialiserte styringsmoduler** og en arbeidsflate for budsjettansvarlige. Streamlit-applikasjonen (`src/app.py`) har en tilsvarende arbeidsflate:
 
 | Modul | Tittel & Fokus | Nøkkelinnhold & Analytiske Kapabiliteter |
 | :---: | :--- | :--- |
+| **Web** | **💼 Rådgiveroversikt** | Filtrer månedsrapporten på rammeområde og ansvarssted. Viser YTD-status, vedtatt årsbudsjett, EOY-prognose og prognoseavvik, månedstrend, prognosedrivere og møteoppfølging. Tilgjengelige sektorer hentes fra DuckDB og datadekningen vises eksplisitt. Møteoppfølging lagres lokalt i nettleseren, ikke som delt saksbehandling. |
+| **Streamlit** | **💼 Rådgiveroversikt** | Filtrer på rammeområde, ansvarssted og tilgjengelig regnskapsperiode fra DuckDB. Viser regnskap og budsjett hittil i år, årsprognose, prognoseavvik og drivere. Grensesnittet viser hvilke sektorer datagrunnlaget inneholder og ber brukeren kontrollere fullstendighet mot autoritative kildesystemer. Prognosen er et estimat, ikke et vedtak. |
 | **1** | **📊 Avviksoversikt (Gold Layer)** | 100 % dynamisk multi-slicer filtrering (Periode, Sektor, Ansvar, Funksjon, Status). RAG betinget formatering (`🔴 Kritiske avvik > 5 %`, `🟡 Advarsel 2–5 %`, `🟢 I rute < 2 %`). Edward Tufte Data-Ink bullet charts for KOSTRA-funksjoner og utgiftsarter (1010, 1020, 1040, 1090, 1270). 3M rullende glidende snitt. |
 | **2** | **📈 Tidsserie & Årsprognose (EAC)** | Dedikert, toveissynkronisert filterpanel. YTD M1–M8 (Bokført `31 524 851 kr`) vs. Årsbudsjett (`29 295 237 kr`), nettoavvik (`-2 229 614 kr`), LOY gjenstående ramme M9–M12 og påkrevd månedstak (`2 281 890 kr/mnd`). Prescriptive 4-slider simulator, real-time SVG-trajektorie og 1-klikks automatisert tertialnotatgenerator. |
 | **3** | **🌲 ML Prognoser & Early Warning (XAI)** | Forklarbar maskinlæring (XAI) basert på `RandomForestRegressor` ($R^2 = 0.9758$, $\text{MAE} = 1\,655\text{ NOK}$). 100 % revisjonsgodkjent beslutningstre (`DecisionTreeClassifier`) med eksplisitte `IF-THEN`-regler for tidlig varsling. |
@@ -161,6 +163,7 @@ FastAPI-backend-en (`src/api_server.py`) kjører asynkront på port 8000 og leve
 
 | Endepunkt | Metode | Beskrivelse |
 | :--- | :---: | :--- |
+| `/api/v1/monthly-report` | `GET` | Henter siste månedsrapport for valgt utvalg: YTD, EOY, månedsserie, konto-/funksjonsdrivere og tilgjengelige sektor-/ansvarsstedsvalg. Parametrene `sektor` og `ansvar` kan settes til `ALL` eller avgrenses til én verdi. Dette er kun en oppsummering av sektorene som faktisk finnes i DuckDB; den skal ikke tolkes som garanti for full kommunedekning. |
 | `/api/pipeline/status` | `GET` | Returnerer status for DuckDB, modelltrening og filantall i `data/raw` (21) og `data/localblob` (42). |
 | `/api/pipeline/run` | `POST` | Kjører end-to-end datapipeline (DuckDB Medallion ETL og MLOps retrain). |
 | `/api/eac/forecast` | `POST` | Beregner EAC/ETC basert på YTD-tall og simulerte kuttspaker (vikar, kjøp, drift, fast kutt). |
@@ -259,7 +262,7 @@ Kom - G3/
 │   └── export/                         # Genererte rapporter og avstemmingslogger
 ├── models/                             # Serialiserte ML-modeller (.pkl / joblib)
 └── src/
-    ├── app.py                          # Streamlit AI Workbench (7 moduler)
+    ├── app.py                          # Streamlit AI Workbench (8 moduler)
     ├── api_server.py                   # FastAPI REST backend (10 endepunkter, RAG, Presidio)
     ├── test_api_endpoints.py           # Automatisert testsuite for FastAPI (10/10 tester)
     ├── db_manager.py                   # DuckDB Medallion ETL og Ingestion Engine

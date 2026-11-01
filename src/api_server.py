@@ -404,6 +404,213 @@ def get_summary(
     }
 
 
+@app.get("/api/v1/monthly-report")
+def get_monthly_report(
+    sektor: str = Query(default="ALL"),
+    ansvar: str = Query(default="ALL"),
+):
+    """Return a current-period budget follow-up report for the selected scope."""
+    where_parts = ["1=1"]
+    params: List[Any] = []
+    if sektor != "ALL":
+        where_parts.append("sektor_navn = ?")
+        params.append(sektor)
+    if ansvar != "ALL":
+        where_parts.append("ansvar_code = ?")
+        params.append(ansvar)
+    where_sql = " AND ".join(where_parts)
+
+    latest_rows = query_duckdb(
+        f"""
+        SELECT MAX(accounting_period) AS latest_period
+        FROM modelready_fact
+        WHERE {where_sql}
+        """,
+        params,
+    )
+    latest_period = latest_rows[0]["latest_period"] if latest_rows else None
+    if latest_period is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No accounting periods found for sector {sektor} and responsibility {ansvar}.",
+        )
+
+    latest_period_str = latest_period.isoformat()
+    latest_params = [*params, latest_period]
+    summary_rows = query_duckdb(
+        f"""
+        SELECT
+            COUNT(*) AS active_rows,
+            COALESCE(SUM(monthly_delta_budsjett_nok), 0) AS period_budget_nok,
+            COALESCE(SUM(monthly_delta_regnskap_nok), 0) AS period_actual_nok,
+            COALESCE(SUM(cum_budsjett_ytd_nok), 0) AS ytd_budget_nok,
+            COALESCE(SUM(cum_regnskap_ytd_nok), 0) AS ytd_actual_nok,
+            COALESCE(SUM(annual_budget_eoy_nok), 0) AS annual_budget_nok,
+            COALESCE(SUM(eoy_forecast_unadjusted_nok), 0) AS eoy_forecast_nok,
+            COALESCE(SUM(eoy_variance_projected_nok), 0) AS eoy_variance_nok
+        FROM modelready_fact
+        WHERE {where_sql} AND accounting_period = ?
+        """,
+        latest_params,
+    )
+    monthly_rows = query_duckdb(
+        f"""
+        SELECT
+            accounting_period,
+            COALESCE(SUM(monthly_delta_budsjett_nok), 0) AS budget_nok,
+            COALESCE(SUM(monthly_delta_regnskap_nok), 0) AS actual_nok
+        FROM modelready_fact
+        WHERE {where_sql} AND YEAR(accounting_period) = YEAR(?)
+        GROUP BY accounting_period
+        ORDER BY accounting_period
+        """,
+        [*params, latest_period],
+    )
+    driver_rows = query_duckdb(
+        f"""
+        SELECT
+            sektor_navn,
+            funksjon_code,
+            funksjon_navn,
+            konto_code,
+            kontonavn,
+            COALESCE(SUM(cum_regnskap_ytd_nok), 0) AS ytd_actual_nok,
+            COALESCE(SUM(annual_budget_eoy_nok), 0) AS annual_budget_nok,
+            COALESCE(SUM(eoy_forecast_unadjusted_nok), 0) AS eoy_forecast_nok,
+            COALESCE(SUM(eoy_variance_projected_nok), 0) AS eoy_variance_nok
+        FROM modelready_fact
+        WHERE {where_sql} AND accounting_period = ?
+        GROUP BY sektor_navn, funksjon_code, funksjon_navn, konto_code, kontonavn
+        HAVING SUM(eoy_variance_projected_nok) > 0
+        ORDER BY eoy_variance_nok DESC
+        LIMIT 10
+        """,
+        latest_params,
+    )
+    option_parts = ["accounting_period = ?"]
+    option_params: List[Any] = [latest_period]
+    if sektor != "ALL":
+        option_parts.append("sektor_navn = ?")
+        option_params.append(sektor)
+    option_where = " AND ".join(option_parts)
+    sector_coverage_rows = query_duckdb(
+        """
+        SELECT
+            sektor_navn,
+            MAX(accounting_period) AS latest_period,
+            COUNT(DISTINCT accounting_period) AS period_count
+        FROM modelready_fact
+        GROUP BY sektor_navn
+        ORDER BY sektor_navn
+        """,
+        [],
+    )
+    sector_latest_periods = {
+        str(row["sektor_navn"]): row["latest_period"]
+        for row in sector_coverage_rows
+    }
+    if sektor == "ALL" and len(set(sector_latest_periods.values())) > 1:
+        coverage = ", ".join(
+            f"{sector}: {latest.isoformat()}"
+            for sector, latest in sector_latest_periods.items()
+        )
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "A combined report is unavailable because the sectors do not share "
+                f"the same latest accounting period ({coverage}). Select one sector."
+            ),
+        )
+    unit_rows = query_duckdb(
+        f"""
+        SELECT DISTINCT ansvar_code
+        FROM modelready_fact
+        WHERE {option_where}
+        ORDER BY ansvar_code
+        """,
+        option_params,
+    )
+
+    summary = summary_rows[0] if summary_rows else {}
+    ytd_budget = float(summary.get("ytd_budget_nok") or 0.0)
+    ytd_actual = float(summary.get("ytd_actual_nok") or 0.0)
+    annual_budget = float(summary.get("annual_budget_nok") or 0.0)
+    eoy_forecast = float(summary.get("eoy_forecast_nok") or 0.0)
+    eoy_variance = float(summary.get("eoy_variance_nok") or 0.0)
+    ytd_variance = ytd_actual - ytd_budget
+    month = int(latest_period.month)
+    months_remaining = max(0, 12 - month)
+    monthly_adjustment_needed = max(0.0, eoy_variance) / months_remaining if months_remaining else 0.0
+    period_budget = float(summary.get("period_budget_nok") or 0.0)
+    period_actual = float(summary.get("period_actual_nok") or 0.0)
+    report_name = (
+        "Alle rammeområder med tilgjengelige data"
+        if sektor == "ALL"
+        else sektor
+    )
+
+    return {
+        "status": "ok",
+        "report_name": report_name,
+        "source_sector": sektor,
+        "responsibility": ansvar,
+        "data_as_of": latest_period_str,
+        "year": int(latest_period.year),
+        "month": month,
+        "months_remaining": months_remaining,
+        "available_sectors": list(sector_latest_periods),
+        "sector_coverage": [
+            {
+                "sector": str(row["sektor_navn"]),
+                "latest_period": row["latest_period"].isoformat(),
+                "period_count": int(row["period_count"]),
+            }
+            for row in sector_coverage_rows
+        ],
+        "available_responsibilities": [str(row["ansvar_code"]) for row in unit_rows],
+        "summary": {
+            "active_rows": int(summary.get("active_rows") or 0),
+            "period_budget_nok": round(period_budget, 2),
+            "period_actual_nok": round(period_actual, 2),
+            "period_variance_nok": round(period_actual - period_budget, 2),
+            "ytd_budget_nok": round(ytd_budget, 2),
+            "ytd_actual_nok": round(ytd_actual, 2),
+            "ytd_variance_nok": round(ytd_variance, 2),
+            "ytd_burn_rate_pct": round(ytd_actual / ytd_budget * 100.0, 2) if ytd_budget else 0.0,
+            "annual_budget_nok": round(annual_budget, 2),
+            "eoy_forecast_nok": round(eoy_forecast, 2),
+            "eoy_variance_nok": round(eoy_variance, 2),
+            "monthly_adjustment_needed_nok": round(monthly_adjustment_needed, 2),
+        },
+        "monthly_trend": [
+            {
+                "period": row["accounting_period"].isoformat(),
+                "budget_nok": round(float(row["budget_nok"] or 0.0), 2),
+                "actual_nok": round(float(row["actual_nok"] or 0.0), 2),
+                "variance_nok": round(
+                    float(row["actual_nok"] or 0.0) - float(row["budget_nok"] or 0.0),
+                    2,
+                ),
+            }
+            for row in monthly_rows
+        ],
+        "drivers": [
+            {
+                "sektor_navn": row["sektor_navn"],
+                "funksjon_code": str(row["funksjon_code"]),
+                "funksjon_navn": row["funksjon_navn"],
+                "konto_code": str(row["konto_code"]),
+                "kontonavn": row["kontonavn"],
+                "ytd_actual_nok": round(float(row["ytd_actual_nok"] or 0.0), 2),
+                "annual_budget_nok": round(float(row["annual_budget_nok"] or 0.0), 2),
+                "eoy_forecast_nok": round(float(row["eoy_forecast_nok"] or 0.0), 2),
+                "eoy_variance_nok": round(float(row["eoy_variance_nok"] or 0.0), 2),
+            }
+            for row in driver_rows
+        ],
+    }
+
+
 @app.get("/api/v1/deviations")
 def get_deviations(
     sektor: str = Query(default="ALL"),
