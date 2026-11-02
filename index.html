@@ -1162,7 +1162,7 @@
         <span>🏛️</span> <span>Søknader &amp; Tilskudd</span>
       </button>
       <button type="button" class="nav-btn" data-target="view-budget">
-        <span>💼</span> <span>Budsjettmodul (Lønn &amp; Rammer)</span>
+        <span>📑</span> <span>Budsjett &amp; Framsikt Regulering</span>
       </button>
       <button type="button" class="nav-btn" data-target="view-guide">
         <span>📖</span> <span>Brukerveiledning &amp; Metodikk</span>
@@ -3463,6 +3463,123 @@
             </div>
           </div>
         </div>
+      
+
+        <!-- ===================================================================
+             FRAMSIKT INTEGRASJON & BUDSJETT-TEMPLATES (IMPORTKLARE FILER)
+             =================================================================== -->
+        <div class="panel" style="margin-top:1.5rem; border-top:3px solid var(--clr-fig-regnskap);">
+          <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <h3 style="font-size:0.95rem; font-weight:700; color:var(--text-primary); margin-bottom:0.2rem;">
+                🏛️ Framsikt Integrasjon: Budsjett-Templates &amp; Importmotor
+              </h3>
+              <p style="font-size:0.77rem; color:var(--text-secondary); margin:0;">
+                Gjensidig samspill: Utfylling av budsjettreguleringer, salderingssjekk og direkte eksport til Framsikt Økonomiplan &amp; Tertialrapport.
+              </p>
+            </div>
+            <div style="display:flex; gap:0.4rem; align-items:center;">
+              <button type="button" class="cockpit-btn" id="btn-download-framsikt-csv" style="font-size:0.73rem; padding:0.35rem 0.75rem; background:var(--clr-ok-bg); color:var(--clr-ok-text); border:1px solid var(--clr-ok-text); font-weight:700;">
+                📥 Last ned Framsikt CSV (Importklar)
+              </button>
+              <button type="button" class="cockpit-btn" id="btn-download-framsikt-excel" style="font-size:0.73rem; padding:0.35rem 0.75rem; font-weight:700;">
+                📊 Last ned Framsikt Excel (.xlsx)
+              </button>
+              <button type="button" class="cockpit-btn" id="btn-copy-framsikt-text" style="font-size:0.73rem; padding:0.35rem 0.75rem;">
+                📋 Kopier Tertialnotat
+              </button>
+            </div>
+          </div>
+
+          <!-- Valg av Predefinert Framsikt Template -->
+          <div style="background:var(--bg-subtle); padding:0.65rem 0.85rem; border:1px solid var(--border-light); border-radius:4px; margin-bottom:0.75rem; margin-top:0.6rem;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:0.75rem; align-items:end;">
+              <div>
+                <label for="framsikt-template-select" style="font-weight:700; font-size:0.74rem; display:block; margin-bottom:0.25rem;">
+                  ⭐ Velg Predefinert Framsikt Template:
+                </label>
+                <select id="framsikt-template-select" style="width:100%; padding:0.35rem; font-size:0.78rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                  <option value="template-loy-helse" selected>🏥 [Helse &amp; Mestring] LOY-Saldering Vikar/Overtid (§ 13-1)</option>
+                  <option value="template-loy-oppvekst">🎓 [Oppvekst] Vakanssparing &amp; Lærerjustering (§ 13-1)</option>
+                  <option value="template-fond-bystyre">🏛️ [Kommune totalt] Budsjettregulering mot Disposisjonsfond (§ 14-6)</option>
+                  <option value="template-nav-etterslep">📑 [Teknisk] Korreksjon NAV Sykelønnsrefusjoner (Art 1690/1710)</option>
+                  <option value="custom">⚡ Egendefinert budsjettendring (Legg inn rader fritt)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="framsikt-target-period" style="font-weight:700; font-size:0.74rem; display:block; margin-bottom:0.25rem;">
+                  📅 Gjeldende Periode i Framsikt:
+                </label>
+                <select id="framsikt-target-period" style="width:100%; padding:0.35rem; font-size:0.78rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                  <option value="M9-M12">M09–M12 (Resten av året / EOY)</option>
+                  <option value="M09">M09 (September rapportering)</option>
+                  <option value="T2">Tertial 2 (2. Tertialrapport Bystyret)</option>
+                  <option value="2025-2028">HØP 2025–2028 (Handlings- og økonomiplan)</option>
+                </select>
+              </div>
+
+              <div>
+                <span style="font-weight:700; font-size:0.74rem; display:block; margin-bottom:0.25rem; color:var(--text-primary);">
+                  ⚖️ Automatisk Salderingsstatus:
+                </span>
+                <div id="framsikt-balance-badge" style="padding:0.35rem 0.6rem; border-radius:4px; font-weight:700; font-size:0.75rem; text-align:center; background:var(--clr-ok-bg); color:var(--clr-ok-text); border:1px solid var(--clr-ok-text);">
+                  ✔ I BALANSE: Netto 0,00 NOK
+                </div>
+              </div>
+
+              <div>
+                <button type="button" class="btn btn-secondary" id="btn-add-framsikt-row" style="width:100%; font-size:0.74rem; padding:0.35rem; font-weight:700;">
+                  ➕ Legg til budsjettlinje
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Framsikt Import-tabell (Redigerbar og live avstemt) -->
+          <div class="table-wrapper" style="margin-bottom:0.75rem;">
+            <table class="styled-table" id="framsikt-table" style="width:100%; font-size:0.75rem;">
+              <thead>
+                <tr style="background:var(--header-dark); color:#fff;">
+                  <th style="padding:0.4rem 0.5rem;">Område / Enhet</th>
+                  <th style="padding:0.4rem 0.5rem;">KOSTRA Funksjon</th>
+                  <th style="padding:0.4rem 0.5rem;">KOSTRA Art</th>
+                  <th style="padding:0.4rem 0.5rem;">Artekst</th>
+                  <th style="padding:0.4rem 0.5rem; text-align:right;">Endring (NOK)</th>
+                  <th style="padding:0.4rem 0.5rem; text-align:right;">Fullårseffekt</th>
+                  <th style="padding:0.4rem 0.5rem;">Tiltakskategori</th>
+                  <th style="padding:0.4rem 0.5rem;">Lovhjemmel</th>
+                  <th style="padding:0.4rem 0.5rem;">Beskrivelse / Begrunnelse for Framsikt</th>
+                  <th style="padding:0.4rem 0.5rem; text-align:center;">Slett</th>
+                </tr>
+              </thead>
+              <tbody id="framsikt-table-body">
+                <!-- Rader genereres dynamisk basert på valgt template -->
+              </tbody>
+              <tfoot id="framsikt-table-foot" style="background:var(--bg-subtle); font-weight:700; border-top:2px solid var(--border-light);">
+                <tr>
+                  <td colspan="4" style="padding:0.4rem 0.5rem;">SUM BUDSJETTREGULERING / SALDERING:</td>
+                  <td class="num-col" id="framsikt-sum-nok" style="text-align:right; font-family:var(--font-mono); color:var(--clr-ok-text);">0 kr</td>
+                  <td class="num-col" id="framsikt-sum-full" style="text-align:right; font-family:var(--font-mono);">0 kr</td>
+                  <td colspan="4" id="framsikt-sum-status" style="padding:0.4rem 0.5rem; font-size:0.72rem; color:var(--clr-ok-text);">
+                    ✔ Oppfyller kommunelovens krav til intern saldering.
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Framsikt Forhåndsvisning av Tertialnotat Tekst -->
+          <div style="background:var(--bg-canvas); border:1px solid var(--border-light); border-radius:4px; padding:0.65rem 0.85rem; font-size:0.75rem; line-height:1.45;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <strong style="color:var(--text-primary); font-size:0.78rem;">📝 Kladde til Framsikt Tertialrapport (Tekstlig Begrunnelse &amp; Vedtaksforslag)</strong>
+              <span style="font-size:0.7rem; color:var(--text-muted);">Klar til å limes rett inn i Framsikt Tekstmodul</span>
+            </div>
+            <textarea id="framsikt-text-preview" rows="4" style="width:100%; font-family:var(--font-mono); font-size:0.74rem; padding:0.5rem; border:1px solid var(--border-light); border-radius:3px; background:#fff; color:var(--text-primary); line-height:1.4;" readonly></textarea>
+          </div>
+
+        </div>
+
       </section>
 
       <section id="view-guide" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Brukerveiledning og Metodikk Explainer">
@@ -4492,6 +4609,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         activeView.focus();
         if (viewId === "view-eda") {
           renderEdaModule();
+        }
+        if (viewId === "view-budget" && typeof initFramsiktModule === "function") {
+          initFramsiktModule();
         }
       }
       if (clickedBtn) {
@@ -7709,6 +7829,312 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         `;
       }
     }
+
+  
+
+    // =========================================================================
+    // 19. FRAMSIKT BUDSJETT-TEMPLATES & IMPORTMOTOR (KRISTIANSAND KOMMUNE)
+    // =========================================================================
+
+    const FRAMSIKT_PRESET_TEMPLATES = {
+      "template-loy-helse": [
+        {
+          omrade: "Område 3 Helse/Mestring", ansvar: "25310", fn: "254", art: "102000", artekst: "Vikarlønn ved fravær",
+          belop: -350000, fullar: -1050000, kat: "Administrative EOY", hjemmel: "Kommuneloven § 13-1",
+          tekst: "Innstramming i vikarbyrå og 80% dekningsgrad på korttidsfravær i omsorgssentre (M9-M12)"
+        },
+        {
+          omrade: "Område 3 Helse/Mestring", ansvar: "25310", fn: "254", art: "104000", artekst: "Overtidslønn",
+          belop: -120000, fullar: -360000, kat: "Administrative EOY", hjemmel: "Kommuneloven § 13-1",
+          tekst: "Strenge rutiner for forhåndsgodkjenning av turnusovertid i Visma Gat"
+        },
+        {
+          omrade: "Område 3 Helse/Mestring", ansvar: "25710", fn: "254", art: "102000", artekst: "Vikarlønn ved fravær",
+          belop: -280000, fullar: -840000, kat: "Administrative EOY", hjemmel: "Kommuneloven § 13-1",
+          tekst: "Omdisponering av interne ressurser og vaktplanoptimalisering i hjemmetjenesten"
+        },
+        {
+          omrade: "Område 3 Helse/Mestring", ansvar: "25310", fn: "254", art: "101000", artekst: "Fastlønn ordinære stillinger",
+          belop: 750000, fullar: 2250000, kat: "Administrative EOY", hjemmel: "Kommuneloven § 13-1",
+          tekst: "Intern saldering: Konvertering av variable vikarmidler til faste stillinger for å stabilisere drift"
+        }
+      ],
+      "template-loy-oppvekst": [
+        {
+          omrade: "Område 2 Oppvekst", ansvar: "20210", fn: "202", art: "102000", artekst: "Vikarlønn",
+          belop: -200000, fullar: -600000, kat: "Administrative EOY", hjemmel: "Kommuneloven § 13-1",
+          tekst: "Vikarstopp på korttidsfravær og sammenslåing av klasser ved fravær (M9-M12)"
+        },
+        {
+          omrade: "Område 2 Oppvekst", ansvar: "20210", fn: "202", art: "101000", artekst: "Fastlønn",
+          belop: -124140, fullar: -372420, kat: "Administrative EOY", hjemmel: "Kommuneloven § 13-1",
+          tekst: "Vakanssparing ved utsettelse av nyansettelse i 1,5 måneder"
+        },
+        {
+          omrade: "Område 2 Oppvekst", ansvar: "20220", fn: "202", art: "102000", artekst: "Vikarlønn",
+          belop: -180000, fullar: -540000, kat: "Administrative EOY", hjemmel: "Kommuneloven § 13-1",
+          tekst: "Redusert innleie av eksterne timevikarer i grunnskolen"
+        },
+        {
+          omrade: "Område 2 Oppvekst", ansvar: "20210", fn: "202", art: "109000", artekst: "Pensjon / KLP",
+          belop: 504140, fullar: 1512420, kat: "Administrative EOY", hjemmel: "Kommuneloven § 13-1",
+          tekst: "Intern saldering: Dekning av tariffregulert pensjonspremieavvik fra lønnsreserve"
+        }
+      ],
+      "template-fond-bystyre": [
+        {
+          omrade: "Område 3 Helse/Mestring", ansvar: "25310", fn: "254", art: "102000", artekst: "Vikarlønn",
+          belop: 897346, fullar: 897346, kat: "Politisk Vedtak EOY", hjemmel: "Kommuneloven § 14-6",
+          tekst: "Budsjettregulering 2. tertial: Tilleggsbevilgning for akutt pasienttyngde og vikarbehov"
+        },
+        {
+          omrade: "Område 2 Oppvekst", ansvar: "20210", fn: "202", art: "101000", artekst: "Fastlønn",
+          belop: 324140, fullar: 324140, kat: "Politisk Vedtak EOY", hjemmel: "Kommuneloven § 14-6",
+          tekst: "Kompensasjon for sentralt lønnsoppgjør KS 2024 (5,2 % ramme)"
+        },
+        {
+          omrade: "Område 9 Finans/Felles", ansvar: "90000", fn: "880", art: "195000", artekst: "Bruk av disposisjonsfond",
+          belop: -1221486, fullar: -1221486, kat: "Politisk Vedtak EOY", hjemmel: "Kommuneloven § 14-6",
+          tekst: "Bystyrevedtak: Finansiering via trekk på disposisjonsfond for å sikre lovpålagt tjenestetilbud"
+        }
+      ],
+      "template-nav-etterslep": [
+        {
+          omrade: "Område 3 Helse/Mestring", ansvar: "25310", fn: "254", art: "171000", artekst: "Sykelønnsrefusjon NAV",
+          belop: 350000, fullar: 0, kat: "Teknisk EOY", hjemmel: "Periodisering",
+          tekst: "Periodiseringskorreksjon: Forventet innbetaling av forfalte NAV sykelønnsrefusjoner for M06-M08"
+        },
+        {
+          omrade: "Område 2 Oppvekst", ansvar: "20210", fn: "202", art: "171000", artekst: "Sykelønnsrefusjon NAV",
+          belop: 180000, fullar: 0, kat: "Teknisk EOY", hjemmel: "Periodisering",
+          tekst: "Periodiseringskorreksjon: Etterslep på foreldrepenger og sykelønn fra NAV"
+        },
+        {
+          omrade: "Område 9 Finans/Felles", ansvar: "90000", fn: "880", art: "171000", artekst: "Sentral refusjonspost",
+          belop: -530000, fullar: 0, kat: "Teknisk EOY", hjemmel: "Periodisering",
+          tekst: "Teknisk motpost for sentral periodisering mot hovedbok"
+        }
+      ]
+    };
+
+    let currentFramsiktRows = [];
+
+    function initFramsiktModule() {
+      const templateSelect = document.getElementById("framsikt-template-select");
+      const targetPeriodSelect = document.getElementById("framsikt-target-period");
+      const btnAddRow = document.getElementById("btn-add-framsikt-row");
+      const btnDownloadCsv = document.getElementById("btn-download-framsikt-csv");
+      const btnDownloadExcel = document.getElementById("btn-download-framsikt-excel");
+      const btnCopyText = document.getElementById("btn-copy-framsikt-text");
+
+      if (!templateSelect) return;
+
+      function loadTemplate(key) {
+        if (FRAMSIKT_PRESET_TEMPLATES[key]) {
+          currentFramsiktRows = JSON.parse(JSON.stringify(FRAMSIKT_PRESET_TEMPLATES[key]));
+        } else {
+          currentFramsiktRows = [
+            {
+              omrade: "Område 3 Helse/Mestring", ansvar: "25310", fn: "254", art: "102000", artekst: "Vikarlønn",
+              belop: -100000, fullar: -300000, kat: "Administrative EOY", hjemmel: "Kommuneloven § 13-1",
+              tekst: "Egendefinert innsparingstiltak"
+            },
+            {
+              omrade: "Område 3 Helse/Mestring", ansvar: "25310", fn: "254", art: "101000", artekst: "Fastlønn",
+              belop: 100000, fullar: 300000, kat: "Administrative EOY", hjemmel: "Kommuneloven § 13-1",
+              tekst: "Egendefinert omdisponering"
+            }
+          ];
+        }
+        renderFramsiktTable();
+      }
+
+      templateSelect.addEventListener("change", (e) => loadTemplate(e.target.value));
+      targetPeriodSelect?.addEventListener("change", () => updateFramsiktTextPreview());
+
+      btnAddRow?.addEventListener("click", () => {
+        currentFramsiktRows.push({
+          omrade: "Område 3 Helse/Mestring", ansvar: "25310", fn: "254", art: "102000", artekst: "Vikarlønn",
+          belop: 0, fullar: 0, kat: "Administrative EOY", hjemmel: "Kommuneloven § 13-1",
+          tekst: "Ny budsjettjustering..."
+        });
+        renderFramsiktTable();
+      });
+
+      btnDownloadCsv?.addEventListener("click", downloadFramsiktCsv);
+      btnDownloadExcel?.addEventListener("click", downloadFramsiktExcel);
+      btnCopyText?.addEventListener("click", copyFramsiktText);
+
+      // Last første mal ved start
+      loadTemplate(templateSelect.value || "template-loy-helse");
+    }
+
+    function renderFramsiktTable() {
+      const tbody = document.getElementById("framsikt-table-body");
+      if (!tbody) return;
+
+      tbody.innerHTML = currentFramsiktRows.map((row, idx) => `
+        <tr>
+          <td><input type="text" value="${escapeHtml(row.omrade + ' / ' + row.ansvar)}" onchange="updateFramsiktCell(${idx}, 'omrade', this.value)" style="width:130px; padding:0.2rem; font-size:0.72rem;" /></td>
+          <td><input type="text" value="${escapeHtml(row.fn)}" onchange="updateFramsiktCell(${idx}, 'fn', this.value)" style="width:50px; padding:0.2rem; font-size:0.72rem; text-align:center;" /></td>
+          <td><input type="text" value="${escapeHtml(row.art)}" onchange="updateFramsiktCell(${idx}, 'art', this.value)" style="width:65px; padding:0.2rem; font-size:0.72rem; font-family:var(--font-mono);" /></td>
+          <td><input type="text" value="${escapeHtml(row.artekst)}" onchange="updateFramsiktCell(${idx}, 'artekst', this.value)" style="width:110px; padding:0.2rem; font-size:0.72rem;" /></td>
+          <td class="num-col"><input type="number" step="1000" value="${row.belop}" onchange="updateFramsiktCell(${idx}, 'belop', parseFloat(this.value)||0)" style="width:90px; padding:0.2rem; font-size:0.72rem; text-align:right; font-family:var(--font-mono); font-weight:700; color:${row.belop < 0 ? 'var(--clr-ok-text)' : 'var(--clr-highlight-red)'};" /></td>
+          <td class="num-col"><input type="number" step="1000" value="${row.fullar}" onchange="updateFramsiktCell(${idx}, 'fullar', parseFloat(this.value)||0)" style="width:90px; padding:0.2rem; font-size:0.72rem; text-align:right; font-family:var(--font-mono);" /></td>
+          <td>
+            <select onchange="updateFramsiktCell(${idx}, 'kat', this.value)" style="font-size:0.72rem; padding:0.18rem;">
+              <option value="Administrative EOY" ${row.kat === 'Administrative EOY' ? 'selected' : ''}>Administrative EOY</option>
+              <option value="Teknisk EOY" ${row.kat === 'Teknisk EOY' ? 'selected' : ''}>Teknisk EOY</option>
+              <option value="Politisk Vedtak EOY" ${row.kat === 'Politisk Vedtak EOY' ? 'selected' : ''}>Politisk Vedtak EOY</option>
+            </select>
+          </td>
+          <td>
+            <select onchange="updateFramsiktCell(${idx}, 'hjemmel', this.value)" style="font-size:0.72rem; padding:0.18rem;">
+              <option value="Kommuneloven § 13-1" ${row.hjemmel.includes('13-1') ? 'selected' : ''}>Kommuneloven § 13-1 (Adm)</option>
+              <option value="Kommuneloven § 14-6" ${row.hjemmel.includes('14-6') ? 'selected' : ''}>Kommuneloven § 14-6 (Bystyre)</option>
+              <option value="Periodisering" ${row.hjemmel.includes('Periodisering') ? 'selected' : ''}>Periodisering</option>
+            </select>
+          </td>
+          <td><input type="text" value="${escapeHtml(row.tekst)}" onchange="updateFramsiktCell(${idx}, 'tekst', this.value)" style="width:100%; min-width:180px; padding:0.2rem; font-size:0.72rem;" /></td>
+          <td style="text-align:center;">
+            <button type="button" onclick="deleteFramsiktRow(${idx})" style="background:none; border:none; color:var(--clr-highlight-red); cursor:pointer; font-weight:700;">✕</button>
+          </td>
+        </tr>
+      `).join("");
+
+      updateFramsiktSummary();
+    }
+
+    function updateFramsiktCell(idx, field, val) {
+      if (currentFramsiktRows[idx]) {
+        currentFramsiktRows[idx][field] = val;
+        updateFramsiktSummary();
+      }
+    }
+
+    function deleteFramsiktRow(idx) {
+      currentFramsiktRows.splice(idx, 1);
+      renderFramsiktTable();
+    }
+
+    function updateFramsiktSummary() {
+      const sumBelop = currentFramsiktRows.reduce((acc, r) => acc + (parseFloat(r.belop) || 0), 0);
+      const sumFull = currentFramsiktRows.reduce((acc, r) => acc + (parseFloat(r.fullar) || 0), 0);
+
+      const sumNokEl = document.getElementById("framsikt-sum-nok");
+      const sumFullEl = document.getElementById("framsikt-sum-full");
+      const badgeEl = document.getElementById("framsikt-balance-badge");
+      const statusEl = document.getElementById("framsikt-sum-status");
+
+      if (sumNokEl) {
+        sumNokEl.textContent = `${sumBelop >= 0 ? '+' : ''}${fmtNum(sumBelop)} kr`;
+        sumNokEl.style.color = sumBelop === 0 ? "var(--clr-ok-text)" : (sumBelop > 0 ? "var(--clr-highlight-red)" : "var(--clr-ok-text)");
+      }
+      if (sumFullEl) {
+        sumFullEl.textContent = `${sumFull >= 0 ? '+' : ''}${fmtNum(sumFull)} kr`;
+      }
+
+      if (badgeEl && statusEl) {
+        if (Math.abs(sumBelop) < 1.0) {
+          badgeEl.textContent = "✔ I BALANSE: Netto 0,00 NOK";
+          badgeEl.style.background = "var(--clr-ok-bg)";
+          badgeEl.style.color = "var(--clr-ok-text)";
+          badgeEl.style.borderColor = "var(--clr-ok-text)";
+          statusEl.textContent = "✔ Oppfyller kommunelovens krav til intern saldering.";
+          statusEl.style.color = "var(--clr-ok-text)";
+        } else {
+          badgeEl.textContent = `⚠️ UBALANSE: ${sumBelop >= 0 ? '+' : ''}${fmtNum(sumBelop)} NOK`;
+          badgeEl.style.background = "var(--clr-warn-bg)";
+          badgeEl.style.color = "var(--clr-warn-text)";
+          badgeEl.style.borderColor = "var(--clr-warn-text)";
+          statusEl.textContent = "⚠️ Ubalanse krever motpost (f.eks. disposisjonsfond art 1950 jf. § 14-6).";
+          statusEl.style.color = "var(--clr-warn-text)";
+        }
+      }
+
+      updateFramsiktTextPreview();
+    }
+
+    function updateFramsiktTextPreview() {
+      const previewEl = document.getElementById("framsikt-text-preview");
+      const periodSelect = document.getElementById("framsikt-target-period");
+      if (!previewEl) return;
+
+      const period = periodSelect ? periodSelect.value : "M9-M12";
+      const totalBelop = currentFramsiktRows.reduce((acc, r) => acc + (parseFloat(r.belop) || 0), 0);
+      const isBalanced = Math.abs(totalBelop) < 1.0;
+
+      let txt = `FRAMSIKT TERTIALNOTAT / BUDSJETTENDRING (${period} 2024)\n`;
+      txt += `Hjemmel: Kommuneloven ${isBalanced ? '§ 13-1 (Administrativ omdisponering innenfor rammen)' : '§ 14-6 (Bystyrevedtak om budsjettregulering)'}\n\n`;
+      txt += `1. BAKGRUNN OG BEGRUNNELSE:\n`;
+      txt += `Regnskapsrapporteringen per M08 viser behov for omdisponering av budsjettmidler for å sikre forsvarlig drift og måloppnåelse ut året.\n\n`;
+      txt += `2. SPESIFIKASJON AV TILTAK OG ENDRINGER:\n`;
+      currentFramsiktRows.forEach((r, i) => {
+        txt += `• Rad ${i+1}: ${r.omrade} (Ansvar ${r.ansvar}, Fn ${r.fn}, Art ${r.art}): ${r.belop >= 0 ? '+' : ''}${fmtNum(r.belop)} kr (${r.hjemmel}) — ${r.tekst}\n`;
+      });
+      txt += `\n3. FINANSIELL BALANSE OG VEDTAK:\n`;
+      if (isBalanced) {
+        txt += `Endringene er fullt ut intern-saldert (netto 0,00 NOK) og iverksettes administrativt av enhetsleder i Framsikt med hjemmel i Kommuneloven § 13-1.`;
+      } else {
+        txt += `Endringene medfører et netto reguleringsbehov på ${fmtNum(totalBelop)} NOK og oversendes Formannskapet/Bystyret for bevilgning fra disposisjonsfond jf. Kommuneloven § 14-6.`;
+      }
+
+      previewEl.value = txt;
+    }
+
+    function downloadFramsiktCsv() {
+      const periodSelect = document.getElementById("framsikt-target-period");
+      const period = periodSelect ? periodSelect.value : "M9-M12";
+
+      // Norsk CSV-format med semikolon og UTF-8 BOM for Framsikt & Excel
+      let csv = "\uFEFFBudsjettår;Måned/Periodisering;Område;Ansvar (Enhet);KOSTRA Funksjon;KOSTRA Art;Artekst;Endring i kr (EOY);Fullårseffekt (2027);Tiltakskategori;Lovhjemmel / Myndighet;Beskrivelse / Begrunnelse\r\n";
+
+      currentFramsiktRows.forEach(r => {
+        const line = [
+          "2024",
+          period,
+          `"${(r.omrade || '').replace(/"/g, '""')}"`,
+          r.ansvar || "",
+          r.fn || "",
+          r.art || "",
+          `"${(r.artekst || '').replace(/"/g, '""')}"`,
+          r.belop || 0,
+          r.fullar || 0,
+          `"${(r.kat || '').replace(/"/g, '""')}"`,
+          `"${(r.hjemmel || '').replace(/"/g, '""')}"`,
+          `"${(r.tekst || '').replace(/"/g, '""')}"`
+        ].join(";");
+        csv += line + "\r\n";
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `framsikt_budsjettendringer_${period}_2024.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadFramsiktExcel() {
+      // Lenker til den offisielle importfilen eller trigget nedlasting
+      window.open("antigravity_master_instructions_suite/framsikt_budsjettendringer_eoy.xlsx", "_blank");
+    }
+
+    function copyFramsiktText() {
+      const previewEl = document.getElementById("framsikt-text-preview");
+      if (!previewEl) return;
+      navigator.clipboard.writeText(previewEl.value).then(() => {
+        alert("✔ Kladde til Framsikt Tertialnotat er kopiert til utklippstavlen! Kan nå limes rett inn i Framsikt.");
+      }).catch(() => {
+        previewEl.select();
+        document.execCommand("copy");
+        alert("✔ Kladde til Framsikt Tertialnotat er kopiert til utklippstavlen!");
+      });
+    }
+
 
   </script>
 </body>
