@@ -1740,35 +1740,26 @@
               <div id="min-favorable-kpi" style="font-size:0.72rem; font-weight:700; color:#15803D;"></div>
             </div>
 
-            <div class="grid-2col" style="gap:1rem; align-items:start; margin-bottom:0;">
-              <!-- Horisontal Bar Chart Container (Tufte-standard) -->
-              <div style="background:var(--bg-subtle, #F8FAFC); border:1px solid var(--border-light, #E2E8F0); border-radius:6px; padding:0.75rem;">
-                <div style="font-size:0.72rem; font-weight:700; color:var(--text-primary); margin-bottom:0.5rem; display:flex; justify-content:space-between; align-items:center;">
-                  <span>Horisontal avviksfordeling (Mindreforbruk EOY)</span>
-                  <span style="font-size:0.68rem; color:#15803D; font-weight:600; display:inline-flex; align-items:center; gap:0.25rem;">
-                    <span style="width:7px; height:7px; border-radius:2px; background:#16A34A; display:inline-block;"></span> Gunstig avvik
-                  </span>
-                </div>
-                <div id="min-favorable-chart-wrap" style="width:100%; min-height:140px;"></div>
-              </div>
-
-              <!-- Kompakt Data-tabell -->
-              <div class="table-wrapper">
-                <table class="data-table" style="font-size:0.73rem;">
-                  <caption id="min-favorable-caption">Største mindreforbruk per august 2024</caption>
-                  <thead>
-                    <tr>
-                      <th>Konto</th>
-                      <th>Kontonavn</th>
-                      <th class="num-col">Årsbudsjett</th>
-                      <th class="num-col">Prognose</th>
-                      <th class="num-col" style="color:#15803D;">Mindreforbruk</th>
-                    </tr>
-                  </thead>
-                  <tbody id="min-favorable-tbody"></tbody>
-                </table>
-              </div>
+            <!-- Tabell med integrert horisontal avvikssøyle til høyre (Tufte data-ink standard) -->
+            <div class="table-wrapper">
+              <table class="data-table" style="font-size:0.73rem;">
+                <caption id="min-favorable-caption">Største mindreforbruk per august 2024</caption>
+                <thead>
+                  <tr>
+                    <th style="width:12%;">Konto</th>
+                    <th>Kontonavn</th>
+                    <th class="num-col" style="width:15%;">Årsbudsjett</th>
+                    <th class="num-col" style="width:15%;">Prognose</th>
+                    <th class="num-col" style="width:18%;">Mindreforbruk</th>
+                    <th style="text-align:left; width:130px;" title="Horisontal avvikssøyle for mindreforbruk (Tufte)">Mindreforbrukssøyle</th>
+                  </tr>
+                </thead>
+                <tbody id="min-favorable-tbody">
+                  <!-- Fylles dynamisk fra DuckDB -->
+                </tbody>
+              </table>
             </div>
+            <div id="min-favorable-chart-wrap" style="display:none;" aria-hidden="true"></div>
           </div>
 
           <!-- Møteoppsummering, Tiltaksavtale & Formell Signatur -->
@@ -6610,11 +6601,12 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     }
 
         function renderFavorableBarChart(report) {
-      const container = document.getElementById("min-favorable-chart-wrap");
       const tbody = document.getElementById("min-favorable-tbody");
       const kpiEl = document.getElementById("min-favorable-kpi");
       const caption = document.getElementById("min-favorable-caption");
-      if (!container || !tbody) return;
+      const chartWrap = document.getElementById("min-favorable-chart-wrap");
+      if (chartWrap) chartWrap.innerHTML = "";
+      if (!tbody) return;
 
       const curFunksjon = document.getElementById("flt-funksjon")?.value || "ALL";
       let favRows = report.favorable_drivers || [];
@@ -6645,8 +6637,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       }
 
       if (!favRows.length) {
-        container.innerHTML = `<div style="color:var(--text-muted); font-size:0.74rem; padding:1.2rem; text-align:center;">Ingen kontoer har mindreforbruk i ${escapeHtml(scopeLabel)}.</div>`;
-        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--text-muted); text-align:center;">Ingen kontoer med mindreforbruk registrert for ${escapeHtml(scopeLabel)}.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted); text-align:center; padding:1.2rem;">Ingen kontoer har registrert mindreforbruk for ${escapeHtml(scopeLabel)}.</td></tr>`;
         if (kpiEl) kpiEl.textContent = "0 kr";
         return;
       }
@@ -6656,47 +6647,33 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         kpiEl.textContent = `Samlet topp ${favRows.length} mindreforbruk: ${fmtNOK(sumMindreforbruk, true)}`;
       }
 
-      // 1. Populate table
-      tbody.innerHTML = favRows.map(r => `
-        <tr>
-          <td style="font-weight:600; font-family:var(--font-mono, monospace); font-size:0.7rem;">${escapeHtml(r.konto_code)}</td>
-          <td title="${escapeHtml(r.funksjon_code || '')} — ${escapeHtml(r.funksjon_navn || '')}">${escapeHtml(r.kontonavn || '')}</td>
-          <td class="num-col">${fmtNOK(r.annual_budget_nok)}</td>
-          <td class="num-col">${fmtNOK(r.eoy_forecast_nok)}</td>
-          <td class="num-col rag-green" style="font-weight:700;">${fmtNOK(r.eoy_variance_nok, true)}</td>
-        </tr>
-      `).join("");
-
-      // 2. Generate Tufte Horizontal Bar Chart SVG
       const maxVal = Math.max(...favRows.map(r => Math.abs(r.eoy_variance_nok || 0)), 1.0);
-      const barTrackWidth = 190;
-      const rowHeight = 28;
-      const svgHeight = favRows.length * rowHeight + 8;
+      const barTrackWidth = 110;
 
-      const svgLines = [
-        `<svg viewBox="0 0 520 ${svgHeight}" style="width:100%; height:auto;" preserveAspectRatio="xMinYMin meet" role="img" aria-label="TOP ${favRows.length} konti med mindreforbruk">`
-      ];
-
-      favRows.forEach((r, idx) => {
-        const y = idx * rowHeight + 4;
+      // Populate table with right-hand horizontal bar chart column (Edward Tufte data-ink standard)
+      tbody.innerHTML = favRows.map(r => {
         const val = r.eoy_variance_nok || 0;
         const valAbs = Math.abs(val);
         const barW = Math.max(5, Math.round((valAbs / maxVal) * barTrackWidth));
-
-        let rawName = r.kontonavn || "";
-        if (rawName.length > 25) rawName = rawName.slice(0, 23) + "…";
-        const label = `${escapeHtml(r.konto_code)} ${escapeHtml(rawName)}`;
         const valStr = fmtNOK(val, true);
 
-        svgLines.push(
-          `<text x="0" y="${y + 15}" font-size="10" font-weight="600" fill="var(--text-primary, #1E293B)">${label}</text>`,
-          `<rect x="185" y="${y + 4}" width="${barW}" height="14" rx="2.5" fill="#16A34A" />`,
-          `<text x="${185 + barW + 7}" y="${y + 15}" font-size="10.5" font-weight="700" fill="#15803D">${valStr}</text>`
-        );
-      });
+        const barSvg = `
+          <svg width="${barTrackWidth}" height="14" viewBox="0 0 ${barTrackWidth} 14" style="vertical-align:middle; display:inline-block;" aria-label="Mindreforbruk: ${valStr}">
+            <rect x="0" y="1" width="${barW}" height="12" rx="2" fill="#16A34A" />
+          </svg>
+        `;
 
-      svgLines.push('</svg>');
-      container.innerHTML = svgLines.join("");
+        return `
+          <tr>
+            <td style="font-weight:600; font-family:var(--font-mono, monospace); font-size:0.7rem;">${escapeHtml(r.konto_code)}</td>
+            <td title="${escapeHtml(r.funksjon_code || '')} — ${escapeHtml(r.funksjon_navn || '')}">${escapeHtml(r.kontonavn || '')}</td>
+            <td class="num-col">${fmtNOK(r.annual_budget_nok)}</td>
+            <td class="num-col">${fmtNOK(r.eoy_forecast_nok)}</td>
+            <td class="num-col rag-green" style="font-weight:700;">${valStr}</td>
+            <td style="text-align:left; padding-left:0.5rem;">${barSvg}</td>
+          </tr>
+        `;
+      }).join("");
     }
 
     function renderMonthlyReport(report, isLive = true) {

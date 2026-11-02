@@ -368,19 +368,17 @@ def run_all_tests():
         record_test("Art 1710 er postet direkte under 102000 med motpost NAV refusjon", bool(sal_refund_info["hasArt1710Subrow"]))
         record_test("Netto fraværsbelastning etter Art 1710 er beregnet i tabellen", bool(sal_refund_info["hasNettoSubrow"]))
 
-        # Sjekk Mindreforbruksanalyse (Horisontal bar chart for TOP 5 konti med mindreforbruk)
+        # Sjekk Mindreforbruksanalyse (Horisontal bar chart til høyre for TOP 5 konti med mindreforbruk)
         fav_chart_info = page.evaluate('''() => {
             const panel = document.getElementById("min-favorable-panel");
-            const svg = document.querySelector("#min-favorable-chart-wrap svg");
-            const rects = document.querySelectorAll("#min-favorable-chart-wrap svg rect").length;
-            const texts = document.querySelectorAll("#min-favorable-chart-wrap svg text").length;
+            const svg = document.querySelector("#min-favorable-tbody svg");
+            const rects = document.querySelectorAll("#min-favorable-tbody svg rect").length;
             const tableRows = document.querySelectorAll("#min-favorable-tbody tr").length;
             const kpiText = document.getElementById("min-favorable-kpi")?.textContent || "";
             return {
                 panelVisible: panel && getComputedStyle(panel).display !== "none",
                 hasSvg: !!svg,
                 rects,
-                texts,
                 tableRows,
                 kpiText
             };
@@ -396,7 +394,7 @@ def run_all_tests():
         fav_25310_info = page.evaluate('''() => {
             const caption = document.getElementById("min-favorable-caption")?.textContent || "";
             const firstRowCode = document.querySelector("#min-favorable-tbody tr td")?.textContent || "";
-            const rects = document.querySelectorAll("#min-favorable-chart-wrap svg rect").length;
+            const rects = document.querySelectorAll("#min-favorable-tbody svg rect").length;
             const kpiText = document.getElementById("min-favorable-kpi")?.textContent || "";
             return { caption, firstRowCode, rects, kpiText };
         }''')
