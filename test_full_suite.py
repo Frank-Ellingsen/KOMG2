@@ -331,11 +331,21 @@ def run_all_tests():
         # Test fanevelger
         tabs = page.query_selector_all(".min-tab-btn")
         record_test("Predefinerte rapporter har 3 visningsfaner", len(tabs) == 3, f"Faner: {len(tabs)}")
-        if len(tabs) >= 2:
+        if len(tabs) >= 3:
             tabs[1].click() # Flash Ledelsesnotat
             page.wait_for_timeout(100)
             flash_visible = page.is_visible("#min-subview-flash")
             record_test("Fane 2 (Flash Ledelsesnotat) vises ved klikk", bool(flash_visible))
+
+            tabs[2].click() # Eksepsjonsrapport
+            page.wait_for_timeout(100)
+            exc_visible = page.is_visible("#min-subview-exception")
+            record_test("Fane 3 (Controllerens Eksepsjonsrapport) vises ved klikk", bool(exc_visible))
+            exc_text = page.inner_text("#exception-report-tbody")
+            has_helse_exc = "25310" in exc_text
+            has_oppvekst_exc = "20210" in exc_text or "22110" in exc_text
+            record_test("Eksepsjonsrapport filtrerer dynamisk på Helse og Omsorg", has_helse_exc and not has_oppvekst_exc, f"Helse: {has_helse_exc}, Oppvekst: {has_oppvekst_exc}")
+
             # Gå tilbake til første fane for eventuelle videre tester
             tabs[0].click()
             page.wait_for_timeout(100)

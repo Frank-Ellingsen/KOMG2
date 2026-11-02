@@ -1273,7 +1273,7 @@
     <header class="top-banner">
       <div>
         <h1>🏛️ KOSTRA AI Workbench — Økonomi, Tidsserier &amp; ML</h1>
-        <p id="active-filter-banner">📅 År: 2024 &nbsp;|&nbsp; 📆 Periode: M1–M8 (Bokført YTD) &nbsp;|&nbsp; 🏛️ Sektor: Alle Sektorer</p>
+        <p id="active-filter-banner">📅 Periode: YTD M01–M08 | 🏛️ Sektor: Alle Sektorer | 📍 Ansvar: Alle Ansvarssteder (9 aktive) | 📂 Alle KOSTRA-Funksjoner (6) | 🚦 Status: Alle Statuser</p>
       </div>
       <div class="banner-badges">
         <button type="button" class="status-badge" id="btn-open-modal-guide" style="background:#FFFFFF; color:var(--header-dark); border:1px solid var(--border-light); cursor:pointer;" title="Åpne Hurtigguide og Formelforklaring (Esc eller klikk utenfor for å lukke)">
@@ -1787,44 +1787,7 @@
                     <th>Prioritet</th><th>Enhet / Avdeling</th><th>Kjerneårsak</th><th style="text-align:right;">YTD Avvik</th><th style="text-align:center;">Z-Score</th><th>Handlingsregel</th><th style="text-align:center;">Møtestatus</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td><span class="rag-badge rag-red">P1 HØY</span></td>
-                    <td><strong>22110 PPT og ped. oppfølging</strong></td>
-                    <td>Kjøp av eksterne sakkyndige vurderinger (art 1270)</td>
-                    <td style="text-align:right; font-family:var(--font-mono); color:var(--clr-highlight-red); font-weight:700;">+170 000 kr (+20,9 %)</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:700;">2,85 σ</td>
-                    <td>§ 13-1 Umiddelbar konsulentstopp</td>
-                    <td style="text-align:center;"><button type="button" class="btn btn-secondary" style="font-size:0.68rem; padding:0.15rem 0.4rem;">📞 Beram møte</button></td>
-                  </tr>
-                  <tr>
-                    <td><span class="rag-badge rag-red">P1 HØY</span></td>
-                    <td><strong>25310 Sykehjem A</strong></td>
-                    <td>Korttidsfravær 14,2 % dekket med vikarbyrå (art 1020)</td>
-                    <td style="text-align:right; font-family:var(--font-mono); color:var(--clr-highlight-red); font-weight:700;">+359 972 kr (+11,3 %)</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:700;">2,42 σ</td>
-                    <td>§ 14-6 Bystyresak + Gat-vaktbok revisjon</td>
-                    <td style="text-align:center;"><span class="rag-badge rag-green">✔ Møte avholdt</span></td>
-                  </tr>
-                  <tr>
-                    <td><span class="rag-badge rag-amber">P2 MIDDELS</span></td>
-                    <td><strong>25710 Hjemmetjenesten Nord</strong></td>
-                    <td>Turnusovertid helg og helligdager (art 1040)</td>
-                    <td style="text-align:right; font-family:var(--font-mono); color:var(--clr-highlight-red); font-weight:700;">+321 404 kr (+11,3 %)</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:700;">2,18 σ</td>
-                    <td>§ 13-1 Forhåndsgodkjenning av overtid</td>
-                    <td style="text-align:center;"><button type="button" class="btn btn-secondary" style="font-size:0.68rem; padding:0.15rem 0.4rem;">📞 Beram møte</button></td>
-                  </tr>
-                  <tr>
-                    <td><span class="rag-badge rag-amber">P2 MIDDELS</span></td>
-                    <td><strong>20210 Grunnskole A</strong></td>
-                    <td>Lærerlønnsjustering etter KS-oppgjør uten kompensasjon</td>
-                    <td style="text-align:right; font-family:var(--font-mono); color:var(--clr-highlight-red); font-weight:700;">+324 140 kr (+6,3 %)</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:700;">1,95 σ</td>
-                    <td>§ 13-1 Vakansfrys ut året</td>
-                    <td style="text-align:center;"><button type="button" class="btn btn-secondary" style="font-size:0.68rem; padding:0.15rem 0.4rem;">📞 Beram møte</button></td>
-                  </tr>
-                </tbody>
+                <tbody id="exception-report-tbody"></tbody>
               </table>
             </div>
           </div>
@@ -2943,7 +2906,7 @@
                 <th>Handlingsanbefaling</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="procurement-spend-tbody">
               <tr>
                 <td><code>BIL-2024-8841</code></td>
                 <td>25310</td>
@@ -5518,6 +5481,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         activeView.classList.remove("inactive");
         activeView.setAttribute("aria-hidden", "false");
         activeView.focus();
+        try { renderAllDynamicReports(); } catch(e) {}
         if (viewId === "view-eda") {
           if (typeof initEdaModule === "function") initEdaModule();
           else renderEdaModule();
@@ -5556,7 +5520,8 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         critCount, warnCount, okCount, totalRows, overallStatus, overallRagKey
       } = ctx;
 
-      const fnLabel = funksjon === "ALL" ? "Alle Funksjoner (10)" : `Funksjon ${funksjon}`;
+      const validFns = KOSTRA_FUNCTIONS.filter(fn => sektor === "ALL" || fn.sektor === sektor);
+      const fnLabel = funksjon === "ALL" ? `Alle Funksjoner (${validFns.length})` : (KOSTRA_FUNCTIONS.find(fn => fn.code === funksjon)?.name || `Funksjon ${funksjon}`);
       const stLabel = statusFlt === "ALL" ? "Alle RAG-Statuser" : statusFlt;
       const ansLabel = ctx.ansvar === "ALL" ? "Alle Ansvarssteder" : ctx.ansvarMeta.name;
       const bannerEl = document.getElementById("active-filter-banner");
@@ -6091,7 +6056,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         if (statusFlt !== "ALL" && r.status !== statusFlt) return false;
         return true;
       });
-      const finalAnom = filteredAnom.length > 0 ? filteredAnom : ANOMALY_ROWS;
+      const finalAnom = filteredAnom;
 
       const anomTbody = document.getElementById("anomaly-table-body");
       if (anomTbody) {
@@ -6868,9 +6833,241 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       }
     }
 
+    // =========================================================================
+    // DYNAMISK CONTROLLERENS EKSEPSJONSRAPPORT (VISNING 3)
+    // =========================================================================
+    function renderExceptionReport(ctx) {
+      if (!ctx) ctx = getFilteredContext();
+      const { sektor, ansvar, funksjon } = ctx;
+      const tbody = document.getElementById("exception-report-tbody");
+      if (!tbody) return;
+
+      const EXCEPTION_ITEMS = [
+        {
+          ansvar: "25310",
+          sektor: "Helse og Omsorg",
+          fn: "254",
+          priority: "P1 HØY",
+          priorityRag: "rag-red",
+          unit: "25310 Sykehjem A",
+          cause: "Korttidsfravær 14,2 % dekket med vikarbyrå (art 1020/1270)",
+          avvik: 359972,
+          avvikPct: 11.3,
+          zScore: "2,42 σ",
+          rule: "§ 14-6 Bystyresak + Gat-vaktbok revisjon",
+          statusBtn: `<span class="rag-badge rag-green">✔ Møte avholdt</span>`
+        },
+        {
+          ansvar: "25710",
+          sektor: "Helse og Omsorg",
+          fn: "254",
+          priority: "P2 MIDDELS",
+          priorityRag: "rag-amber",
+          unit: "25710 Hjemmetjenesten Nord",
+          cause: "Turnusovertid helg og helligdager (art 1040)",
+          avvik: 321404,
+          avvikPct: 11.3,
+          zScore: "2,18 σ",
+          rule: "§ 13-1 Forhåndsgodkjenning av overtid",
+          statusBtn: `<button type="button" class="btn btn-secondary" style="font-size:0.68rem; padding:0.15rem 0.4rem;">📞 Beram møte</button>`
+        },
+        {
+          ansvar: "25720",
+          sektor: "Helse og Omsorg",
+          fn: "254",
+          priority: "P2 MIDDELS",
+          priorityRag: "rag-amber",
+          unit: "25720 Hjemmetjenesten Sør",
+          cause: "Turnusovertid og helgevakter (art 1040)",
+          avvik: 321403,
+          avvikPct: 11.3,
+          zScore: "2,18 σ",
+          rule: "§ 13-1 Stram turnusstyring via Gat",
+          statusBtn: `<button type="button" class="btn btn-secondary" style="font-size:0.68rem; padding:0.15rem 0.4rem;">📞 Beram møte</button>`
+        },
+        {
+          ansvar: "25320",
+          sektor: "Helse og Omsorg",
+          fn: "254",
+          priority: "P2 MIDDELS",
+          priorityRag: "rag-amber",
+          unit: "25320 Sykehjem B",
+          cause: "Korttidsfravær helgeavlastning (art 1020)",
+          avvik: 282835,
+          avvikPct: 11.3,
+          zScore: "1,91 σ",
+          rule: "§ 13-1 Vikarbegrensning",
+          statusBtn: `<button type="button" class="btn btn-secondary" style="font-size:0.68rem; padding:0.15rem 0.4rem;">📞 Beram møte</button>`
+        },
+        {
+          ansvar: "22110",
+          sektor: "Oppvekst og Utdanning",
+          fn: "221",
+          priority: "P1 HØY",
+          priorityRag: "rag-red",
+          unit: "22110 PPT og ped. oppfølging",
+          cause: "Kjøp av eksterne sakkyndige vurderinger (art 1270)",
+          avvik: 170000,
+          avvikPct: 20.9,
+          zScore: "2,85 σ",
+          rule: "§ 13-1 Umiddelbar konsulentstopp",
+          statusBtn: `<button type="button" class="btn btn-secondary" style="font-size:0.68rem; padding:0.15rem 0.4rem;">📞 Beram møte</button>`
+        },
+        {
+          ansvar: "20210",
+          sektor: "Oppvekst og Utdanning",
+          fn: "202",
+          priority: "P2 MIDDELS",
+          priorityRag: "rag-amber",
+          unit: "20210 Grunnskole A",
+          cause: "Lærerlønnsjustering etter KS-oppgjør uten kompensasjon",
+          avvik: 324140,
+          avvikPct: 6.3,
+          zScore: "1,95 σ",
+          rule: "§ 13-1 Vakansfrys ut året",
+          statusBtn: `<button type="button" class="btn btn-secondary" style="font-size:0.68rem; padding:0.15rem 0.4rem;">📞 Beram møte</button>`
+        },
+        {
+          ansvar: "20220",
+          sektor: "Oppvekst og Utdanning",
+          fn: "202",
+          priority: "P2 MIDDELS",
+          priorityRag: "rag-amber",
+          unit: "20220 Grunnskole B",
+          cause: "Spesialpedagogiske tiltak og vikarer (art 1020/1030)",
+          avvik: 290020,
+          avvikPct: 6.3,
+          zScore: "1,74 σ",
+          rule: "§ 13-1 Ressursomfordeling",
+          statusBtn: `<button type="button" class="btn btn-secondary" style="font-size:0.68rem; padding:0.15rem 0.4rem;">📞 Beram møte</button>`
+        },
+        {
+          ansvar: "20230",
+          sektor: "Oppvekst og Utdanning",
+          fn: "202",
+          priority: "P3 LAV",
+          priorityRag: "rag-green",
+          unit: "20230 Grunnskole C",
+          cause: "Vikartimer ved fravær (art 1020)",
+          avvik: 238840,
+          avvikPct: 6.3,
+          zScore: "1,44 σ",
+          rule: "§ 13-1 Vikartak",
+          statusBtn: `<button type="button" class="btn btn-secondary" style="font-size:0.68rem; padding:0.15rem 0.4rem;">📞 Beram møte</button>`
+        }
+      ];
+
+      const filtered = EXCEPTION_ITEMS.filter(item => {
+        if (sektor !== "ALL" && item.sektor !== sektor) return false;
+        if (ansvar !== "ALL" && item.ansvar !== ansvar) return false;
+        if (funksjon !== "ALL" && item.fn !== funksjon) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:1.2rem; color:var(--text-muted); font-style:italic;">Ingen unntaksavvik funnet for valgt filterkombinasjon (alle enheter innenfor toleransegrensen).</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(row => `
+        <tr>
+          <td><span class="rag-badge ${row.priorityRag}">${row.priority}</span></td>
+          <td><strong>${row.unit}</strong></td>
+          <td>${row.cause}</td>
+          <td style="text-align:right; font-family:var(--font-mono); color:var(--clr-highlight-red); font-weight:700;">+${row.avvik.toLocaleString("nb-NO")} kr (+${row.avvikPct.toFixed(1).replace(".", ",")} %)</td>
+          <td style="text-align:center; font-family:var(--font-mono); font-weight:700;">${row.zScore}</td>
+          <td>${row.rule}</td>
+          <td style="text-align:center;">${row.statusBtn}</td>
+        </tr>
+      `).join("");
+    }
+
+    // =========================================================================
+    // DYNAMISK INNKJØPS- & SPEND MODUL (MODUL 8)
+    // =========================================================================
+    function renderProcurementModule(ctx) {
+      if (!ctx) ctx = getFilteredContext();
+      const { sektor, ansvar } = ctx;
+      const tbody = document.getElementById("procurement-spend-tbody");
+      if (!tbody) return;
+
+      const PROC_ITEMS = [
+        {
+          bilag: "BIL-2024-8841",
+          ansvar: "25310",
+          sektor: "Helse og Omsorg",
+          leverandor: "Bemanningspartner Sør AS",
+          art: "127000 Konsulent & vikarbyrå",
+          status: '<span class="rag-badge rag-red">🔴 Maverick Spend</span>',
+          tiltak: "Avviksbehandles: Innkjøp skal rettes mot rammeavtale RAM-2023-04 (Adecco/Randstad)"
+        },
+        {
+          bilag: "BIL-2024-9102",
+          ansvar: "20210",
+          sektor: "Oppvekst og Utdanning",
+          leverandor: "Kontor & Skolemateriell Direkte",
+          art: "115000 Undervisningsmateriell",
+          status: '<span class="rag-badge rag-amber">🟡 Enkeltkjøp (&lt;500k)</span>',
+          tiltak: "Sjekk fellesavtale for skolemateriell før neste bestilling"
+        },
+        {
+          bilag: "BIL-2024-9330",
+          ansvar: "25710",
+          sektor: "Helse og Omsorg",
+          leverandor: "Atea Norge AS",
+          art: "119500 IT-utstyr & lisenser",
+          status: '<span class="rag-badge rag-green">🟢 Godkjent Avtale</span>',
+          tiltak: "I henhold til felles KommIT-avtale"
+        },
+        {
+          bilag: "BIL-2024-9450",
+          ansvar: "25320",
+          sektor: "Helse og Omsorg",
+          leverandor: "Mediq Norge AS",
+          art: "115000 Medisinsk forbruksmateriell",
+          status: '<span class="rag-badge rag-green">🟢 Godkjent Avtale</span>',
+          tiltak: "Felles kommunal innkjøpsavtale Agder"
+        },
+        {
+          bilag: "BIL-2024-9510",
+          ansvar: "20220",
+          sektor: "Oppvekst og Utdanning",
+          leverandor: "Felles renholdstjenester AS",
+          art: "120000 Renholdstjenester",
+          status: '<span class="rag-badge rag-amber">🟡 Enkeltkjøp</span>',
+          tiltak: "Vurder overgang til felles byggserviceramme"
+        }
+      ];
+
+      const filtered = PROC_ITEMS.filter(item => {
+        if (sektor !== "ALL" && item.sektor !== sektor) return false;
+        if (ansvar !== "ALL" && item.ansvar !== ansvar) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:1.2rem; color:var(--text-muted); font-style:italic;">Ingen innkjøpsbilag funnet for valgt utvalg.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => `
+        <tr>
+          <td><code>${item.bilag}</code></td>
+          <td>${item.ansvar}</td>
+          <td>${item.leverandor}</td>
+          <td>${item.art}</td>
+          <td>${item.status}</td>
+          <td>${item.tiltak}</td>
+        </tr>
+      `).join("");
+    }
+
+
     function renderAllDynamicReports() {
       const ctx = getFilteredContext();
       renderFlashReport(ctx);
+      renderExceptionReport(ctx);
+      renderProcurementModule(ctx);
       renderModule1(ctx);
       renderModule2(ctx);
       renderModule3(ctx);
@@ -8410,6 +8607,7 @@ function renderSalaryBudgetModule(ctx) {
             if (flashView) flashView.style.display = "none";
             if (exceptionView) exceptionView.style.display = "block";
             if (filterContainer) filterContainer.style.display = "none";
+            renderExceptionReport(getFilteredContext());
           }
         });
       });
