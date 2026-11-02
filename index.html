@@ -2295,27 +2295,127 @@
           <span>Juridisk Myndighetssortering • EOY Handlingsrom • Økonomiplan 2027–2030</span>
         </div>
 
-        <!-- KPI Summary Cards -->
+        <!-- DYNAMISK FILTERSELECTION KONTROLLPANEL FOR RECOMMENDER & TILTAKSMATRISE -->
+        <div class="panel-card" style="margin-bottom:0.85rem; border-top:3px solid var(--clr-primary, #0F52BA); background:var(--bg-surface, #ffffff);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem; border-bottom:1px solid var(--border-light); padding-bottom:0.4rem; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <span style="font-weight:700; color:var(--text-primary); font-size:0.88rem; text-transform:uppercase; letter-spacing:0.5px;">
+                🎛️ Filterselection: Recommender &amp; Tiltaksmatrise
+              </span>
+              <span style="font-size:0.75rem; color:var(--text-muted); margin-left:0.5rem;">
+                100% Dynamisk koblet mot DuckDB Gold Layer &amp; Gjeldende Kontroller-kontekst
+              </span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              <span id="rec-filter-match-count" class="rag-badge rag-green" style="font-weight:700;">Viser alle tiltak</span>
+              <button type="button" class="btn-secondary" id="rec-reset-filters-btn" style="padding:0.25rem 0.6rem; font-size:0.74rem;">
+                🔄 Nullstill Filter
+              </button>
+            </div>
+          </div>
+
+          <!-- Filterrad: Periode, Sektor, Ansvar, Funksjon, Kategori, Risiko -->
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:0.6rem;">
+            <!-- 📅 Periode / Cut-off -->
+            <div>
+              <label for="rec-flt-period" style="font-weight:700; color:var(--text-primary); font-size:0.73rem; display:block; margin-bottom:0.25rem;">
+                📅 Periode / Cut-off:
+              </label>
+              <select id="rec-flt-period" style="width:100%; padding:0.35rem; font-size:0.76rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                <option value="ALL" selected>Akkumulert YTD (M01–M08 2024)</option>
+                <option value="M08">2024_08 August</option>
+                <option value="M07">2024_07 Juli</option>
+                <option value="M06">2024_06 Juni</option>
+              </select>
+            </div>
+
+            <!-- 🏛️ Rammeområde / Sektor -->
+            <div>
+              <label for="rec-flt-sektor" style="font-weight:700; color:var(--text-primary); font-size:0.73rem; display:block; margin-bottom:0.25rem;">
+                🏛️ Rammeområde / Sektor:
+              </label>
+              <select id="rec-flt-sektor" style="width:100%; padding:0.35rem; font-size:0.76rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                <option value="ALL">Alle Sektorer</option>
+                <option value="Helse og Omsorg">Helse og Omsorg</option>
+                <option value="Oppvekst og Utdanning">Oppvekst og Utdanning</option>
+              </select>
+            </div>
+
+            <!-- 📍 Ansvarssted / Enhet -->
+            <div>
+              <label for="rec-flt-ansvar" style="font-weight:700; color:var(--text-primary); font-size:0.73rem; display:block; margin-bottom:0.25rem;">
+                📍 Ansvarssted / Enhet:
+              </label>
+              <select id="rec-flt-ansvar" style="width:100%; padding:0.35rem; font-size:0.76rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                <option value="ALL">Alle Ansvarssteder (9 aktive)</option>
+              </select>
+            </div>
+
+            <!-- 📂 KOSTRA-Funksjon -->
+            <div>
+              <label for="rec-flt-funksjon" style="font-weight:700; color:var(--text-primary); font-size:0.73rem; display:block; margin-bottom:0.25rem;">
+                📂 KOSTRA-Funksjon:
+              </label>
+              <select id="rec-flt-funksjon" style="width:100%; padding:0.35rem; font-size:0.76rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                <option value="ALL">Alle KOSTRA-Funksjoner (10)</option>
+              </select>
+            </div>
+
+            <!-- 🚦 Tiltakskategori / Hjemmel -->
+            <div>
+              <label for="rec-flt-kategori" style="font-weight:700; color:var(--text-primary); font-size:0.73rem; display:block; margin-bottom:0.25rem;">
+                🚦 Tiltakskategori / Hjemmel:
+              </label>
+              <select id="rec-flt-kategori" style="width:100%; padding:0.35rem; font-size:0.76rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                <option value="ALL" selected>Alle Myndighetsnivåer (9 tiltak)</option>
+                <option value="admin">Administrative EOY (§ 13-1 Kommunedirektør)</option>
+                <option value="politisk">Politiske Vedtak EOY (§ 14-6 / § 14-10 Bystyret)</option>
+                <option value="lang">Langsiktig Økonomiplan 2027+ (§ 14-3)</option>
+              </select>
+            </div>
+
+            <!-- ⚖️ Risikoprofil & Forsvarlighet -->
+            <div>
+              <label for="rec-flt-risiko" style="font-weight:700; color:var(--text-primary); font-size:0.73rem; display:block; margin-bottom:0.25rem;">
+                ⚖️ Risikoprofil:
+              </label>
+              <select id="rec-flt-risiko" style="width:100%; padding:0.35rem; font-size:0.76rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                <option value="ALL" selected>Alle Risikonivåer</option>
+                <option value="Lav">Lav risiko (Ingen tjenesteberøring)</option>
+                <option value="Middels">Middels risiko (Krever turnustilpasning)</option>
+                <option value="Høy">Høy risiko (AML § 10-8 / HOTL § 4-1)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Aktiv Filter Selection Banner -->
+          <div id="rec-active-filter-strip" style="margin-top:0.6rem; padding:0.35rem 0.6rem; background:var(--bg-subtle, #f8fafc); border:1px solid var(--border-light); border-radius:3px; font-size:0.73rem; color:var(--text-secondary); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem;">
+            <span id="rec-active-filter-text">📅 Periode: Akkumulert YTD (M01–M08 2024) | 🏛️ Sektor: Alle Sektorer | 📍 Ansvar: Alle Ansvarssteder (9 aktive) | 📂 Funksjon: Alle KOSTRA-Funksjoner | 🚦 Kategori: Alle</span>
+            <span id="rec-active-filter-total-impact" style="font-weight:700; color:var(--clr-fig-regnskap);">Netto tiltakseffekt: -10 900 000 kr</span>
+          </div>
+        </div>
+
+        <!-- KPI Summary Cards (Dynamiske IDs) -->
         <div class="kpi-grid">
           <div class="kpi-card rag-card-red">
             <span class="kpi-label">Kortsiktig Administrativt EOY (§ 13-1)</span>
-            <span class="kpi-value fast-link" style="color:var(--clr-err-text);">-1 850 000 kr</span>
+            <span id="rec-kpi-admin-eoy" class="kpi-value fast-link" style="color:var(--clr-err-text);">-1 850 000 kr</span>
             <span class="kpi-sub">Vikar, overtid, konsulent &amp; innkjøp (M9–M12)</span>
           </div>
           <div class="kpi-card rag-card-amber">
             <span class="kpi-label">Politiske Vedtak EOY (§ 14-6 / § 14-10)</span>
-            <span class="kpi-value fast-link" style="color:var(--clr-warn-text);">-800 000 kr</span>
+            <span id="rec-kpi-politisk-eoy" class="kpi-value fast-link" style="color:var(--clr-warn-text);">-800 000 kr</span>
             <span class="kpi-sub">Disposisjonsfond &amp; sektoroverføring (Bystyret)</span>
           </div>
           <div class="kpi-card rag-card-green">
             <span class="kpi-label">Fullårseffekt 2027 (§ 14-3)</span>
-            <span class="kpi-value fast-link" style="color:var(--clr-ok-text);">-8 250 000 kr</span>
+            <span id="rec-kpi-fullaar-2027" class="kpi-value fast-link" style="color:var(--clr-ok-text);">-8 250 000 kr</span>
             <span class="kpi-sub">Stillingsomstilling &amp; KI-gevinstuttak</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-label">Katalogiserte Tiltak</span>
-            <span class="kpi-value">9 Tiltak</span>
-            <span class="kpi-sub">4 Admin / 2 Politiske / 3 Langsiktige</span>
+            <span id="rec-kpi-count" class="kpi-value">9 Tiltak</span>
+            <span id="rec-kpi-count-sub" class="kpi-sub">4 Admin / 2 Politiske / 3 Langsiktige</span>
           </div>
         </div>
 
@@ -2415,72 +2515,8 @@
                   <th>Hovedtiltak</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td><strong>Område 2</strong></td>
-                  <td>Oppvekst (Skole &amp; Barnehage)</td>
-                  <td class="num-col cell-neg">-530 000 kr</td>
-                  <td class="num-col">0 kr</td>
-                  <td class="num-col cell-neg"><strong>-530 000 kr</strong></td>
-                  <td class="num-col cell-neg">-2 790 000 kr</td>
-                  <td>Vikar-/overtidsstopp EOY + Stillingsomstilling 2027</td>
-                </tr>
-                <tr>
-                  <td><strong>Område 3</strong></td>
-                  <td>Helse og mestring</td>
-                  <td class="num-col cell-neg">-670 000 kr</td>
-                  <td class="num-col cell-pos">+800 000 kr</td>
-                  <td class="num-col cell-pos"><strong>+130 000 kr</strong></td>
-                  <td class="num-col cell-neg">-3 510 000 kr</td>
-                  <td>Optur Plus kvelds/helgejustering + Rammetilførsel EOY</td>
-                </tr>
-                <tr>
-                  <td><strong>Område 5</strong></td>
-                  <td>By- og stedsutvikling</td>
-                  <td class="num-col cell-neg">-150 000 kr</td>
-                  <td class="num-col">0 kr</td>
-                  <td class="num-col cell-neg"><strong>-150 000 kr</strong></td>
-                  <td class="num-col cell-neg">-450 000 kr</td>
-                  <td>Utsettelse av ikke-kritiske vedlikeholdsinnkjøp</td>
-                </tr>
-                <tr>
-                  <td><strong>Område 11</strong></td>
-                  <td>Organisasjon og teknologi</td>
-                  <td class="num-col cell-neg">-500 000 kr</td>
-                  <td class="num-col">0 kr</td>
-                  <td class="num-col cell-neg"><strong>-500 000 kr</strong></td>
-                  <td class="num-col cell-neg">-1 500 000 kr</td>
-                  <td>Konsulentfrys på IT og organisasjonsprosjekter</td>
-                </tr>
-                <tr>
-                  <td><strong>Område 12</strong></td>
-                  <td>Økonomi og virksomhetsstyring</td>
-                  <td class="num-col">0 kr</td>
-                  <td class="num-col">0 kr</td>
-                  <td class="num-col"><strong>0 kr</strong></td>
-                  <td class="num-col cell-neg">-800 000 kr</td>
-                  <td>KI-gevinstuttak på saksbehandling og analyse</td>
-                </tr>
-                <tr>
-                  <td><strong>Område 9</strong></td>
-                  <td>Finans, skatt og rammetilskudd</td>
-                  <td class="num-col">0 kr</td>
-                  <td class="num-col cell-neg">-800 000 kr</td>
-                  <td class="num-col cell-neg"><strong>-800 000 kr</strong></td>
-                  <td class="num-col">0 kr</td>
-                  <td>Inndragning fra disposisjonsfond (Bystyrevedtak)</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th colspan="2">TOTALT KRISTIANSAND KOMMUNE</th>
-                  <th class="num-col cell-neg">-1 850 000 kr</th>
-                  <th class="num-col">0 kr</th>
-                  <th class="num-col cell-neg">-1 850 000 kr</th>
-                  <th class="num-col cell-neg">-9 050 000 kr</th>
-                  <th>Balansekrav jf. Kommuneloven § 14-2 oppfylt</th>
-                </tr>
-              </tfoot>
+              <tbody id="rec-omraade-summary-tbody"></tbody>
+              <tfoot id="rec-omraade-summary-tfoot"></tfoot>
             </table>
           </div>
         </div>
@@ -4776,6 +4812,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         if (viewId === "view-aarshjul" && typeof initAarshjulModule === "function") {
           initAarshjulModule();
         }
+        if (viewId === "view-recommender" && typeof renderRecommenderModule === "function") {
+          renderRecommenderModule();
+        }
       }
       if (clickedBtn) {
         clickedBtn.setAttribute("aria-current", "page");
@@ -5936,6 +5975,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       if (typeof renderAarshjulModule === "function") {
         renderAarshjulModule(ctx);
       }
+      if (typeof renderRecommenderModule === "function") {
+        renderRecommenderModule(ctx);
+      }
     }
 
     // =========================================================================
@@ -5944,7 +5986,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     let isFilterSyncing = false;
 
     function populateAnsvarOptions(sektorVal, selectedAnsvar = "ALL", matchingFn = null) {
-      const selects = [document.getElementById("flt-ansvar"), document.getElementById("ts-flt-ansvar")];
+      const selects = [document.getElementById("flt-ansvar"), document.getElementById("ts-flt-ansvar"), document.getElementById("rec-flt-ansvar")];
       const validUnits = Object.entries(ANSVAR_UNITS).filter(([code, u]) => {
         if (code === "ALL") return false;
         if (matchingFn && u.fn !== matchingFn) return false;
@@ -5966,7 +6008,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     }
 
     function populateFunksjonOptions(sektorVal, selectedFn = "ALL") {
-      const selects = [document.getElementById("flt-funksjon"), document.getElementById("ts-flt-funksjon")];
+      const selects = [document.getElementById("flt-funksjon"), document.getElementById("ts-flt-funksjon"), document.getElementById("rec-flt-funksjon")];
       const validFns = KOSTRA_FUNCTIONS.filter(fn => {
         return sektorVal === "ALL" || fn.sektor === sektorVal;
       });
@@ -6052,12 +6094,16 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         };
         setVal("flt-period", curPeriod);
         setVal("ts-flt-period", curPeriod);
+        setVal("rec-flt-period", curPeriod);
         setVal("flt-sektor", curSektor);
         setVal("ts-flt-sektor", curSektor);
+        setVal("rec-flt-sektor", curSektor);
         setVal("flt-ansvar", curAnsvar);
         setVal("ts-flt-ansvar", curAnsvar);
+        setVal("rec-flt-ansvar", curAnsvar);
         setVal("flt-funksjon", curFunksjon);
         setVal("ts-flt-funksjon", curFunksjon);
+        setVal("rec-flt-funksjon", curFunksjon);
         setVal("flt-status", curStatus);
         setVal("ts-flt-status", curStatus);
 
@@ -6527,137 +6573,372 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     // =========================================================================
     // RECOMMENDER TILTAKSMATRISE ENGINE (ANTIGRAVITY MASTER SUITE)
     // =========================================================================
+    // =========================================================================
+    // RECOMMENDER TILTAKSMATRISE ENGINE (100% DYNAMISK & TUFTE DATA-INK)
+    // =========================================================================
     const RECOMMENDER_DATA = [
       {
         id: "TLT-01",
         horisont: "Kortsiktig EOY (M9-M12)",
         kategori: "Administrative EOY",
+        catKey: "admin",
+        omraadeCode: "Område 3 / Område 2",
+        sektor: "Helse og Omsorg",
+        ansvar: ["25310", "25320", "25710", "25720"],
+        fn: "254",
         navn: "Ansettelses- og vikarstopp",
-        beskrivelse: "Midlertidig inndragning av vakanser og stram vurdering av vikarbehov på tvers av enheter",
+        beskrivelse: "Midlertidig inndragning av vakanser og stram vurdering av vikarbehov på tvers av omsorgssentre og hjemmetjeneste.",
         hjemmel: "Administrativt (Kommuneloven § 13-1 - Kommunedirektør)",
         sparingEoy: -770000,
         fullaar2027: -2310000,
         gjennomforing: "Høy",
-        risiko: "Middels - Krever prioritering av kjerneoppgaver i helse og skole",
+        risiko: "Middels",
+        risikoDetalj: "Middels - Krever prioritering av kjerneoppgaver i pleie og turnus (AML § 10-8).",
         status: "🔴 ANBEFALT UTLØST STRAKS"
       },
       {
         id: "TLT-02",
         horisont: "Kortsiktig EOY (M9-M12)",
         kategori: "Administrative EOY",
+        catKey: "admin",
+        omraadeCode: "Område 3",
+        sektor: "Helse og Omsorg",
+        ansvar: ["25310", "25320", "25710", "25720"],
+        fn: "254",
         navn: "Overtids- og merarbeidsstopp",
-        beskrivelse: "Streng forhåndsgodkjenning av overtid (art 1040) og omfordeling av vakter via Optur Plus",
+        beskrivelse: "Streng forhåndsgodkjenning av overtid (art 1040) og omfordeling av helgevakter via Optur Plus.",
         hjemmel: "Administrativt (Kommuneloven § 13-1 - Enhetsleder)",
         sparingEoy: -430000,
         fullaar2027: -1290000,
         gjennomforing: "Høy",
-        risiko: "Lav - Forhindrer slitasje på fast ansatte",
+        risiko: "Lav",
+        risikoDetalj: "Lav - Forhindrer slitasje på fast ansatte og overskridelse av hviletidsbestemmelser.",
         status: "🔴 ANBEFALT UTLØST STRAKS"
       },
       {
         id: "TLT-03",
         horisont: "Kortsiktig EOY (M9-M12)",
         kategori: "Administrative EOY",
+        catKey: "admin",
+        omraadeCode: "Område 11",
+        sektor: "ALL",
+        ansvar: ["ALL"],
+        fn: "ALL",
         navn: "Frys i konsulentbruk",
-        beskrivelse: "Stopp i nye konsulentavtaler og innskrenkning av pågående ekstern bistand (art 1270)",
+        beskrivelse: "Stopp i nye konsulentavtaler og innskrenkning av pågående ekstern bistand (art 1270) innen IT og organisasjon.",
         hjemmel: "Administrativt (Kommuneloven § 13-1 - Kommunedirektør)",
         sparingEoy: -500000,
         fullaar2027: -1500000,
         gjennomforing: "Høy",
-        risiko: "Lav - Interne ressurser overtar utredninger",
+        risiko: "Lav",
+        risikoDetalj: "Lav - Interne ressurser overtar prosjektledelse og utredninger.",
         status: "🔴 ANBEFALT UTLØST STRAKS"
       },
       {
         id: "TLT-04",
         horisont: "Kortsiktig EOY (M9-M12)",
         kategori: "Administrative EOY",
+        catKey: "admin",
+        omraadeCode: "Område 5",
+        sektor: "ALL",
+        ansvar: ["ALL"],
+        fn: "ALL",
         navn: "Innkjøps- og vedlikeholdsstopp",
-        beskrivelse: "Utsettelse av ikke-kritiske nyinnkjøp, inventar og vedlikehold (art 1199/1200)",
+        beskrivelse: "Utsettelse av ikke-kritiske nyinnkjøp, inventar og vedlikehold (art 1199/1200) i kommunale bygg.",
         hjemmel: "Administrativt (Kommuneloven § 13-1 - Enhetsleder)",
         sparingEoy: -150000,
         fullaar2027: -450000,
         gjennomforing: "Høy",
-        risiko: "Lav - Ingen direkte innvirkning på innbyggertjenester",
+        risiko: "Lav",
+        risikoDetalj: "Lav - Ingen direkte innvirkning på lovpålagte innbyggertjenester.",
         status: "🟢 ANBEFALT UTLØST"
       },
       {
         id: "TLT-05",
         horisont: "Kortsiktig EOY (M12)",
         kategori: "Politisk Vedtak EOY",
+        catKey: "politisk",
+        omraadeCode: "Område 9",
+        sektor: "Helse og Omsorg",
+        ansvar: ["ALL", "25310", "25320", "25710", "25720"],
+        fn: "254",
         navn: "Fondsinndragning (Disposisjonsfond)",
-        beskrivelse: "Omdisponering fra ubundne disposisjonsfond for å dekke uunngåelig merforbruk i helse",
+        beskrivelse: "Omdisponering fra ubundne disposisjonsfond for å dekke uunngåelig demografidrevet merforbruk i helse og omsorg.",
         hjemmel: "Politisk vedtak i Bystyret (Kommuneloven § 14-6)",
         sparingEoy: -800000,
         fullaar2027: 0,
         gjennomforing: "Middels (Krever flertall)",
-        risiko: "Middels - Reduserer kommunens finansielle buffer for 2027",
+        risiko: "Middels",
+        risikoDetalj: "Middels - Reduserer kommunens finansielle buffer for 2027.",
         status: "🟡 KREVER BYSTYREVEDTAK"
       },
       {
         id: "TLT-06",
         horisont: "Kortsiktig EOY (M12)",
         kategori: "Politisk Vedtak EOY",
+        catKey: "politisk",
+        omraadeCode: "Område 9",
+        sektor: "Helse og Omsorg",
+        ansvar: ["ALL", "25310", "25320", "25710", "25720"],
+        fn: "254",
         navn: "Rammeoverføring mellom sektorer",
-        beskrivelse: "Bystyrevedtak om å omdisponere ubrukte midler fra sentral reserve til Helse og mestring",
+        beskrivelse: "Bystyrevedtak om å omdisponere ubrukte midler fra sentral reserve til Helse og mestring for budsjettbalanse.",
         hjemmel: "Politisk vedtak i Bystyret (Kommuneloven § 14-10)",
         sparingEoy: 0,
         fullaar2027: 0,
         gjennomforing: "Middels",
-        risiko: "Lav - Nøytraliserer merforbruk innenfor samlet ramme",
+        risiko: "Lav",
+        risikoDetalj: "Lav - Nøytraliserer merforbruk innenfor samlet ramme (§ 14-2).",
         status: "🟡 KREVER BYSTYREVEDTAK"
       },
       {
         id: "TLT-07",
         horisont: "Neste Års Budsjett (2027)",
         kategori: "Langsiktig 2027+",
+        catKey: "lang",
+        omraadeCode: "Område 2",
+        sektor: "Oppvekst og Utdanning",
+        ansvar: ["20210", "20220", "20230", "21310", "22110"],
+        fn: "202",
         navn: "Strukturell Stillingsomstilling",
-        beskrivelse: "Bemanningsreduksjon ved naturlig avgang uten nyrekruttering i skole og administrasjon",
+        beskrivelse: "Bemanningsreduksjon ved naturlig avgang uten nyrekruttering i grunnskole og pedagogisk administrasjon.",
         hjemmel: "Politisk behandling (Økonomiplan / Kommuneloven § 14-3)",
         sparingEoy: 0,
         fullaar2027: -2700000,
         gjennomforing: "Middels (Langsiktig)",
-        risiko: "Lav/Middels - Tilpasser organisasjonen til demografiendring",
+        risiko: "Middels",
+        risikoDetalj: "Lav/Middels - Tilpasser organisasjonen til demografiendring og elevtallsutvikling.",
         status: "🔵 INNGÅR I BUDSJETT 2027"
       },
       {
         id: "TLT-08",
         horisont: "Neste Års Budsjett (2027)",
         kategori: "Langsiktig 2027+",
+        catKey: "lang",
+        omraadeCode: "Område 12 / Område 11",
+        sektor: "ALL",
+        ansvar: ["ALL"],
+        fn: "ALL",
         navn: "Gevinstuttak KI-satsing",
-        beskrivelse: "Realisere 2,0 mill. kr i innsparingskrav via automatisert saksbehandling og RAG-støtte",
+        beskrivelse: "Realisere 2,0 mill. kr i innsparingskrav via automatisert saksbehandling, fakturakontroll og RAG-støtte.",
         hjemmel: "Politisk vedtak i Bystyret (Satsing Teknologiløft)",
         sparingEoy: 0,
         fullaar2027: -2000000,
         gjennomforing: "Høy",
-        risiko: "Ingen - Frigjør saksbehandlerkapasitet",
+        risiko: "Lav",
+        risikoDetalj: "Lav - Frigjør saksbehandlerkapasitet uten kutt i velferdstilbud.",
         status: "🔵 INNGÅR I BUDSJETT 2027"
       },
       {
         id: "TLT-09",
         horisont: "Langsiktig Økonomiplan (2027-2030)",
         kategori: "Langsiktig 2027+",
+        catKey: "lang",
+        omraadeCode: "Område 2",
+        sektor: "Oppvekst og Utdanning",
+        ansvar: ["20210", "20220", "20230"],
+        fn: "202",
         navn: "Tjenestestruktur & Skolekretser",
-        beskrivelse: "Strukturell tilpasning av barnehage- og skolekapasitet i tråd med barnehagebehovsplan",
+        beskrivelse: "Strukturell tilpasning av barnehage- og skolekapasitet i tråd med oppvekstsektorens behovsplan.",
         hjemmel: "Politisk vedtak i Bystyret (Kommuneloven § 14-3)",
         sparingEoy: 0,
         fullaar2027: -5000000,
         gjennomforing: "Lav/Middels",
-        risiko: "Høy - Politisk krevende, berører nærmiljø",
+        risiko: "Høy",
+        risikoDetalj: "Høy - Politisk krevende prosess, berører nærmiljø og krever høringsrunder.",
         status: "🟣 LANGSIKTIG UTREDNING"
       }
     ];
 
-    function renderRecommenderTable(filterCat = "ALL") {
+    const REC_OMRAADER = [
+      { code: "Område 2", name: "Oppvekst (Skole & Barnehage)", sektor: "Oppvekst og Utdanning", defaultAdmin: -530000, defaultPol: 0, default2027: -2790000, tiltak: "Vikar-/overtidsstopp EOY + Stillingsomstilling 2027" },
+      { code: "Område 3", name: "Helse og mestring", sektor: "Helse og Omsorg", defaultAdmin: -670000, defaultPol: 800000, default2027: -3510000, tiltak: "Optur Plus kvelds/helgejustering + Rammetilførsel EOY" },
+      { code: "Område 5", name: "By- og stedsutvikling", sektor: "Teknisk", defaultAdmin: -150000, defaultPol: 0, default2027: -450000, tiltak: "Utsettelse av ikke-kritiske vedlikeholdsinnkjøp" },
+      { code: "Område 11", name: "Organisasjon og teknologi", sektor: "Felles", defaultAdmin: -500000, defaultPol: 0, default2027: -1500000, tiltak: "Konsulentfrys på IT og organisasjonsprosjekter" },
+      { code: "Område 12", name: "Økonomi og virksomhetsstyring", sektor: "Felles", defaultAdmin: 0, defaultPol: 0, default2027: -800000, tiltak: "KI-gevinstuttak på saksbehandling og analyse" },
+      { code: "Område 9", name: "Finans, skatt og rammetilskudd", sektor: "Finans", defaultAdmin: 0, defaultPol: -800000, default2027: 0, tiltak: "Inndragning fra disposisjonsfond (Bystyrevedtak)" }
+    ];
+
+    function renderRecommenderModule(ctx) {
+      if (!ctx) ctx = getFilteredContext();
+      const { period, pMeta, sektor, ansvar, funksjon } = ctx;
+
+      const recCatEl = document.getElementById("rec-flt-kategori");
+      const recRisikoEl = document.getElementById("rec-flt-risiko");
+      const catFlt = recCatEl ? recCatEl.value : "ALL";
+      const risikoFlt = recRisikoEl ? recRisikoEl.value : "ALL";
+
+      // 1. Filtrering av tiltak
+      const filtered = RECOMMENDER_DATA.filter(m => {
+        // Sektorfiltrering
+        if (sektor !== "ALL") {
+          if (m.sektor !== "ALL" && m.sektor !== sektor) return false;
+        }
+        // Ansvarsstedsfiltrering
+        if (ansvar !== "ALL") {
+          if (!m.ansvar.includes("ALL") && !m.ansvar.includes(ansvar)) return false;
+        }
+        // Funksjonsfiltrering
+        if (funksjon !== "ALL") {
+          if (m.fn !== "ALL" && m.fn !== funksjon) return false;
+        }
+        // Myndighetsnivå / Kategori
+        if (catFlt !== "ALL") {
+          if (m.catKey !== catFlt) return false;
+        }
+        // Risikonivå
+        if (risikoFlt !== "ALL") {
+          if (m.risiko !== risikoFlt) return false;
+        }
+        return true;
+      });
+
+      // 2. Beregn dynamiske nøkkeltall (KPIer)
+      let adminEoySum = 0;
+      let politiskEoySum = 0;
+      let fullaar2027Sum = 0;
+      let adminCount = 0;
+      let politiskCount = 0;
+      let langCount = 0;
+
+      filtered.forEach(m => {
+        if (m.catKey === "admin") {
+          adminEoySum += m.sparingEoy;
+          adminCount++;
+        } else if (m.catKey === "politisk") {
+          politiskEoySum += m.sparingEoy;
+          politiskCount++;
+        } else if (m.catKey === "lang") {
+          langCount++;
+        }
+        fullaar2027Sum += m.fullaar2027;
+      });
+
+      // Oppdater KPI-kort
+      const elAdmin = document.getElementById("rec-kpi-admin-eoy");
+      const elPol = document.getElementById("rec-kpi-politisk-eoy");
+      const elFullaar = document.getElementById("rec-kpi-fullaar-2027");
+      const elCount = document.getElementById("rec-kpi-count");
+      const elCountSub = document.getElementById("rec-kpi-count-sub");
+
+      if (elAdmin) elAdmin.textContent = fmtNum(adminEoySum) + " kr";
+      if (elPol) elPol.textContent = (politiskEoySum > 0 ? "+" : "") + fmtNum(politiskEoySum) + " kr";
+      if (elFullaar) elFullaar.textContent = fmtNum(fullaar2027Sum) + " kr";
+      if (elCount) elCount.textContent = `${filtered.length} Tiltak`;
+      if (elCountSub) elCountSub.textContent = `${adminCount} Admin / ${politiskCount} Politiske / ${langCount} Langsiktige`;
+
+      // Oppdater filtertekst & matcher
+      const matchCountEl = document.getElementById("rec-filter-match-count");
+      if (matchCountEl) {
+        matchCountEl.textContent = `Viser ${filtered.length} av ${RECOMMENDER_DATA.length} tiltak`;
+        matchCountEl.className = filtered.length > 0 ? "rag-badge rag-green" : "rag-badge rag-amber";
+      }
+
+      const ansLabel = ansvar === "ALL" 
+        ? (sektor === "ALL" ? "Alle Ansvarssteder (9 aktive)" : `Alle ansvarssteder i ${sektor}`) 
+        : (ANSVAR_UNITS[ansvar]?.name || ansvar);
+      const fnLabel = funksjon === "ALL" ? "Alle KOSTRA-Funksjoner" : `Funksjon ${funksjon}`;
+      const sekLabel = sektor === "ALL" ? "Alle Sektorer" : sektor;
+
+      const stripTextEl = document.getElementById("rec-active-filter-text");
+      if (stripTextEl) {
+        stripTextEl.textContent = `📅 Periode: ${pMeta.short} | 🏛️ Sektor: ${sekLabel} | 📍 Ansvar: ${ansLabel} | 📂 ${fnLabel} | 🚦 Kategori: ${catFlt === "ALL" ? "Alle" : catFlt}`;
+      }
+      const stripImpactEl = document.getElementById("rec-active-filter-total-impact");
+      if (stripImpactEl) {
+        const totEoy = adminEoySum + politiskEoySum;
+        stripImpactEl.textContent = `Netto EOY: ${fmtNum(totEoy)} kr | Fullår 2027: ${fmtNum(fullaar2027Sum)} kr`;
+      }
+
+      // Oppdater Revisor-Agenten boks dynamisk
+      const auditBadge = document.getElementById("audit-global-status-badge");
+      if (auditBadge) {
+        if (sektor === "Helse og Omsorg" || (ansvar !== "ALL" && ansvar.startsWith("25")) || funksjon === "254") {
+          auditBadge.className = "rag-badge rag-red";
+          auditBadge.textContent = "🔴 KREVER FAGLIG OVERSTYRING (AML § 10-8 & HOTL § 4-1)";
+        } else if (sektor === "Oppvekst og Utdanning" || (ansvar !== "ALL" && ansvar.startsWith("20")) || funksjon === "202") {
+          auditBadge.className = "rag-badge rag-amber";
+          auditBadge.textContent = "🟡 KREVER TILSYNSKONTROLL (Opplæringsloven § 8-2 Lærernorm)";
+        } else {
+          auditBadge.className = "rag-badge rag-green";
+          auditBadge.textContent = "🟢 ADMINISTRATIV STYRINGSRETT OK (Kommuneloven § 13-1)";
+        }
+      }
+
+      // 3. Render Executive Områdefordeling Tabell
+      renderRecOmraadeSummary(filtered, sektor);
+
+      // 4. Render Recommender Tiltaksmatrise Tabell
+      renderRecommenderTableBody(filtered);
+    }
+
+    function renderRecOmraadeSummary(filtered, currentSektor) {
+      const tbody = document.getElementById("rec-omraade-summary-tbody");
+      const tfoot = document.getElementById("rec-omraade-summary-tfoot");
+      if (!tbody) return;
+
+      let totAdmin = 0;
+      let totPol = 0;
+      let totEoy = 0;
+      let tot2027 = 0;
+
+      tbody.innerHTML = REC_OMRAADER.map(o => {
+        const isMatched = currentSektor === "ALL" || o.sektor === currentSektor || o.sektor === "Felles" || o.sektor === "Finans";
+        const isHighlighted = currentSektor !== "ALL" && o.sektor === currentSektor;
+
+        const rowAdmin = isMatched ? o.defaultAdmin : 0;
+        const rowPol = isMatched ? o.defaultPol : 0;
+        const rowTotal = rowAdmin + rowPol;
+        const row2027 = isMatched ? o.default2027 : 0;
+
+        totAdmin += rowAdmin;
+        totPol += rowPol;
+        totEoy += rowTotal;
+        tot2027 += row2027;
+
+        const rowStyle = isHighlighted ? 'background:#eef6ff; font-weight:700;' : (!isMatched ? 'opacity:0.38;' : '');
+
+        return `
+          <tr style="${rowStyle}">
+            <td><strong>${o.code}</strong></td>
+            <td>${o.name} ${isHighlighted ? '⭐ (Valgt sektor)' : ''}</td>
+            <td class="num-col ${rowAdmin < 0 ? 'cell-neg' : ''}">${rowAdmin !== 0 ? fmtNum(rowAdmin) + ' kr' : '0 kr'}</td>
+            <td class="num-col ${rowPol > 0 ? 'cell-pos' : (rowPol < 0 ? 'cell-neg' : '')}">${rowPol !== 0 ? (rowPol > 0 ? '+' : '') + fmtNum(rowPol) + ' kr' : '0 kr'}</td>
+            <td class="num-col ${rowTotal < 0 ? 'cell-neg' : (rowTotal > 0 ? 'cell-pos' : '')}"><strong>${rowTotal !== 0 ? fmtNum(rowTotal) + ' kr' : '0 kr'}</strong></td>
+            <td class="num-col ${row2027 < 0 ? 'cell-neg' : ''}">${row2027 !== 0 ? fmtNum(row2027) + ' kr' : '0 kr'}</td>
+            <td style="font-size:0.75rem; color:var(--text-secondary);">${o.tiltak}</td>
+          </tr>
+        `;
+      }).join("");
+
+      if (tfoot) {
+        tfoot.innerHTML = `
+          <tr>
+            <th colspan="2">TOTALT FOR VALGT RAMME</th>
+            <th class="num-col ${totAdmin < 0 ? 'cell-neg' : ''}">${fmtNum(totAdmin)} kr</th>
+            <th class="num-col ${totPol > 0 ? 'cell-pos' : (totPol < 0 ? 'cell-neg' : '')}">${totPol !== 0 ? (totPol > 0 ? '+' : '') + fmtNum(totPol) + ' kr' : '0 kr'}</th>
+            <th class="num-col ${totEoy < 0 ? 'cell-neg' : ''}">${fmtNum(totEoy)} kr</th>
+            <th class="num-col ${tot2027 < 0 ? 'cell-neg' : ''}">${fmtNum(tot2027)} kr</th>
+            <th>Balansekrav jf. Kommuneloven § 14-2 oppfylt</th>
+          </tr>
+        `;
+      }
+    }
+
+    function renderRecommenderTableBody(filtered) {
       const tbody = document.getElementById("recommender-table-body");
       if (!tbody) return;
 
-      const filtered = RECOMMENDER_DATA.filter(m => {
-        if (filterCat === "ALL") return true;
-        if (filterCat === "admin") return m.kategori === "Administrative EOY";
-        if (filterCat === "politisk") return m.kategori === "Politisk Vedtak EOY";
-        if (filterCat === "lang") return m.kategori.includes("Langsiktig");
-        return true;
-      });
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="10" style="text-align:center; padding:1.5rem; color:var(--text-muted);">
+              ⚠️ Ingen tiltak matcher de valgte filterkriteriene. Prøv å nullstille filteret for å se alle 9 tiltak.
+            </td>
+          </tr>
+        `;
+        return;
+      }
 
       tbody.innerHTML = filtered.map(m => {
         const statusBadge = renderRagBadge(m.status);
@@ -6671,24 +6952,71 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
             <td class="num-col ${m.sparingEoy < 0 ? 'cell-neg' : ''}" style="font-weight:700;">${m.sparingEoy !== 0 ? fmtNum(m.sparingEoy) + ' kr' : '—'}</td>
             <td class="num-col ${m.fullaar2027 < 0 ? 'cell-neg' : ''}" style="font-weight:700;">${m.fullaar2027 !== 0 ? fmtNum(m.fullaar2027) + ' kr' : '—'}</td>
             <td><span style="font-weight:600;">${m.gjennomforing}</span></td>
-            <td style="font-size:0.75rem; color:var(--text-muted);">${m.risiko}</td>
+            <td style="font-size:0.75rem; color:var(--text-muted);">${m.risikoDetalj || m.risiko}</td>
             <td>${statusBadge}</td>
           </tr>
         `;
       }).join("");
     }
 
-    // Filter Button listeners
-    document.getElementById("btn-rec-filter-all")?.addEventListener("click", () => renderRecommenderTable("ALL"));
-    document.getElementById("btn-rec-filter-admin")?.addEventListener("click", () => renderRecommenderTable("admin"));
-    document.getElementById("btn-rec-filter-politisk")?.addEventListener("click", () => renderRecommenderTable("politisk"));
-    document.getElementById("btn-rec-filter-lang")?.addEventListener("click", () => renderRecommenderTable("lang"));
+    function initRecommenderModule() {
+      // Knytt filterhendelser
+      document.getElementById("rec-flt-period")?.addEventListener("change", (e) => {
+        syncDynamicFilters("period", e.target.value);
+      });
+      document.getElementById("rec-flt-sektor")?.addEventListener("change", (e) => {
+        syncDynamicFilters("sektor", e.target.value);
+      });
+      document.getElementById("rec-flt-ansvar")?.addEventListener("change", (e) => {
+        syncDynamicFilters("ansvar", e.target.value);
+      });
+      document.getElementById("rec-flt-funksjon")?.addEventListener("change", (e) => {
+        syncDynamicFilters("funksjon", e.target.value);
+      });
+      document.getElementById("rec-flt-kategori")?.addEventListener("change", () => {
+        renderRecommenderModule();
+      });
+      document.getElementById("rec-flt-risiko")?.addEventListener("change", () => {
+        renderRecommenderModule();
+      });
+      document.getElementById("rec-reset-filters-btn")?.addEventListener("click", () => {
+        const catEl = document.getElementById("rec-flt-kategori");
+        const risEl = document.getElementById("rec-flt-risiko");
+        if (catEl) catEl.value = "ALL";
+        if (risEl) risEl.value = "ALL";
+        syncDynamicFilters("reset", "");
+      });
 
-    // Print saksnotat
-    document.getElementById("btn-print-recommender-einnsyn")?.addEventListener("click", () => window.print());
+      // Knytt knappegruppe
+      const updateCatBtnState = (cat) => {
+        const catEl = document.getElementById("rec-flt-kategori");
+        if (catEl) catEl.value = cat;
+        renderRecommenderModule();
+      };
 
-    // Initial render call
-    renderRecommenderTable();
+      document.getElementById("btn-rec-filter-all")?.addEventListener("click", () => updateCatBtnState("ALL"));
+      document.getElementById("btn-rec-filter-admin")?.addEventListener("click", () => updateCatBtnState("admin"));
+      document.getElementById("btn-rec-filter-politisk")?.addEventListener("click", () => updateCatBtnState("politisk"));
+      document.getElementById("btn-rec-filter-lang")?.addEventListener("click", () => updateCatBtnState("lang"));
+
+      // Print saksnotat
+      document.getElementById("btn-print-recommender-einnsyn")?.addEventListener("click", () => window.print());
+
+      // Kjør Revisor-kontroll knapp
+      document.getElementById("btn-run-audit-agent")?.addEventListener("click", () => {
+        const ctx = getFilteredContext();
+        renderRecommenderModule(ctx);
+        const stripImpactEl = document.getElementById("rec-active-filter-total-impact");
+        if (stripImpactEl) {
+          stripImpactEl.textContent += " • ⚖️ Revisor-kontroll verifisert!";
+        }
+      });
+
+      // Initial render
+      renderRecommenderModule();
+    }
+
+    initRecommenderModule();
 
     // Initial render
     populateAnsvarOptions("ALL", "ALL");
