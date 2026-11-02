@@ -331,7 +331,8 @@ def run_all_tests():
             const paths = document.querySelectorAll("#min-trend-sparkline-svg-wrap path").length;
             const kpiText = document.getElementById("min-trend-sparkline-kpi")?.textContent || "";
             const tableRows = document.querySelectorAll("#min-trend-body tr").length;
-            const tableMicroSvgs = document.querySelectorAll("#min-trend-body tr svg").length;
+            const tableBars = document.querySelectorAll("#min-trend-body tr svg rect").length;
+            const hasAvvikHeader = (document.querySelector(".data-table th:last-child")?.textContent || "").includes("Avvikssøyle");
             const tableText = document.getElementById("min-trend-body")?.innerText || "";
             const hasDoubleKr = tableText.includes("kr kr");
             return {
@@ -341,16 +342,18 @@ def run_all_tests():
                 paths,
                 kpiText,
                 tableRows,
-                tableMicroSvgs,
+                tableBars,
+                hasAvvikHeader,
                 hasDoubleKr
             };
         }''')
         record_test("Dynamisk Tufte Sparkline-boks er synlig", bool(sparkline_info["boxVisible"]))
         record_test("Sparkline SVG inneholder 8 månedspunkter (M01-M08)", sparkline_info["circles"] == 8, f"Sirkler: {sparkline_info['circles']}")
         record_test("Sparkline SVG inneholder budsjett- og regnskapskurver", sparkline_info["paths"] >= 2, f"Paths: {sparkline_info['paths']}")
-        record_test("Månedstabell har 8 rader med inline micro-sparklines", 
-                    sparkline_info["tableRows"] == 8 and sparkline_info["tableMicroSvgs"] == 8,
-                    f"Rader: {sparkline_info['tableRows']}, MicroSVGs: {sparkline_info['tableMicroSvgs']}")
+        record_test("Månedstabell har 8 rader med betinget avvikssøyle (conditional bar length of avvik)", 
+                    sparkline_info["tableRows"] == 8 and sparkline_info["tableBars"] == 8,
+                    f"Rader: {sparkline_info['tableRows']}, Avvikssøyler: {sparkline_info['tableBars']}")
+        record_test("Kolonnetittel til høyre for MoM er 'Avvikssøyle'", bool(sparkline_info["hasAvvikHeader"]))
         record_test("Fjernet overflødig 'kr kr' i MoM trend-kolonne", not sparkline_info["hasDoubleKr"])
 
         # Test fanevelger

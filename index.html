@@ -1570,7 +1570,7 @@
                       <th class="num-col">Regnskap</th>
                       <th class="num-col">Mnd-avvik</th>
                       <th class="num-col">MoM Trend</th>
-                      <th style="text-align:center; width:80px;">Bane</th>
+                      <th style="text-align:center; width:95px;" title="Betinget søylediagram for avvik: Venstre (grønn) = Mindreforbruk, Høyre (rød) = Merforbruk">Avvikssøyle</th>
                     </tr>
                   </thead>
                   <tbody id="min-trend-body"></tbody>
@@ -7049,31 +7049,34 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
       const trendBody = document.getElementById("min-trend-body");
       let prevActual = 0;
-      const maxAllActual = Math.max(...(report.monthly_trend || []).map(r => r.actual_nok), 1);
+      const maxAbsVariance = Math.max(...(report.monthly_trend || []).map(r => Math.abs(r.variance_nok)), 1);
+
       trendBody.innerHTML = report.monthly_trend.map((row, idx) => {
         const period = new Date(`${row.period}T12:00:00`);
         const label = new Intl.DateTimeFormat("nb-NO", { month: "short" }).format(period);
         const varianceClass = row.variance_nok > 0 ? "rag-red" : "rag-green";
         const momDiff = idx > 0 ? row.actual_nok - prevActual : 0;
         prevActual = row.actual_nok;
-        // Fix: fmtNOK already appends 'kr', so avoid double 'kr kr'
         const momLabel = idx > 0 ? `${momDiff >= 0 ? '+' : ''}${fmtNOK(momDiff)}` : "—";
 
-        // Micro-sparkline up to this month
-        const rowHistory = report.monthly_trend.slice(0, idx + 1);
-        const microW = 60;
-        const microH = 16;
-        const mPts = rowHistory.map((h, hIdx) => {
-          const x = rowHistory.length > 1 ? (hIdx / (rowHistory.length - 1)) * (microW - 10) + 5 : microW / 2;
-          const y = microH - 3 - (h.actual_nok / maxAllActual) * (microH - 6);
-          return `${x.toFixed(1)},${y.toFixed(1)}`;
-        }).join(" ");
-        const lastPt = mPts.split(" ").pop().split(",");
-        const endDotColor = row.variance_nok > 0 ? "#D62728" : "#16A34A";
-        const microSvg = `
-          <svg width="${microW}" height="${microH}" viewBox="0 0 ${microW} ${microH}" style="vertical-align:middle;">
-            <polyline points="${mPts}" fill="none" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="${lastPt[0]}" cy="${lastPt[1]}" r="2.8" fill="${endDotColor}" stroke="#FFFFFF" stroke-width="1"/>
+        // Conditional bar length of avvik (divergence bar from zero-axis)
+        const barW = 84;
+        const barH = 16;
+        const midX = barW / 2; // 42px center
+        const maxBarSpan = 36; // max px to either side
+        const valAbs = Math.abs(row.variance_nok);
+        const spanPx = Math.max(Math.round((valAbs / maxAbsVariance) * maxBarSpan), 2);
+        const isMerforbruk = row.variance_nok > 0;
+        const barColor = isMerforbruk ? "#D62728" : "#16A34A";
+        const rectX = isMerforbruk ? midX : midX - spanPx;
+
+        const condBarSvg = `
+          <svg width="${barW}" height="${barH}" viewBox="0 0 ${barW} ${barH}" style="vertical-align:middle; display:inline-block;" aria-label="Avvik: ${fmtNOK(row.variance_nok, true)}">
+            <title>${label}: Avvik ${fmtNOK(row.variance_nok, true)} (${isMerforbruk ? 'Merforbruk' : 'Mindreforbruk'})</title>
+            <!-- Zero axis -->
+            <line x1="${midX}" y1="2" x2="${midX}" y2="${barH - 2}" stroke="#CBD5E1" stroke-width="1.2" />
+            <!-- Conditional bar length of avvik -->
+            <rect x="${rectX}" y="3.5" width="${spanPx}" height="9" rx="1.5" fill="${barColor}" />
           </svg>`;
 
         return `<tr>
@@ -7082,7 +7085,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
           <td class="num-col">${fmtNOK(row.actual_nok)}</td>
           <td class="num-col ${varianceClass}">${fmtNOK(row.variance_nok, true)}</td>
           <td class="num-col" style="color:var(--text-muted); font-size:0.7rem;">${momLabel}</td>
-          <td style="text-align:center; padding:2px 4px;">${microSvg}</td>
+          <td style="text-align:center; padding:2px 4px;">${condBarSvg}</td>
         </tr>`;
       }).join("");
 
