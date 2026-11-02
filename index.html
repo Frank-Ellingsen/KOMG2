@@ -1312,6 +1312,89 @@
       </button>
     </nav>
 
+    <!-- ===================================================================
+         GLOBAL FILTER SELECTION BAR (TILGJENGELIG I ALLE MENYER / ARBEIDSROM)
+         =================================================================== -->
+    <div class="global-filter-strip" id="global-filter-panel" style="background:var(--bg-surface); border:1px solid var(--border-light); border-radius:6px; padding:0.6rem 0.85rem; margin-bottom:0.85rem; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; flex-wrap:wrap; gap:0.4rem;">
+        <span style="font-size:0.74rem; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:0.35rem;">
+          <span>🎛️</span> <span>Aktiv Filterseleksjon (Synkronisert på tvers av alle menyer)</span>
+        </span>
+        <span style="font-size:0.7rem; color:var(--text-secondary); font-variant-numeric:tabular-nums;">
+          Automatiske kaskaderende valg jf. KOSTRA-forskrift &amp; FAST
+        </span>
+      </div>
+      <div class="filter-panel" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:0.55rem; align-items:end; padding:0; background:transparent; border:none;">
+        <div class="field-group">
+          <label for="flt-period" style="font-size:0.71rem; font-weight:700;">📅 Periode / Cut-off</label>
+          <select id="flt-period" style="width:100%; padding:0.32rem; font-size:0.76rem;">
+            <option value="ALL">Akkumulert YTD (M01–M08 2024)</option>
+            <option value="M08">Siste Bokførte Måned (2024_08 August)</option>
+            <option value="M07">2024_07 Juli</option>
+            <option value="M06">2024_06 Juni</option>
+            <option value="M05">2024_05 Mai</option>
+            <option value="M04">2024_04 April</option>
+            <option value="M03">2024_03 Mars</option>
+            <option value="M02">2024_02 Februar</option>
+            <option value="M01">2024_01 Januar</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="flt-sektor" style="font-size:0.71rem; font-weight:700;">🏛️ Rammeområde / Sektor</label>
+          <select id="flt-sektor" style="width:100%; padding:0.32rem; font-size:0.76rem;">
+            <option value="ALL">Alle Sektorer</option>
+            <option value="Oppvekst og Utdanning">Oppvekst og Utdanning</option>
+            <option value="Helse og Omsorg">Helse og Omsorg</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="flt-ansvar" style="font-size:0.71rem; font-weight:700;">📍 Ansvarssted / Enhet</label>
+          <select id="flt-ansvar" style="width:100%; padding:0.32rem; font-size:0.76rem;">
+            <option value="ALL">Alle Ansvarssteder (9 aktive)</option>
+            <option value="25310">25310 - Omsorgssenter / Sykehjem A (Helse, Fn 254)</option>
+            <option value="25320">25320 - Omsorgssenter / Sykehjem B (Helse, Fn 254)</option>
+            <option value="25710">25710 - Hjemmetjenesten Sone Nord (Helse, Fn 254)</option>
+            <option value="25720">25720 - Hjemmetjenesten Sone Sør (Helse, Fn 254)</option>
+            <option value="20210">20210 - Grunnskole A 1–10 trinn (Oppvekst, Fn 202)</option>
+            <option value="20220">20220 - Grunnskole B 1–10 trinn (Oppvekst, Fn 202)</option>
+            <option value="20230">20230 - Grunnskole C 1–10 trinn (Oppvekst, Fn 202)</option>
+            <option value="21310">21310 - Voksenopplæringssenter (Oppvekst, Fn 213)</option>
+            <option value="22110">22110 - PPT og pedagogisk oppfølging (Oppvekst, Fn 221)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="flt-funksjon" style="font-size:0.71rem; font-weight:700;">📂 KOSTRA-Funksjon</label>
+          <select id="flt-funksjon" style="width:100%; padding:0.32rem; font-size:0.76rem;">
+            <option value="ALL">Alle KOSTRA-Funksjoner (10)</option>
+            <option value="202">202 - Grunnskoleopplæring</option>
+            <option value="254">254 - Helse- og omsorgstjenester i institusjon</option>
+            <option value="214">214 - Skolefritidstilbud (SFO)</option>
+            <option value="221">221 - PPT</option>
+            <option value="213">213 - Voksenopplæring</option>
+            <option value="215">215 - Skolestatistikk og fellesoppgaver</option>
+            <option value="241">241 - Helse- og omsorgstjenester i hjemmet</option>
+            <option value="253">253 - Forebyggende helsetjenester</option>
+            <option value="261">261 - Sosiale tjenester og tiltak for voksne</option>
+            <option value="265">265 - Kommunalt disponerte boliger</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="flt-status" style="font-size:0.71rem; font-weight:700;">🚦 Avviksstatus (RAG)</label>
+          <select id="flt-status" style="width:100%; padding:0.32rem; font-size:0.76rem;">
+            <option value="ALL">Alle Statuser</option>
+            <option value="🔴 KRITISK AVVIK">🔴 KRITISK AVVIK</option>
+            <option value="🟡 ADVARSEL">🟡 ADVARSEL</option>
+            <option value="🟢 I RUTE">🟢 I RUTE</option>
+          </select>
+        </div>
+        <div class="field-group" style="display:flex; align-items:end;">
+          <button type="button" id="btn-reset-filters" class="cockpit-btn" style="padding:0.35rem 0.75rem; font-size:0.74rem; width:100%; background:var(--bg-subtle); color:var(--text-primary); border:1px solid var(--border-light);" title="Tilbakestill alle filtre til utgangspunktet">
+            🔄 Nullstill Filter
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="views-host">
       <!-- ===================================================================
            RÅDGIVERENS ARBEIDSFLATE
@@ -1764,79 +1847,9 @@
            MODUL 1: AVVIKSOVERSIKT (GOLD LAYER)
            =================================================================== -->
       <section id="view-avvik" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Avviksoversikt Gold Layer">
-        <div class="section-bar">
-          <span>1. Filtrering, Utsnittskuttere (Slicers) &amp; Periodevelger</span>
-          <span>FAST &amp; Power BI-Style</span>
-        </div>
-
-        <div class="filter-panel" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.65rem; align-items:end;">
-          <div class="field-group">
-            <label for="flt-period">Velg Periode / Måned</label>
-            <select id="flt-period" style="width:100%; padding:0.32rem;">
-              <option value="ALL">Akkumulert YTD (M01–M08 2024)</option>
-              <option value="M08">Siste Bokførte Måned (2024_08 August)</option>
-              <option value="M07">2024_07 Juli</option>
-              <option value="M06">2024_06 Juni</option>
-              <option value="M05">2024_05 Mai</option>
-              <option value="M04">2024_04 April</option>
-              <option value="M03">2024_03 Mars</option>
-              <option value="M02">2024_02 Februar</option>
-              <option value="M01">2024_01 Januar</option>
-            </select>
-          </div>
-          <div class="field-group">
-            <label for="flt-sektor">Velg Rammeområde / Sektor</label>
-            <select id="flt-sektor" style="width:100%; padding:0.32rem;">
-              <option value="ALL">Alle Sektorer</option>
-              <option value="Oppvekst og Utdanning">Oppvekst og Utdanning</option>
-              <option value="Helse og Omsorg">Helse og Omsorg</option>
-            </select>
-          </div>
-          <div class="field-group">
-            <label for="flt-ansvar">Ansvarssted / Enhet (9 enheter)</label>
-            <select id="flt-ansvar" style="width:100%; padding:0.32rem;">
-              <option value="ALL">Alle Ansvarssteder (9 aktive)</option>
-              <option value="25310">25310 - Omsorgssenter / Sykehjem A (Helse, Fn 254)</option>
-              <option value="25320">25320 - Omsorgssenter / Sykehjem B (Helse, Fn 254)</option>
-              <option value="25710">25710 - Hjemmetjenesten Sone Nord (Helse, Fn 254)</option>
-              <option value="25720">25720 - Hjemmetjenesten Sone Sør (Helse, Fn 254)</option>
-              <option value="20210">20210 - Grunnskole A 1–10 trinn (Oppvekst, Fn 202)</option>
-              <option value="20220">20220 - Grunnskole B 1–10 trinn (Oppvekst, Fn 202)</option>
-              <option value="20230">20230 - Grunnskole C 1–10 trinn (Oppvekst, Fn 202)</option>
-              <option value="21310">21310 - Voksenopplæringssenter (Oppvekst, Fn 213)</option>
-              <option value="22110">22110 - PPT og pedagogisk oppfølging (Oppvekst, Fn 221)</option>
-            </select>
-          </div>
-          <div class="field-group">
-            <label for="flt-funksjon">KOSTRA-Funksjon (10 funksjoner)</label>
-            <select id="flt-funksjon" style="width:100%; padding:0.32rem;">
-              <option value="ALL">Alle KOSTRA-Funksjoner (10)</option>
-              <option value="202">202 - Grunnskoleopplæring</option>
-              <option value="254">254 - Helse- og omsorgstjenester i institusjon</option>
-              <option value="214">214 - Skolefritidstilbud (SFO)</option>
-              <option value="221">221 - PPT</option>
-              <option value="213">213 - Voksenopplæring</option>
-              <option value="215">215 - Skolestatistikk og fellesoppgaver</option>
-              <option value="241">241 - Helse- og omsorgstjenester i hjemmet</option>
-              <option value="253">253 - Forebyggende helsetjenester</option>
-              <option value="261">261 - Sosiale tjenester og tiltak for voksne</option>
-              <option value="265">265 - Kommunalt disponerte boliger</option>
-            </select>
-          </div>
-          <div class="field-group">
-            <label for="flt-status">Filter på Avviksstatus (RAG)</label>
-            <select id="flt-status" style="width:100%; padding:0.32rem;">
-              <option value="ALL">Alle Statuser</option>
-              <option value="🔴 KRITISK AVVIK">🔴 KRITISK AVVIK</option>
-              <option value="🟡 ADVARSEL">🟡 ADVARSEL</option>
-              <option value="🟢 I RUTE">🟢 I RUTE</option>
-            </select>
-          </div>
-          <div class="field-group">
-            <button type="button" id="btn-reset-filters" class="cockpit-btn" style="padding:0.38rem 0.75rem; font-size:0.75rem; width:100%;">
-              🔄 Nullstill Filter
-            </button>
-          </div>
+        <div class="section-bar" style="margin-bottom:0.75rem;">
+          <span>1. Hovedtall &amp; Månedlig Avviksoversikt (Gold Layer)</span>
+          <span id="slicer-context-tag">Akkumulert YTD</span>
         </div>
 
         <!-- 6 Rounded KPI Cards (mirrors 01_DASHBOARD & app.py) -->

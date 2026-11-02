@@ -146,8 +146,19 @@ def run_all_tests():
         # TEST 3: Global Filterkaskadering & Synkronisering
         # -------------------------------------------------------------
         print("\n--- TESTBLOKK 3: Dynamisk Filterkaskadering & Synkronisering ---")
-        # Gå til Avviksoversikt først
+        # Bekreft at globalt filterpanel er synlig på tvers av menyer
+        page.click('.nav-btn[data-target="view-min-okonomi"]')
+        page.wait_for_timeout(50)
+        filter_in_min_okonomi = page.is_visible("#global-filter-panel")
+        page.click('.nav-btn[data-target="view-budget"]')
+        page.wait_for_timeout(50)
+        filter_in_budget = page.is_visible("#global-filter-panel")
+        record_test("Globalt filterpanel er synlig i Min Hverdag (view-min-okonomi)", bool(filter_in_min_okonomi))
+        record_test("Globalt filterpanel er synlig i Budsjett (view-budget)", bool(filter_in_budget))
+
+        # Gå til Avviksoversikt og velg Helse og Omsorg
         page.click('.nav-btn[data-target="view-avvik"]')
+        page.wait_for_timeout(50)
 
         # Velg Helse og Omsorg i global filter
         page.select_option("#flt-sektor", "Helse og Omsorg")
