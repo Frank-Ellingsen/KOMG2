@@ -1528,15 +1528,50 @@
           <!-- Månedlig trend og kostnadsdrivere -->
           <div class="grid-2col" style="margin-bottom:0.75rem;">
             <div class="panel-card">
-              <div class="panel-title">
-                <span>Utvikling hittil i år &amp; MoM-takt</span>
-                <span class="panel-subtitle">Månedlig regnskap og avvik</span>
+              <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem;">
+                <div>
+                  <span>Utvikling hittil i år &amp; MoM-takt</span>
+                  <span class="panel-subtitle">Månedlig regnskap og avvik</span>
+                </div>
+                <div id="min-trend-sparkline-kpi" style="font-size:0.7rem; color:var(--text-secondary); text-align:right;"></div>
               </div>
+
+              <!-- Dynamisk Tufte Sparkline Container -->
+              <div id="min-trend-sparkline-box" style="margin-bottom:0.75rem; padding:0.6rem 0.75rem; background:var(--bg-subtle, #F8FAFC); border:1px solid var(--border-light, #E2E8F0); border-radius:6px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; font-size:0.7rem;">
+                  <span style="font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:0.3rem;">
+                    <span>📈</span> <span>Månedlig Bane (Jan–Aug 2024)</span>
+                  </span>
+                  <div style="display:flex; gap:0.65rem; font-size:0.68rem; align-items:center; flex-wrap:wrap;">
+                    <span style="display:inline-flex; align-items:center; gap:0.25rem; color:var(--text-muted);">
+                      <svg width="16" height="4"><line x1="0" y1="2" x2="16" y2="2" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="3,2"/></svg> Budsjett
+                    </span>
+                    <span style="display:inline-flex; align-items:center; gap:0.25rem; color:#2563EB; font-weight:600;">
+                      <svg width="16" height="4"><line x1="0" y1="2" x2="16" y2="2" stroke="#2563EB" stroke-width="2.2"/></svg> Regnskap
+                    </span>
+                    <span style="display:inline-flex; align-items:center; gap:0.25rem; color:#D62728; font-weight:600;">
+                      <span style="width:7px; height:7px; border-radius:50%; background:#D62728; display:inline-block;"></span> Merforbruk
+                    </span>
+                    <span style="display:inline-flex; align-items:center; gap:0.25rem; color:#16A34A; font-weight:600;">
+                      <span style="width:7px; height:7px; border-radius:50%; background:#16A34A; display:inline-block;"></span> Mindreforbruk
+                    </span>
+                  </div>
+                </div>
+                <div id="min-trend-sparkline-svg-wrap" style="width:100%; height:62px;"></div>
+              </div>
+
               <div class="table-wrapper">
                 <table class="data-table" style="font-size:0.74rem;">
                   <caption id="min-trend-caption">Månedlig budsjett og regnskap</caption>
                   <thead>
-                    <tr><th>Periode</th><th class="num-col">Budsjett</th><th class="num-col">Regnskap</th><th class="num-col">Mnd-avvik</th><th class="num-col">MoM Trend</th></tr>
+                    <tr>
+                      <th>Periode</th>
+                      <th class="num-col">Budsjett</th>
+                      <th class="num-col">Regnskap</th>
+                      <th class="num-col">Mnd-avvik</th>
+                      <th class="num-col">MoM Trend</th>
+                      <th style="text-align:center; width:80px;">Bane</th>
+                    </tr>
                   </thead>
                   <tbody id="min-trend-body"></tbody>
                 </table>
@@ -6808,6 +6843,108 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         : "Registrer kun forventet, dokumenterbar effekt for resten av året. Dette er en enkel scenariojustering, ikke en godkjent prognose.";
     }
 
+    function renderTrendSparkline(monthlyTrend) {
+      const svgWrap = document.getElementById("min-trend-sparkline-svg-wrap");
+      const kpiEl = document.getElementById("min-trend-sparkline-kpi");
+      if (!svgWrap) return;
+      if (!monthlyTrend || !monthlyTrend.length) {
+        svgWrap.innerHTML = '<div style="font-size:0.72rem; color:var(--text-muted); padding:0.5rem;">Ingen månedstall tilgjengelig for trendkurve.</div>';
+        if (kpiEl) kpiEl.textContent = "";
+        return;
+      }
+
+      const actuals = monthlyTrend.map(r => r.actual_nok);
+      const budgets = monthlyTrend.map(r => r.budget_nok);
+      const n = monthlyTrend.length;
+      const totalActual = actuals.reduce((a, b) => a + b, 0);
+      const avgActual = totalActual / n;
+      const maxActual = Math.max(...actuals);
+      const minActual = Math.min(...actuals);
+      const maxIdx = actuals.indexOf(maxActual);
+      const minIdx = actuals.indexOf(minActual);
+      const lastActual = actuals[n - 1];
+      const lastVariance = monthlyTrend[n - 1].variance_nok;
+
+      if (kpiEl) {
+        kpiEl.innerHTML = `<span style="font-variant-numeric:tabular-nums;">Snitt: <strong>${fmtNOK(avgActual)}</strong> | Maks: <strong>${fmtNOK(maxActual)}</strong></span>`;
+      }
+
+      const W = 420;
+      const H = 60;
+      const padL = 16;
+      const padR = 48;
+      const padT = 12;
+      const padB = 16;
+      const cw = W - padL - padR;
+      const ch = H - padT - padB;
+
+      const allVals = [...actuals, ...budgets];
+      const maxVal = Math.max(...allVals, 1) * 1.12;
+
+      function getX(i) {
+        return n > 1 ? padL + (i / (n - 1)) * cw : padL + cw / 2;
+      }
+      function getY(val) {
+        return padT + ch - (val / maxVal) * ch;
+      }
+
+      function fmtM(val) {
+        if (Math.abs(val) >= 1000000) {
+          return (val / 1000000).toFixed(2).replace(".", ",") + "M";
+        }
+        return Math.round(val / 1000) + "k";
+      }
+
+      const actualCoords = monthlyTrend.map((r, i) => ({ x: getX(i), y: getY(r.actual_nok) }));
+      const budgetCoords = monthlyTrend.map((r, i) => ({ x: getX(i), y: getY(r.budget_nok) }));
+
+      const budgetPath = budgetCoords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(" ");
+      const actualPath = actualCoords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(" ");
+      const areaPath = `${actualPath} L ${actualCoords[n-1].x.toFixed(1)} ${(padT + ch).toFixed(1)} L ${actualCoords[0].x.toFixed(1)} ${(padT + ch).toFixed(1)} Z`;
+
+      let dotsHtml = "";
+      let monthLabelsHtml = "";
+      monthlyTrend.forEach((r, i) => {
+        const c = actualCoords[i];
+        const isOver = r.variance_nok > 0;
+        const color = isOver ? "#D62728" : "#16A34A";
+        const isHighlight = i === n - 1 || i === maxIdx || i === minIdx;
+        const rRad = isHighlight ? 4 : 2.8;
+
+        dotsHtml += `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="${rRad}" fill="${color}" stroke="#FFFFFF" stroke-width="1.5">
+          <title>${r.period}: Regnskap ${fmtNOK(r.actual_nok)}, Budsjett ${fmtNOK(r.budget_nok)} (Avvik ${fmtNOK(r.variance_nok, true)})</title>
+        </circle>`;
+
+        const periodDate = new Date(`${r.period}T12:00:00`);
+        const label = new Intl.DateTimeFormat("nb-NO", { month: "short" }).format(periodDate).replace(".", "");
+        monthLabelsHtml += `<text x="${c.x.toFixed(1)}" y="${H - 2}" text-anchor="middle" font-size="7.5" fill="#64748B" font-weight="${i === n - 1 ? '700' : '400'}">${escapeHtml(label)}</text>`;
+      });
+
+      let calloutsHtml = "";
+      const maxC = actualCoords[maxIdx];
+      calloutsHtml += `<text x="${maxC.x.toFixed(1)}" y="${(maxC.y - 5).toFixed(1)}" text-anchor="middle" font-size="7.5" font-weight="700" fill="#1E293B">Maks: ${fmtM(maxActual)}</text>`;
+      
+      if (minIdx !== maxIdx) {
+        const minC = actualCoords[minIdx];
+        calloutsHtml += `<text x="${minC.x.toFixed(1)}" y="${(minC.y + 11).toFixed(1)}" text-anchor="middle" font-size="7.5" font-weight="600" fill="#64748B">Lavest: ${fmtM(minActual)}</text>`;
+      }
+
+      const lastC = actualCoords[n - 1];
+      const endColor = lastVariance > 0 ? "#D62728" : "#16A34A";
+      calloutsHtml += `<text x="${(lastC.x + 6).toFixed(1)}" y="${(lastC.y + 3).toFixed(1)}" font-size="8" font-weight="700" fill="${endColor}">${fmtM(lastActual)}</text>`;
+
+      svgWrap.innerHTML = `
+        <svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="overflow:visible;">
+          <path d="${areaPath}" fill="rgba(37, 99, 235, 0.08)" />
+          <path d="${budgetPath}" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="3,2.5" />
+          <path d="${actualPath}" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+          ${dotsHtml}
+          ${calloutsHtml}
+          ${monthLabelsHtml}
+        </svg>
+      `;
+    }
+
     function renderMonthlyReport(report, isLive = true) {
       monthlyReportData = report;
       // Generer automatisk AI-ledelsesnotat (NLG)
@@ -6871,7 +7008,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       const momRegEl = document.getElementById("min-mom-reg");
       const lastM = report.monthly_trend && report.monthly_trend.length ? report.monthly_trend[report.monthly_trend.length - 1] : null;
       if (momRegEl && lastM) {
-        momRegEl.textContent = `M08: +${fmtNOK(lastM.actual_nok)} kr i perioden`;
+        momRegEl.textContent = `M08: +${fmtNOK(lastM.actual_nok)} i perioden`;
       }
       const momEacEl = document.getElementById("min-mom-eac");
       if (momEacEl) {
@@ -6907,21 +7044,45 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
           : `Prognosen viser ikke merforbruk mot årsbudsjettet per ${monthLabel} ` +
             `(${fmtNOK(summary.eoy_variance_nok, true)}). Følg utviklingen og kvalitetssikre forutsetningene.`;
 
+      // Render dynamic sparkline micro-chart
+      renderTrendSparkline(report.monthly_trend);
+
       const trendBody = document.getElementById("min-trend-body");
       let prevActual = 0;
+      const maxAllActual = Math.max(...(report.monthly_trend || []).map(r => r.actual_nok), 1);
       trendBody.innerHTML = report.monthly_trend.map((row, idx) => {
         const period = new Date(`${row.period}T12:00:00`);
         const label = new Intl.DateTimeFormat("nb-NO", { month: "short" }).format(period);
         const varianceClass = row.variance_nok > 0 ? "rag-red" : "rag-green";
         const momDiff = idx > 0 ? row.actual_nok - prevActual : 0;
         prevActual = row.actual_nok;
-        const momLabel = idx > 0 ? `${momDiff >= 0 ? '+' : ''}${fmtNOK(momDiff)} kr` : "—";
+        // Fix: fmtNOK already appends 'kr', so avoid double 'kr kr'
+        const momLabel = idx > 0 ? `${momDiff >= 0 ? '+' : ''}${fmtNOK(momDiff)}` : "—";
+
+        // Micro-sparkline up to this month
+        const rowHistory = report.monthly_trend.slice(0, idx + 1);
+        const microW = 60;
+        const microH = 16;
+        const mPts = rowHistory.map((h, hIdx) => {
+          const x = rowHistory.length > 1 ? (hIdx / (rowHistory.length - 1)) * (microW - 10) + 5 : microW / 2;
+          const y = microH - 3 - (h.actual_nok / maxAllActual) * (microH - 6);
+          return `${x.toFixed(1)},${y.toFixed(1)}`;
+        }).join(" ");
+        const lastPt = mPts.split(" ").pop().split(",");
+        const endDotColor = row.variance_nok > 0 ? "#D62728" : "#16A34A";
+        const microSvg = `
+          <svg width="${microW}" height="${microH}" viewBox="0 0 ${microW} ${microH}" style="vertical-align:middle;">
+            <polyline points="${mPts}" fill="none" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="${lastPt[0]}" cy="${lastPt[1]}" r="2.8" fill="${endDotColor}" stroke="#FFFFFF" stroke-width="1"/>
+          </svg>`;
+
         return `<tr>
           <th scope="row">${escapeHtml(label)}</th>
           <td class="num-col">${fmtNOK(row.budget_nok)}</td>
           <td class="num-col">${fmtNOK(row.actual_nok)}</td>
           <td class="num-col ${varianceClass}">${fmtNOK(row.variance_nok, true)}</td>
           <td class="num-col" style="color:var(--text-muted); font-size:0.7rem;">${momLabel}</td>
+          <td style="text-align:center; padding:2px 4px;">${microSvg}</td>
         </tr>`;
       }).join("");
 
@@ -7041,6 +7202,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       ["min-ytd-reg", "min-ytd-bud", "min-ytd-variance", "min-annual-budget", "min-eac", "min-eac-variance", "min-monthly-gap"]
         .forEach(id => { document.getElementById(id).textContent = "—"; });
       document.getElementById("min-trend-body").replaceChildren();
+      renderTrendSparkline([]);
       document.getElementById("min-drivers-body").replaceChildren();
       setMonthlyReportStatus("Data ikke tilgjengelig", true);
       document.getElementById("min-assessment").className = "panel-card rag-card-red";

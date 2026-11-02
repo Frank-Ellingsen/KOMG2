@@ -317,11 +317,41 @@ def run_all_tests():
                     "bestillingsnotat" in doc_preview_enhet.lower() or "avviksforklaring" in doc_preview_enhet.lower() or "NOT-2026" in doc_preview_enhet)
 
         # -------------------------------------------------------------
-        # TEST 8: Modul 12: Min Økonomi & Månedsrapport
+        # TEST 8: Modul 12: Min Økonomi & Månedsrapport (Inkl. Tufte Sparklines)
         # -------------------------------------------------------------
-        print("\n--- TESTBLOKK 8: Min Økonomi & Predefinerte Rapporter ---")
+        print("\n--- TESTBLOKK 8: Min Økonomi & Predefinerte Rapporter (Inkl. Sparkline) ---")
         page.click('.nav-btn[data-target="view-min-okonomi"]')
         page.wait_for_timeout(150)
+
+        # Sjekk dynamisk Tufte sparkline over månedstabellen
+        sparkline_info = page.evaluate('''() => {
+            const box = document.getElementById("min-trend-sparkline-box");
+            const svg = document.querySelector("#min-trend-sparkline-svg-wrap svg");
+            const circles = document.querySelectorAll("#min-trend-sparkline-svg-wrap circle").length;
+            const paths = document.querySelectorAll("#min-trend-sparkline-svg-wrap path").length;
+            const kpiText = document.getElementById("min-trend-sparkline-kpi")?.textContent || "";
+            const tableRows = document.querySelectorAll("#min-trend-body tr").length;
+            const tableMicroSvgs = document.querySelectorAll("#min-trend-body tr svg").length;
+            const tableText = document.getElementById("min-trend-body")?.innerText || "";
+            const hasDoubleKr = tableText.includes("kr kr");
+            return {
+                boxVisible: box && getComputedStyle(box).display !== "none",
+                hasSvg: !!svg,
+                circles,
+                paths,
+                kpiText,
+                tableRows,
+                tableMicroSvgs,
+                hasDoubleKr
+            };
+        }''')
+        record_test("Dynamisk Tufte Sparkline-boks er synlig", bool(sparkline_info["boxVisible"]))
+        record_test("Sparkline SVG inneholder 8 månedspunkter (M01-M08)", sparkline_info["circles"] == 8, f"Sirkler: {sparkline_info['circles']}")
+        record_test("Sparkline SVG inneholder budsjett- og regnskapskurver", sparkline_info["paths"] >= 2, f"Paths: {sparkline_info['paths']}")
+        record_test("Månedstabell har 8 rader med inline micro-sparklines", 
+                    sparkline_info["tableRows"] == 8 and sparkline_info["tableMicroSvgs"] == 8,
+                    f"Rader: {sparkline_info['tableRows']}, MicroSVGs: {sparkline_info['tableMicroSvgs']}")
+        record_test("Fjernet overflødig 'kr kr' i MoM trend-kolonne", not sparkline_info["hasDoubleKr"])
 
         # Test fanevelger
         tabs = page.query_selector_all(".min-tab-btn")
@@ -331,6 +361,9 @@ def run_all_tests():
             page.wait_for_timeout(100)
             flash_visible = page.is_visible("#min-subview-flash")
             record_test("Fane 2 (Flash Ledelsesnotat) vises ved klikk", bool(flash_visible))
+            # Gå tilbake til første fane for eventuelle videre tester
+            tabs[0].click()
+            page.wait_for_timeout(100)
 
         # -------------------------------------------------------------
         # TEST 9: Nullstill Filter test
