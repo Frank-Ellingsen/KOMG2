@@ -1201,7 +1201,7 @@
           🎛️ PIPELINE: ONLINE (5/5 STEG OK)
         </button>
         <span class="status-badge status-err" id="header-status-pill">🔴 KRITISK AVVIK (-2 229 614 kr)</span>
-        <span class="status-badge status-ok">06_CHECKS: Diff = 0,00 kr</span>
+        <span class="status-badge status-ok" id="header-checks-pill">06_CHECKS: Diff = 0,00 kr</span>
       </div>
     </header>
 
@@ -1635,35 +1635,35 @@
 
         <!-- 6 Rounded KPI Cards (mirrors 01_DASHBOARD & app.py) -->
         <div class="kpi-grid">
-          <div class="kpi-card">
-            <span class="kpi-label">Totalt Budsjett (CUBE)</span>
+          <div class="kpi-card" id="kpi-card-bud">
+            <span class="kpi-label" id="kpi-bud-label">Totalt Budsjett (CUBE)</span>
             <span class="kpi-value col-budget" id="kpi-bud">29 295 237 kr</span>
-            <span class="kpi-sub">Rapporteringsår: 2024</span>
+            <span class="kpi-sub" id="kpi-bud-sub">Rapporteringsår: 2024</span>
           </div>
-          <div class="kpi-card">
-            <span class="kpi-label">Bokført Regnskap (CUBE)</span>
+          <div class="kpi-card" id="kpi-card-reg">
+            <span class="kpi-label" id="kpi-reg-label">Bokført Regnskap (CUBE)</span>
             <span class="kpi-value col-regnskap" id="kpi-reg">31 524 851 kr</span>
             <span class="kpi-sub" id="kpi-r3m">Rullende 3M snitt: 3 734 353 kr</span>
           </div>
-          <div class="kpi-card">
+          <div class="kpi-card" id="kpi-card-avvik">
             <span class="kpi-label">Netto Budsjettavvik</span>
             <span class="kpi-value" id="kpi-avvik" style="color: var(--clr-err-text);">-2 229 614 kr</span>
             <span class="kpi-sub" id="kpi-avvik-pct">Relativt avvik: -7,6 %</span>
           </div>
-          <div class="kpi-card">
+          <div class="kpi-card" id="kpi-card-burn">
             <span class="kpi-label">Forbruksrate (Burn Rate)</span>
             <span class="kpi-value" id="kpi-burn">107,6 %</span>
             <span class="kpi-sub">Kritisk terskel: 125,0 %</span>
           </div>
-          <div class="kpi-card">
+          <div class="kpi-card" id="kpi-card-eac">
             <span class="kpi-label">Fullårsprognose (EAC 2024)</span>
             <span class="kpi-value" id="kpi-eac">47 252 826 kr</span>
             <span class="kpi-sub" id="kpi-eac-avvik">Forventet årsavvik: -3 309 971 kr</span>
           </div>
-          <div class="kpi-card">
+          <div class="kpi-card" id="kpi-card-alerts">
             <span class="kpi-label">Kritiske Funksjoner / Advarsler</span>
             <span class="kpi-value" id="kpi-alerts">3 Kritiske / 1 Advarsel</span>
-            <span class="kpi-sub">Av 10 aktive KOSTRA-funksjoner</span>
+            <span class="kpi-sub" id="kpi-alerts-sub">Av 10 aktive KOSTRA-funksjoner</span>
           </div>
         </div>
 
@@ -1671,7 +1671,7 @@
         <div class="grid-2col">
           <div class="panel-card">
             <div class="panel-title">
-              <span>1. Bullet Chart: Forbruksrate (Burn Rate %) vs. Budsjettmål (100 %)</span>
+              <span id="bullet-chart-title">1. Bullet Chart: Forbruksrate (Burn Rate %) vs. Budsjettmål (100 %)</span>
               <span class="panel-subtitle">Sort linje = 100 % ramme | Rød = Overforbruk</span>
             </div>
             <div class="tufte-bar-list" id="bullet-chart-container"></div>
@@ -1823,7 +1823,7 @@
             <span class="kpi-value col-regnskap" id="ts-eoy-eac">47 252 826 kr</span>
             <span class="kpi-sub col-budget" id="kpi-eoy-bud">Vedtatt helårsbudsjett: 43 942 856 kr</span>
           </div>
-          <div class="kpi-card">
+          <div class="kpi-card" id="kpi-card-eoy-diff">
             <span class="kpi-label">Forventet Årsavvik (31.12)</span>
             <span class="kpi-value" id="ts-eoy-diff" style="color: var(--clr-err-text);">-3 309 971 kr</span>
             <span class="kpi-sub" id="ts-eoy-pct">Forventet Burn Rate: 107,5 %</span>
@@ -2166,18 +2166,18 @@
             <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
               <div class="kpi-card" style="background: var(--clr-ok-bg);">
                 <span class="kpi-label" style="color: var(--clr-ok-text);">🟢 Status 0: I RUTE</span>
-                <span class="kpi-value" style="color: var(--clr-ok-text);">1 642</span>
-                <span class="kpi-sub" style="color: var(--clr-ok-text);">72,8 % av kontolinjer</span>
+                <span class="kpi-value" id="dt-s0-val" style="color: var(--clr-ok-text);">1 642</span>
+                <span class="kpi-sub" id="dt-s0-sub" style="color: var(--clr-ok-text);">72,8 % av kontolinjer</span>
               </div>
               <div class="kpi-card" style="background: var(--clr-warn-bg);">
                 <span class="kpi-label" style="color: var(--clr-warn-text);">🟡 Status 1: ADVARSEL</span>
-                <span class="kpi-value" style="color: var(--clr-warn-text);">398</span>
-                <span class="kpi-sub" style="color: var(--clr-warn-text);">17,6 % av kontolinjer</span>
+                <span class="kpi-value" id="dt-s1-val" style="color: var(--clr-warn-text);">398</span>
+                <span class="kpi-sub" id="dt-s1-sub" style="color: var(--clr-warn-text);">17,6 % av kontolinjer</span>
               </div>
               <div class="kpi-card" style="background: var(--clr-err-bg);">
                 <span class="kpi-label" style="color: var(--clr-err-text);">🔴 Status 2: KRITISK</span>
-                <span class="kpi-value" style="color: var(--clr-err-text);">216</span>
-                <span class="kpi-sub" style="color: var(--clr-err-text);">9,6 % av kontolinjer</span>
+                <span class="kpi-value" id="dt-s2-val" style="color: var(--clr-err-text);">216</span>
+                <span class="kpi-sub" id="dt-s2-sub" style="color: var(--clr-err-text);">9,6 % av kontolinjer</span>
               </div>
             </div>
             <pre style="background: var(--bg-subtle); padding: 0.75rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.76rem; color: var(--header-dark); overflow-x: auto; border: 1px solid var(--border-light);">|--- burn_rate_pct &lt;= 110.00
@@ -2237,7 +2237,7 @@
                 <th>Klyngeprofil</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="anomaly-table-body">
               <tr>
                 <th>2024_08</th>
                 <td>2540 - Helse- og omsorgstjenester i institusjon</td>
@@ -3916,7 +3916,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
                 <th>Status</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="checks-table-body">
               <tr>
                 <th>CHK_01</th>
                 <td>Data Model [Sum Budsjett] vs. Faktatabell SUM(ytd_budsjett_nok)</td>
@@ -5179,20 +5179,23 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         el.style.color = ytdRagKey === "red" ? "var(--clr-err-text)" : (ytdRagKey === "amber" ? "var(--clr-warn-text)" : "var(--clr-ok-text)");
       }
 
-      if (document.getElementById("kpi-etc-q4")) document.getElementById("kpi-etc-q4").textContent = fmtNOK(totQ4Etc);
+      const elEtcQ4 = document.getElementById("ts-q4-etc") || document.getElementById("kpi-etc-q4");
+      if (elEtcQ4) elEtcQ4.textContent = fmtNOK(totQ4Etc);
       if (document.getElementById("kpi-etc-q4-sub")) document.getElementById("kpi-etc-q4-sub").textContent = `Budsjett Q4: ${fmtNOK(totQ4Bud)} | Avvik: ${fmtNOK(totQ4Bud - totQ4Etc, true)}`;
       const etcAvvikVal = totQ4Bud - totQ4Etc;
       setKpiCardRag("kpi-card-etc-q4", etcAvvikVal < -100000 ? "red" : (etcAvvikVal < 0 ? "amber" : "green"));
 
-      if (document.getElementById("kpi-eac-m2")) document.getElementById("kpi-eac-m2").textContent = fmtNOK(eoyEac);
+      const elEacM2 = document.getElementById("ts-eoy-eac") || document.getElementById("kpi-eac-m2");
+      if (elEacM2) elEacM2.textContent = fmtNOK(eoyEac);
       if (document.getElementById("kpi-eoy-bud")) document.getElementById("kpi-eoy-bud").textContent = `Vedtatt helårsbudsjett: ${fmtNOK(eoyBud)}`;
       setKpiCardRag("kpi-card-eac-m2", eoyRagKey);
 
-      const elEoyAvvik = document.getElementById("kpi-eoy-avvik");
+      const elEoyAvvik = document.getElementById("ts-eoy-diff") || document.getElementById("kpi-eoy-avvik");
       if (elEoyAvvik) {
         elEoyAvvik.textContent = fmtNOK(eoyAvvik, true);
         elEoyAvvik.style.color = eoyRagKey === "red" ? "var(--clr-err-text)" : (eoyRagKey === "amber" ? "var(--clr-warn-text)" : "var(--clr-ok-text)");
       }
+      setKpiCardRag("kpi-card-eoy-diff", eoyRagKey);
       setKpiCardRag("kpi-card-eoy-avvik-m2", eoyRagKey);
       if (document.getElementById("ts-eoy-pct")) {
         const burnRateEoy = eoyBud > 0 ? (eoyEac / eoyBud) * 100 : 0;
