@@ -75,11 +75,10 @@ For at applikasjonen skal være 100 % intuitiv og handlingsrettet for alle kommu
 
 ### 📊 Rom 2: «Budsjett & Simulering» (For Økonomirådgivere & Controllere)
 * **Målgruppe:** Økonomirådgivere, økonomisjefer og prosjektcontrollere.
-* **Formål:** Modellere helårsprognosen (EOY), kjøre preskriptive simuleringer, overvåke prosjekt-S-kurver (EVM) og eksportere til Framsikt.
+* **Formål:** Modellere helårsprognosen (EOY), kjøre preskriptive simuleringer og eksportere til Framsikt.
 * **Kjernekomponenter:**
   * **Prognoseveien (EAC):** Interaktiv kurve over forventet årsresultat ved årets slutt.
   * **Budsjettsimulator («Hva skjer hvis...»):** Test ansettelsesstopp (1–6 mnd), vikar- og overtidsstopp i sanntid.
-  * **Prosjektcontrolling & EVM (Umoe Mandal standard):** Earned Value Management, Tufte S-kurver (PV/EV/AC/EAC), CPI/SPI og WBS-fremdriftskontroll.
   * **Framsikt 1-Klikks Eksport:** Genererer `framsikt_budsjettendringer_eoy.xlsx` med 0,00 kr feilmargin.
 
 ### 🛒 Rom 3: «Innkjøp, Avtaler & Tilskudd» (For Fagansvarlige & Saksbehandlere)
@@ -176,7 +175,6 @@ Applikasjonen (`index.html`) er bygget som en lynrask, offline-first Single Page
 | **13** | **🏛️ Søknader & Tilskudd** | Inbound statlige tilskudd (IMDi, Helsedir, Klimasats) og outbound kommunale tildelinger med 4-trinns utbetalingskontroll. |
 | **14** | **⚙️ Modelready Datagrunnlag** | Innsyn i `modelready_fact` og FAST-standardens `06_CHECKS` (11 avstemmingskontroller med Diff = 0,00 kr). |
 | **15** | **🎛️ Cockpit & Pipeline Kontroll** | Orkestreringspanel for datastrømmen med live batch-terminal og uforanderlig revisjonslogg. |
-| **16** | **🚢 Prosjektcontrolling & EVM** | ANSI/EIA-748 Earned Value Management for maritim/forsvar (Umoe Mandal SES P-40102, Kystvakt P-30240, VAR K-10800), Tufte S-kurver (PV/EV/AC/EAC), CPI/SPI, WBS nivå 2 og VOR endringshåndtering. |
 
 ---
 
@@ -420,7 +418,7 @@ Tjenester som starter:
 ## 🧪 Verifikasjon & Tester
 
 ### 1. Full E2E Nettlesertest (Playwright E2E Testsuite)
-Kjør den fullstendige, automatiserte nettlesertesten som verifiserer samtlige 16 moduler, dynamisk filterkaskadering, EDA FT Visuals, EVM Prosjektcontrolling (S-kurver, CPI/SPI, WBS), lønnsbudsjett (KOSTRA arter & årsverk), Recommender, Årshjul og feilfri konsoll:
+Kjør den fullstendige, automatiserte nettlesertesten som verifiserer samtlige 16 moduler, dynamisk filterkaskadering, EDA FT Visuals, lønnsbudsjett (KOSTRA arter & årsverk), Recommender, Årshjul og feilfri konsoll:
 ```powershell
 python test_full_suite.py
 ```
