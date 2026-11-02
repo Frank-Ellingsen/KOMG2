@@ -1365,17 +1365,13 @@
         <div class="field-group">
           <label for="flt-funksjon" style="font-size:0.71rem; font-weight:700;">📂 KOSTRA-Funksjon</label>
           <select id="flt-funksjon" style="width:100%; padding:0.32rem; font-size:0.76rem;">
-            <option value="ALL">Alle KOSTRA-Funksjoner (10)</option>
+            <option value="ALL">Alle KOSTRA-Funksjoner (6)</option>
             <option value="202">202 - Grunnskoleopplæring</option>
             <option value="254">254 - Helse- og omsorgstjenester i institusjon</option>
             <option value="214">214 - Skolefritidstilbud (SFO)</option>
             <option value="221">221 - PPT</option>
             <option value="213">213 - Voksenopplæring</option>
-            <option value="215">215 - Skolestatistikk og fellesoppgaver</option>
-            <option value="241">241 - Helse- og omsorgstjenester i hjemmet</option>
-            <option value="253">253 - Forebyggende helsetjenester</option>
-            <option value="261">261 - Sosiale tjenester og tiltak for voksne</option>
-            <option value="265">265 - Kommunalt disponerte boliger</option>
+            <option value="223">223 - Skoleskyss</option>
           </select>
         </div>
         <div class="field-group">
@@ -1735,28 +1731,28 @@
               <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:0.75rem; margin-bottom:0.75rem;">
                 <div class="kpi-card">
                   <span class="kpi-label">Samlet YTD Regnskap</span>
-                  <span class="kpi-value col-regnskap">31 524 851 kr</span>
-                  <span class="kpi-sub">Kommune totalt (alle 9 enheter)</span>
+                  <span class="kpi-value col-regnskap" id="flash-kpi-reg">31 524 851 kr</span>
+                  <span class="kpi-sub" id="flash-kpi-reg-sub">Kommune totalt (alle 9 enheter)</span>
                 </div>
                 <div class="kpi-card">
                   <span class="kpi-label">Samlet YTD Budsjett</span>
-                  <span class="kpi-value col-budget">29 295 237 kr</span>
-                  <span class="kpi-sub">Periodisert ramme</span>
+                  <span class="kpi-value col-budget" id="flash-kpi-bud">29 295 237 kr</span>
+                  <span class="kpi-sub" id="flash-kpi-bud-sub">Periodisert ramme</span>
                 </div>
-                <div class="kpi-card rag-card-red">
+                <div class="kpi-card rag-card-red" id="flash-card-avvik">
                   <span class="kpi-label">Samlet Netto Merforbruk</span>
-                  <span class="kpi-value rag-red">+2 229 614 kr</span>
-                  <span class="kpi-sub">+7,6 % avvik hittil i år</span>
+                  <span class="kpi-value rag-red" id="flash-kpi-avvik">+2 229 614 kr</span>
+                  <span class="kpi-sub" id="flash-kpi-avvik-sub">+7,6 % avvik hittil i år</span>
                 </div>
-                <div class="kpi-card rag-card-red">
+                <div class="kpi-card rag-card-red" id="flash-card-eoy">
                   <span class="kpi-label">Estimert EOY Fondsbelastning</span>
-                  <span class="kpi-value rag-red">-3 344 421 kr</span>
-                  <span class="kpi-sub">Påkrevd trekk på disposisjonsfond</span>
+                  <span class="kpi-value rag-red" id="flash-kpi-eoy">-3 344 421 kr</span>
+                  <span class="kpi-sub" id="flash-kpi-eoy-sub">Påkrevd trekk på disposisjonsfond</span>
                 </div>
               </div>
 
-              <h4 style="font-size:0.82rem; font-weight:700; color:var(--text-primary); margin-bottom:0.4rem;">
-                🚨 Topp 5 Risikoenheter (Bidrar til 89 % av samlet merforbruk):
+              <h4 style="font-size:0.82rem; font-weight:700; color:var(--text-primary); margin-bottom:0.4rem;" id="flash-risiko-header">
+                🚨 Risikoenheter i aktivt utvalg:
               </h4>
               <table class="styled-table" style="width:100%; font-size:0.75rem; margin-bottom:0.75rem;">
                 <thead>
@@ -1764,12 +1760,8 @@
                     <th>Rang</th><th>Enhetsnavn</th><th>Sektor</th><th style="text-align:right;">YTD Regnskap</th><th style="text-align:right;">YTD Avvik</th><th style="text-align:right;">Burn Rate</th><th style="text-align:center;">Lovhjemmel</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="flash-risiko-tbody">
                   <tr><td>#1</td><td><strong>25310 - Omsorgssenter / Sykehjem A</strong></td><td>Helse og Omsorg</td><td style="text-align:right; font-family:var(--font-mono);">3 534 398 kr</td><td style="text-align:right; font-family:var(--font-mono); color:var(--clr-highlight-red); font-weight:700;">+359 972 kr</td><td style="text-align:right; font-family:var(--font-mono);">111,3 %</td><td style="text-align:center;"><span class="rag-badge rag-red">§ 14-6 Bystyresak</span></td></tr>
-                  <tr><td>#2</td><td><strong>20210 - Grunnskole A (1–10 trinn)</strong></td><td>Oppvekst og Utdanning</td><td style="text-align:right; font-family:var(--font-mono);">5 499 740 kr</td><td style="text-align:right; font-family:var(--font-mono); color:var(--clr-highlight-red); font-weight:700;">+324 140 kr</td><td style="text-align:right; font-family:var(--font-mono);">106,3 %</td><td style="text-align:center;"><span class="rag-badge rag-amber">§ 13-1 Strakstiltak</span></td></tr>
-                  <tr><td>#3</td><td><strong>25710 - Hjemmetjenesten Sone Nord</strong></td><td>Helse og Omsorg</td><td style="text-align:right; font-family:var(--font-mono);">3 155 713 kr</td><td style="text-align:right; font-family:var(--font-mono); color:var(--clr-highlight-red); font-weight:700;">+321 404 kr</td><td style="text-align:right; font-family:var(--font-mono);">111,3 %</td><td style="text-align:center;"><span class="rag-badge rag-red">§ 14-6 Bystyresak</span></td></tr>
-                  <tr><td>#4</td><td><strong>25720 - Hjemmetjenesten Sone Sør</strong></td><td>Helse og Omsorg</td><td style="text-align:right; font-family:var(--font-mono);">3 155 713 kr</td><td style="text-align:right; font-family:var(--font-mono); color:var(--clr-highlight-red); font-weight:700;">+321 403 kr</td><td style="text-align:right; font-family:var(--font-mono);">111,3 %</td><td style="text-align:center;"><span class="rag-badge rag-red">§ 14-6 Bystyresak</span></td></tr>
-                  <tr><td>#5</td><td><strong>20220 - Grunnskole B (1–10 trinn)</strong></td><td>Oppvekst og Utdanning</td><td style="text-align:right; font-family:var(--font-mono);">4 920 820 kr</td><td style="text-align:right; font-family:var(--font-mono); color:var(--clr-highlight-red); font-weight:700;">+290 020 kr</td><td style="text-align:right; font-family:var(--font-mono);">106,3 %</td><td style="text-align:center;"><span class="rag-badge rag-amber">§ 13-1 Strakstiltak</span></td></tr>
                 </tbody>
               </table>
               <div style="background:var(--bg-canvas); padding:0.6rem; border-left:3px solid var(--clr-highlight-red); font-size:0.75rem;">
@@ -1981,17 +1973,13 @@
           <div class="field-group">
             <label for="ts-flt-funksjon" style="font-weight:700; color:var(--text-primary); font-size:0.75rem;">📂 KOSTRA-Funksjon:</label>
             <select id="ts-flt-funksjon" style="width:100%; padding:0.32rem;">
-              <option value="ALL">Alle KOSTRA-Funksjoner (10)</option>
-              <option value="202">202 - Grunnskoleopplæring</option>
+              <option value="ALL">Alle KOSTRA-Funksjoner (6)</option>
               <option value="254">254 - Helse- og omsorgstjenester i institusjon</option>
+              <option value="202">202 - Grunnskoleopplæring</option>
               <option value="214">214 - Skolefritidstilbud (SFO)</option>
               <option value="221">221 - PPT</option>
-              <option value="213">213 - Voksenopplæring</option>
-              <option value="215">215 - Skolestatistikk og fellesoppgaver</option>
-              <option value="241">241 - Helse- og omsorgstjenester i hjemmet</option>
-              <option value="253">253 - Forebyggende helsetjenester</option>
-              <option value="261">261 - Sosiale tjenester og tiltak for voksne</option>
-              <option value="265">265 - Kommunalt disponerte boliger</option>
+              <option value="213">213 - Voksenopplæring og leirskole</option>
+              <option value="223">223 - Skoleskyss grunnskole</option>
             </select>
           </div>
           <div class="field-group">
@@ -4702,18 +4690,18 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
     const KOSTRA_FUNCTIONS = [
       {
-        code: "202", name: "202 - Grunnskoleopplæring", sektor: "Oppvekst og Utdanning", rowsPerMonth: 112,
-        bud: 13620000, reg: 14473000, eac: 22092527, eac_avvik: -1662527,
-        mBud: [1702460, 1702460, 1702460, 1702460, 1702460, 1702460, 1702460, 1702780],
-        mReg: [1809120, 1809120, 1809120, 1809120, 1809120, 1809120, 1809120, 1809160],
-        mS0: [91,91,91,91,91,91,91,91], mS1: [7,7,7,7,7,7,7,6], mS2: [14,14,14,14,14,14,14,15]
-      },
-      {
         code: "254", name: "254 - Helse- og omsorgstjenester i institusjon", sektor: "Helse og Omsorg", rowsPerMonth: 88,
         bud: 11337237, reg: 12622851, eac: 18399351, eac_avvik: -1393496,
         mBud: [1403337, 1410893, 1342381, 2357359, 1544215, 241681, 1512209, 1525162],
         mReg: [1014752, 2082090, 1541249, 2256716, 1613437, 519336, 1837523, 1757750],
         mS0: [83,73,81,78,81,79,78,83], mS1: [1,4,1,2,3,2,4,0], mS2: [4,11,6,8,4,7,6,5]
+      },
+      {
+        code: "202", name: "202 - Grunnskoleopplæring", sektor: "Oppvekst og Utdanning", rowsPerMonth: 112,
+        bud: 13620000, reg: 14473000, eac: 22092527, eac_avvik: -1662527,
+        mBud: [1702460, 1702460, 1702460, 1702460, 1702460, 1702460, 1702460, 1702780],
+        mReg: [1809120, 1809120, 1809120, 1809120, 1809120, 1809120, 1809120, 1809160],
+        mS0: [91,91,91,91,91,91,91,91], mS1: [7,7,7,7,7,7,7,6], mS2: [14,14,14,14,14,14,14,15]
       },
       {
         code: "214", name: "214 - Skolefritidstilbud (SFO)", sektor: "Oppvekst og Utdanning", rowsPerMonth: 35,
@@ -4730,58 +4718,30 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         mS0: [24,24,24,24,24,24,24,24], mS1: [3,3,3,3,3,3,3,3], mS2: [1,1,1,1,1,1,1,1]
       },
       {
-        code: "213", name: "213 - Voksenopplæring", sektor: "Oppvekst og Utdanning", rowsPerMonth: 20,
-        bud: 490960, reg: 490960, eac: 749380, eac_avvik: 0,
-        mBud: [61370, 61370, 61370, 61370, 61370, 61370, 61370, 61370],
-        mReg: [61370, 61370, 61370, 61370, 61370, 61370, 61370, 61370],
+        code: "213", name: "213 - Voksenopplæring og leirskole", sektor: "Oppvekst og Utdanning", rowsPerMonth: 20,
+        bud: 513000, reg: 491000, eac: 749380, eac_avvik: 22000,
+        mBud: [64125, 64125, 64125, 64125, 64125, 64125, 64125, 64125],
+        mReg: [61375, 61375, 61375, 61375, 61375, 61375, 61375, 61375],
         mS0: [20,20,20,20,20,20,20,20], mS1: [0,0,0,0,0,0,0,0], mS2: [0,0,0,0,0,0,0,0]
       },
       {
-        code: "215", name: "215 - Skolestatistikk og fellesoppgaver", sektor: "Oppvekst og Utdanning", rowsPerMonth: 8,
-        bud: 180000, reg: 150000, eac: 228960, eac_avvik: 41040,
-        mBud: [22500, 22500, 22500, 22500, 22500, 22500, 22500, 22500],
-        mReg: [18750, 18750, 18750, 18750, 18750, 18750, 18750, 18750],
+        code: "223", name: "223 - Skoleskyss grunnskole", sektor: "Oppvekst og Utdanning", rowsPerMonth: 8,
+        bud: 516000, reg: 469000, eac: 715900, eac_avvik: 47000,
+        mBud: [64500, 64500, 64500, 64500, 64500, 64500, 64500, 64500],
+        mReg: [58625, 58625, 58625, 58625, 58625, 58625, 58625, 58625],
         mS0: [8,8,8,8,8,8,8,8], mS1: [0,0,0,0,0,0,0,0], mS2: [0,0,0,0,0,0,0,0]
-      },
-      {
-        code: "241", name: "241 - Helse- og omsorgstjenester i hjemmet", sektor: "Helse og Omsorg", rowsPerMonth: 15,
-        bud: 230000, reg: 215000, eac: 328170, eac_avvik: 16830,
-        mBud: [28750, 28750, 28750, 28750, 28750, 28750, 28750, 28750],
-        mReg: [26875, 26875, 26875, 26875, 26875, 26875, 26875, 26875],
-        mS0: [15,15,15,15,15,15,15,15], mS1: [0,0,0,0,0,0,0,0], mS2: [0,0,0,0,0,0,0,0]
-      },
-      {
-        code: "253", name: "253 - Forebyggende helsetjenester", sektor: "Helse og Omsorg", rowsPerMonth: 12,
-        bud: 150000, reg: 140000, eac: 213690, eac_avvik: 11310,
-        mBud: [18750, 18750, 18750, 18750, 18750, 18750, 18750, 18750],
-        mReg: [17500, 17500, 17500, 17500, 17500, 17500, 17500, 17500],
-        mS0: [12,12,12,12,12,12,12,12], mS1: [0,0,0,0,0,0,0,0], mS2: [0,0,0,0,0,0,0,0]
-      },
-      {
-        code: "261", name: "261 - Sosiale tjenester og tiltak for voksne", sektor: "Helse og Omsorg", rowsPerMonth: 9,
-        bud: 120000, reg: 110000, eac: 167890, eac_avvik: 12110,
-        mBud: [15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000],
-        mReg: [13750, 13750, 13750, 13750, 13750, 13750, 13750, 13750],
-        mS0: [9,9,9,9,9,9,9,9], mS1: [0,0,0,0,0,0,0,0], mS2: [0,0,0,0,0,0,0,0]
-      },
-      {
-        code: "265", name: "265 - Kommunalt disponerte boliger", sektor: "Helse og Omsorg", rowsPerMonth: 6,
-        bud: 80000, reg: 75000, eac: 114420, eac_avvik: 5580,
-        mBud: [10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000],
-        mReg: [9375, 9375, 9375, 9375, 9375, 9375, 9375, 9375],
-        mS0: [6,6,6,6,6,6,6,6], mS1: [0,0,0,0,0,0,0,0], mS2: [0,0,0,0,0,0,0,0]
       }
     ];
 
     const MONTHLY_SERIES = [
-      { code: "2024_01", label: "M01 (Jan)", bud: 3666042, reg: 3438317, seasonIdx: 0.92 },
-      { code: "2024_02", label: "M02 (Feb)", bud: 3673598, reg: 4505655, seasonIdx: 0.95 },
-      { code: "2024_03", label: "M03 (Mar)", bud: 3605086, reg: 3964814, seasonIdx: 0.98 },
-      { code: "2024_04", label: "M04 (Apr)", bud: 4620064, reg: 4680281, seasonIdx: 1.00 },
-      { code: "2024_05", label: "M05 (Mai)", bud: 3806920, reg: 4037002, seasonIdx: 1.02 },
-      { code: "2024_06", label: "M06 (Jun)", bud: 2504386, reg: 2942901, seasonIdx: 0.88 },
-      { code: "2024_07", label: "M07 (Jul)", bud: 3774914, reg: 4261088, seasonIdx: 1.08 },
-      { code: "2024_08", label: "M08 (Aug)", bud: 3788227, reg: 4181318, seasonIdx: 1.15 }
+      { code: "2024_01", label: "M01 (Jan)", bud: 3648057, reg: 3377462, seasonIdx: 0.92 },
+      { code: "2024_02", label: "M02 (Feb)", bud: 3655613, reg: 4444800, seasonIdx: 0.95 },
+      { code: "2024_03", label: "M03 (Mar)", bud: 3587101, reg: 3903959, seasonIdx: 0.98 },
+      { code: "2024_04", label: "M04 (Apr)", bud: 4602079, reg: 4619426, seasonIdx: 1.00 },
+      { code: "2024_05", label: "M05 (Mai)", bud: 3788935, reg: 3976147, seasonIdx: 1.02 },
+      { code: "2024_06", label: "M06 (Jun)", bud: 2486401, reg: 2882046, seasonIdx: 0.88 },
+      { code: "2024_07", label: "M07 (Jul)", bud: 3756929, reg: 4200233, seasonIdx: 1.08 },
+      { code: "2024_08", label: "M08 (Aug)", bud: 3770122, reg: 4120780, seasonIdx: 1.15 }
     ];
 
     const ANSVAR_UNITS = {
@@ -7228,8 +7188,67 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         "Velg et annet ansvarssted eller start FastAPI lokalt med .\\start_web_cockpit.ps1.";
     }
 
+        function renderFlashReport(ctx) {
+      if (!ctx) ctx = getFilteredContext();
+      const { sektor, ansvar } = ctx;
+
+      const unitEntries = Object.entries(ANSVAR_UNITS).filter(([code, u]) => {
+        if (code === "ALL") return false;
+        if (sektor !== "ALL" && u.sektor !== sektor) return false;
+        if (ansvar !== "ALL" && code !== ansvar) return false;
+        return true;
+      });
+
+      const totReg = unitEntries.reduce((s, [, u]) => s + u.ytdReg, 0);
+      const totBud = unitEntries.reduce((s, [, u]) => s + u.ytdBud, 0);
+      const totAvvik = totReg - totBud;
+      const avvikPct = totBud > 0 ? (totAvvik / totBud) * 100 : 0;
+      const eoyFondsbelastning = Math.round(totAvvik * 1.5);
+
+      const regEl = document.getElementById("flash-kpi-reg");
+      const regSub = document.getElementById("flash-kpi-reg-sub");
+      const budEl = document.getElementById("flash-kpi-bud");
+      const avvikEl = document.getElementById("flash-kpi-avvik");
+      const avvikSub = document.getElementById("flash-kpi-avvik-sub");
+      const eoyEl = document.getElementById("flash-kpi-eoy");
+      const hdrEl = document.getElementById("flash-risiko-header");
+      const tbody = document.getElementById("flash-risiko-tbody");
+
+      if (regEl) regEl.textContent = fmtNOK(totReg);
+      if (regSub) regSub.textContent = sektor === "ALL" ? "Kommune totalt (alle 9 enheter)" : `${sektor} (${unitEntries.length} enheter)`;
+      if (budEl) budEl.textContent = fmtNOK(totBud);
+      if (avvikEl) {
+        avvikEl.textContent = `${totAvvik >= 0 ? '+' : ''}${fmtNOK(totAvvik)}`;
+        avvikEl.className = totAvvik > 0 ? "kpi-value rag-red" : "kpi-value rag-green";
+      }
+      if (avvikSub) avvikSub.textContent = `${avvikPct >= 0 ? '+' : ''}${avvikPct.toFixed(1).replace(".", ",")} % avvik hittil i år`;
+      if (eoyEl) eoyEl.textContent = `-${fmtNOK(eoyFondsbelastning)}`;
+      if (hdrEl) hdrEl.textContent = `🚨 Risikoenheter i ${sektor === "ALL" ? "kommunen" : sektor} (${unitEntries.length} enheter):`;
+
+      if (tbody) {
+        const sorted = [...unitEntries].sort((a, b) => (b[1].ytdReg - b[1].ytdBud) - (a[1].ytdReg - a[1].ytdBud));
+        tbody.innerHTML = sorted.map(([code, u], idx) => {
+          const uAvvik = u.ytdReg - u.ytdBud;
+          const uBurn = u.ytdBud > 0 ? (u.ytdReg / u.ytdBud) * 100 : 100;
+          const isRed = uAvvik > 250000 || uBurn > 110;
+          const hjemmel = isRed ? "§ 14-6 Bystyresak" : "§ 13-1 Strakstiltak";
+          const badgeCls = isRed ? "rag-red" : "rag-amber";
+          return `<tr>
+            <td>#${idx + 1}</td>
+            <td><strong>${u.name}</strong></td>
+            <td>${u.sektor}</td>
+            <td style="text-align:right; font-family:var(--font-mono);">${fmtNOK(u.ytdReg)}</td>
+            <td style="text-align:right; font-family:var(--font-mono); color:${uAvvik > 0 ? 'var(--clr-highlight-red)' : 'var(--clr-ok-text)'}; font-weight:700;">${uAvvik >= 0 ? '+' : ''}${fmtNOK(uAvvik)}</td>
+            <td style="text-align:right; font-family:var(--font-mono);">${uBurn.toFixed(1).replace(".", ",")}&nbsp;%</td>
+            <td style="text-align:center;"><span class="rag-badge ${badgeCls}">${hjemmel}</span></td>
+          </tr>`;
+        }).join("");
+      }
+    }
+
     function renderAllDynamicReports() {
       const ctx = getFilteredContext();
+      renderFlashReport(ctx);
       renderModule1(ctx);
       renderModule2(ctx);
       renderModule3(ctx);
@@ -8763,6 +8782,7 @@ function renderSalaryBudgetModule(ctx) {
             if (flashView) flashView.style.display = "block";
             if (exceptionView) exceptionView.style.display = "none";
             if (filterContainer) filterContainer.style.display = "none";
+            renderFlashReport(getFilteredContext());
           } else if (tab === "exception") {
             if (unitView) unitView.style.display = "none";
             if (flashView) flashView.style.display = "none";
