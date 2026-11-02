@@ -112,6 +112,7 @@ Applikasjonen (`index.html`) er bygget som en lynrask, offline-first Single Page
 | **13** | **🏛️ Søknader & Tilskudd** | Inbound statlige tilskudd (IMDi, Helsedir, Klimasats) og outbound kommunale tildelinger med 4-trinns utbetalingskontroll. |
 | **14** | **⚙️ Modelready Datagrunnlag** | Innsyn i `modelready_fact` og FAST-standardens `06_CHECKS` (11 avstemmingskontroller med Diff = 0,00 kr). |
 | **15** | **🎛️ Cockpit & Pipeline Kontroll** | Orkestreringspanel for datastrømmen med live batch-terminal og uforanderlig revisjonslogg. |
+| **16** | **🚢 Prosjektcontrolling & EVM** | ANSI/EIA-748 Earned Value Management for maritim/forsvar (Umoe Mandal SES P-40102, Kystvakt P-30240, VAR K-10800), Tufte S-kurver (PV/EV/AC/EAC), CPI/SPI, WBS nivå 2 og VOR endringshåndtering. |
 
 ---
 
@@ -355,11 +356,11 @@ Tjenester som starter:
 ## 🧪 Verifikasjon & Tester
 
 ### 1. Full E2E Nettlesertest (Playwright E2E Testsuite)
-Kjør den fullstendige, automatiserte nettlesertesten som verifiserer samtlige moduler, dynamisk filterkaskadering, EDA FT Visuals, lønnsbudsjett (KOSTRA arter & årsverk), Recommender, Årshjul og feilfri konsoll:
+Kjør den fullstendige, automatiserte nettlesertesten som verifiserer samtlige 16 moduler, dynamisk filterkaskadering, EDA FT Visuals, EVM Prosjektcontrolling (S-kurver, CPI/SPI, WBS), lønnsbudsjett (KOSTRA arter & årsverk), Recommender, Årshjul og feilfri konsoll:
 ```powershell
 python test_full_suite.py
 ```
-*Forventet resultat: `41 av 41 tester bestått (100.0 %) — Null console.error, null JavaScript runtime exceptions`.*
+*Forventet resultat: `50 av 50 tester bestått (100.0 %) — Null console.error, null JavaScript runtime exceptions`.*
 
 ### 2. FastAPI Backend REST Testsuite
 Kjør den automatiserte enhetstesten for å verifisere at samtlige 10 REST-endepunkter fungerer:

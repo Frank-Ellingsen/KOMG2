@@ -132,3 +132,89 @@ RETURN
 "📅 År: " & Valgt_Ar & UNICHAR(10) &
 "📆 Måned: " & Valgt_Maned & UNICHAR(10) &
 "🏛️ KOSTRA-funksjon: " & Valgt_Funksjon
+
+
+// =========================================================================
+// 4. EVM & PROSJEKTCONTROLLING (ANSI/EIA-748 STANDARD FOR MARITIM & FORSVAR)
+// =========================================================================
+
+// 4.1 Budget at Completion (Total vedtatt prosjektramme)
+EVM_BAC =
+CALCULATE(
+    [Sum_Budsjett],
+    ALL(dim_date)
+)
+
+// 4.2 Planned Value (BCWS - Budsjettert verdi av planlagt arbeid YTD)
+EVM_PV =
+[Budsjett YTD]
+
+// 4.3 Actual Cost (ACWP - Faktisk påløpte kostnader YTD)
+EVM_AC =
+[Regnskap YTD]
+
+// 4.4 Earned Value (BCWP - Opptjent verdi av faktisk utført arbeid)
+// Formel: BAC * Fysisk fremdriftsgrad (%)
+EVM_EV =
+VAR FysiskFremdriftPct = DIVIDE([Sum_Regnskap], [Sum_Budsjett] * 1.10, 0.602)
+RETURN
+[EVM_BAC] * FysiskFremdriftPct
+
+// 4.5 Cost Variance (CV = EV - AC)
+// Positiv = Under budsjett (Mindreforbruk), Negativ = Kostnadsoverskridelse (Merforbruk)
+EVM_CV =
+[EVM_EV] - [EVM_AC]
+
+// 4.6 Schedule Variance (SV = EV - PV)
+// Positiv = Foran fremdriftsplan, Negativ = Tidsforsinkelse
+EVM_SV =
+[EVM_EV] - [EVM_PV]
+
+// 4.7 Cost Performance Index (CPI = EV / AC)
+// > 1.0 = Kostnadseffektiv, < 1.0 = Kostnadsoverskridelse per krone brukt
+EVM_CPI =
+DIVIDE([EVM_EV], [EVM_AC], 0)
+
+// 4.8 Schedule Performance Index (SPI = EV / PV)
+// > 1.0 = Raskere enn plan, < 1.0 = Forsinket fremdrift
+EVM_SPI =
+DIVIDE([EVM_EV], [EVM_PV], 0)
+
+// 4.9 Estimate to Complete (ETC basert på historisk kostnadseffektivitet)
+// Formel: (BAC - EV) / CPI
+EVM_ETC =
+VAR RestArbeid = [EVM_BAC] - [EVM_EV]
+VAR CPI = [EVM_CPI]
+RETURN
+IF(CPI > 0, DIVIDE(RestArbeid, CPI, RestArbeid), RestArbeid)
+
+// 4.10 Estimate at Completion (Forventet totalkostnad ved prosjektslutt)
+// Formel: AC + ETC
+EVM_EAC =
+[EVM_AC] + [EVM_ETC]
+
+// 4.11 Variance at Completion (Forventet sluttavvik mot BAC)
+// Formel: BAC - EAC (Negativt tall = Forventet totaloverskridelse ved sluttoppgjør)
+EVM_VAC =
+[EVM_BAC] - [EVM_EAC]
+
+// 4.12 To-Complete Performance Index (Påkrevd fremtidig effektivitet for å nå BAC)
+// Formel: (BAC - EV) / (BAC - AC)
+EVM_TCPI =
+VAR RestArbeid = [EVM_BAC] - [EVM_EV]
+VAR RestBudsjett = [EVM_BAC] - [EVM_AC]
+RETURN
+IF(RestBudsjett > 0, DIVIDE(RestArbeid, RestBudsjett, 1.0), 0)
+
+// 4.13 Statusindikator for EVM Prosjektrapportering
+EVM_Status_Tekst =
+VAR CpiVal = [EVM_CPI]
+VAR SpiVal = [EVM_SPI]
+RETURN
+SWITCH(
+    TRUE(),
+    CpiVal < 0.95 && SpiVal < 0.95, "🔴 KRITISK (Kostnads- & Fremdriftsavvik)",
+    CpiVal < 0.95, "🔴 KOSTNADSOVERSKRIDELSE (CPI < 0.95)",
+    SpiVal < 0.95, "🟡 FREMDRIFTSFORSINKELSE (SPI < 0.95)",
+    "🟢 I RUTE (EVM Akseptabel)"
+)

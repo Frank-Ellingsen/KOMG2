@@ -55,6 +55,7 @@ def run_all_tests():
             ("view-eda", "EDA FT Vocabulary"),
             ("view-min-okonomi", "Min Økonomi"),
             ("view-budget", "Budsjett & Lønn"),
+            ("view-evm", "Prosjektcontrolling EVM"),
             ("view-recommender", "Recommender"),
             ("view-aarshjul", "Årshjul & Frister"),
             ("view-invoicing", "Gebyrer & Faktura"),
@@ -166,6 +167,46 @@ def run_all_tests():
             return document.querySelectorAll("#salary-art-table-body tr").length;
         }''')
         record_test("KOSTRA artstabell har 9 kostnadsarter", art_rows == 9, f"Arter: {art_rows}")
+
+        # -------------------------------------------------------------
+        # TEST 5B: Modul 13: Prosjektcontrolling & EVM (Umoe Mandal / Maritim)
+        # -------------------------------------------------------------
+        print("\n--- TESTBLOKK 5B: Prosjektcontrolling & EVM (ANSI/EIA-748) ---")
+        page.click('.nav-btn[data-target="view-evm"]')
+        page.wait_for_timeout(150)
+
+        evm_bac = page.inner_text("#evm-kpi-bac")
+        evm_cpi = page.inner_text("#evm-kpi-cpi")
+        evm_spi = page.inner_text("#evm-kpi-spi")
+        evm_eac = page.inner_text("#evm-kpi-eac")
+        record_test("EVM P-40102 SES Flerbruksfartøy BAC = 120 MNOK", "120 000 000" in evm_bac.replace('\u00a0', ' '), f"BAC: {evm_bac}")
+        record_test("EVM Kostnadsindeks CPI = 0,90 (Overskridelse pr krone)", "0,90" in evm_cpi, f"CPI: {evm_cpi}")
+        record_test("EVM Fremdriftsindeks SPI = 0,92 (Tidsforsinkelse)", "0,92" in evm_spi, f"SPI: {evm_spi}")
+        record_test("EVM Sluttkostnad EAC = 132,6 MNOK", "132" in evm_eac and "631" in evm_eac, f"EAC: {evm_eac}")
+
+        # Sjekk Tufte S-kurve SVG elementer
+        scurve_polylines = page.evaluate('''() => {
+            return document.querySelectorAll("#evm-scurve-svg polyline").length;
+        }''')
+        record_test("Tufte S-kurve SVG inneholder PV, EV og AC polylinjer", scurve_polylines >= 3, f"Polylines: {scurve_polylines}")
+
+        # Sjekk WBS tabell for arbeidspakker
+        wbs_rows = page.evaluate('''() => {
+            return document.querySelectorAll("#tbody-evm-wbs tr").length;
+        }''')
+        record_test("WBS Nivå 2 har 7 spesifiserte arbeidspakker", wbs_rows == 7, f"WBS rader: {wbs_rows}")
+
+        # Test prosjektbytte til Kystvaktpatrulje (PRJ-KV-02)
+        page.select_option("#evm-project-select", "PRJ-KV-02")
+        page.wait_for_timeout(150)
+        kv_bac = page.inner_text("#evm-kpi-bac")
+        kv_cpi = page.inner_text("#evm-kpi-cpi")
+        record_test("Prosjektbytte til P-30240 Kystvakt oppdaterer BAC til 45 MNOK", "45 000 000" in kv_bac.replace('\u00a0', ' '), f"KV BAC: {kv_bac}")
+        record_test("Kystvaktpatrulje har positiv CPI = 1,05 (Mindreforbruk)", "1,05" in kv_cpi, f"KV CPI: {kv_cpi}")
+
+        # Bytt tilbake til SES for konsistens
+        page.select_option("#evm-project-select", "PRJ-SES-01")
+        page.wait_for_timeout(100)
 
         # -------------------------------------------------------------
         # TEST 6: Modul 13: Recommender & Tiltaksmatrise
