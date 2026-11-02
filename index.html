@@ -50,7 +50,89 @@
       grid-template-columns: 272px 1fr;
     }
 
-    /* Sidebar Navigation (Mirrors st.sidebar in src/app.py) */
+        /* =========================================================================
+       4 ARBEIDSROM & ROLLEBASERT NAVIGASJON (DOKUMENT 06 & 07)
+       ========================================================================= */
+    .role-workspace-bar {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.6rem 1.25rem;
+      background: #FFFFFF;
+      border-bottom: 2px solid var(--border-light);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow-x: auto;
+    }
+
+    .role-bar-label {
+      font-size: 0.73rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-right: 0.4rem;
+      white-space: nowrap;
+    }
+
+    .role-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.42rem 0.85rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-light);
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+      white-space: nowrap;
+    }
+
+    .role-tab:hover {
+      background: var(--bg-subtle);
+      border-color: var(--border-dark);
+    }
+
+    .role-tab.active {
+      background: var(--header-dark);
+      color: #FFFFFF;
+      border-color: var(--header-dark);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .role-tab .role-badge {
+      font-size: 0.67rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.08);
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .role-tab.active .role-badge {
+      background: rgba(255, 255, 255, 0.22);
+      color: #FFFFFF;
+    }
+
+    /* Muting/highlighting in sidebar based on active workspace */
+    .module-nav.filter-active .nav-btn:not(.role-match) {
+      opacity: 0.30;
+      transform: scale(0.98);
+      transition: opacity 0.2s;
+    }
+    .module-nav.filter-active .nav-btn.role-match {
+      opacity: 1.0;
+      border-left: 3px solid #38BDF8;
+      background: rgba(255, 255, 255, 0.09);
+      transition: all 0.2s;
+    }
+
+/* Sidebar Navigation (Mirrors st.sidebar in src/app.py) */
     aside.sidebar {
       background-color: var(--header-dark);
       color: #FFFFFF;
@@ -1127,57 +1209,57 @@
     </div>
 
     <div class="nav-section-label">Økonomi og analyse</div>
-    <nav class="module-nav" role="navigation">
-      <button type="button" class="nav-btn" data-target="view-min-okonomi" aria-current="page">
-        <span>💼</span> <span>Rådgiveroversikt</span>
+    <nav class="module-nav" id="module-nav" role="navigation">
+      <button type="button" class="nav-btn" data-target="view-min-okonomi" data-role-category="hverdag,budsjett" aria-current="page">
+        <span>🏠</span> <span>Min Hverdag (Enhetsleder)</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-avvik">
-        <span>📊</span> <span>Avviksoversikt (Gold Layer)</span>
+      <button type="button" class="nav-btn" data-target="view-avvik" data-role-category="budsjett,politikk">
+        <span>📊</span> <span>Avviksoversikt &amp; Månedstall</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-tidsserie">
-        <span>📈</span> <span>Tidsserie &amp; Årsprognose (EAC)</span>
+      <button type="button" class="nav-btn" data-target="view-tidsserie" data-role-category="budsjett">
+        <span>📈</span> <span>Prognosebane &amp; Budsjettsimulator</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-eda">
-        <span>📊</span> <span>EDA &amp; FT Visual Guide</span>
+      <button type="button" class="nav-btn" data-target="view-eda" data-role-category="budsjett">
+        <span>📊</span> <span>Datautforskning (FT Visual Guide)</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-ml">
-        <span>🌲</span> <span>ML Prognoser &amp; Early Warning</span>
+      <button type="button" class="nav-btn" data-target="view-ml" data-role-category="budsjett">
+        <span>🌲</span> <span>Tidlig Varsling &amp; Forbruksmønster</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-anomaly">
-        <span>🚨</span> <span>Anomaly &amp; Klyngeanalyse</span>
+      <button type="button" class="nav-btn" data-target="view-anomaly" data-role-category="budsjett,hverdag">
+        <span>🚨</span> <span>Avviksvarsel &amp; Hendelser</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-recommender">
-        <span>🎯</span> <span>Recommender &amp; Tiltaksmatrise</span>
+      <button type="button" class="nav-btn" data-target="view-recommender" data-role-category="hverdag,budsjett">
+        <span>🎯</span> <span>Tiltakskort &amp; Styringsrett (§ 13-1)</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-chatbot">
-        <span>💬</span> <span>KI-Saksbehandler &amp; Chatbot</span>
+      <button type="button" class="nav-btn" data-target="view-chatbot" data-role-category="hverdag,politikk">
+        <span>💬</span> <span>Søk i Lovverk &amp; Reglement</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-procurement">
-        <span>📜</span> <span>Anskaffelser &amp; Spend (LOA)</span>
+      <button type="button" class="nav-btn" data-target="view-procurement" data-role-category="innkjop">
+        <span>🛒</span> <span>Innkjøpssjekk (LOA) &amp; Avtaler</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-invoicing">
-        <span>💳</span> <span>Faktura, Interne &amp; Selvkost</span>
+      <button type="button" class="nav-btn" data-target="view-invoicing" data-role-category="innkjop,budsjett">
+        <span>💳</span> <span>Faktura, Interne &amp; Selvkostfond</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-grants">
-        <span>🏛️</span> <span>Søknader &amp; Tilskudd</span>
+      <button type="button" class="nav-btn" data-target="view-grants" data-role-category="innkjop,politikk">
+        <span>🏛️</span> <span>Tilskuddsportal (Stat &amp; Kommune)</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-budget">
-        <span>📑</span> <span>Budsjett &amp; Framsikt Regulering</span>
+      <button type="button" class="nav-btn" data-target="view-budget" data-role-category="budsjett">
+        <span>📑</span> <span>Framsikt Regulering &amp; Lønn</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-evm">
+      <button type="button" class="nav-btn" data-target="view-evm" data-role-category="budsjett">
         <span>🚢</span> <span>Prosjektcontrolling &amp; EVM</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-aarshjul">
-        <span>📅</span> <span>Årshjul, Frister &amp; Dokumenter</span>
+      <button type="button" class="nav-btn" data-target="view-aarshjul" data-role-category="politikk,budsjett">
+        <span>📅</span> <span>Årshjul, Frister &amp; Saksdokumenter</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-guide">
-        <span>📖</span> <span>Brukerveiledning &amp; Metodikk</span>
+      <button type="button" class="nav-btn" data-target="view-guide" data-role-category="all">
+        <span>📖</span> <span>Brukerveiledning &amp; Lovhjemler</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-modelready">
-        <span>⚙️</span> <span>Modelready Datagrunnlag</span>
+      <button type="button" class="nav-btn" data-target="view-modelready" data-role-category="all">
+        <span>⚙️</span> <span>Avstemt Datagrunnlag (0,00 Diff)</span>
       </button>
-      <button type="button" class="nav-btn" data-target="view-cockpit">
-        <span>🎛️</span> <span>Cockpit &amp; Pipeline Kontroll</span>
+      <button type="button" class="nav-btn" data-target="view-cockpit" data-role-category="all">
+        <span>🎛️</span> <span>Systemkontroll &amp; Datakvalitet</span>
       </button>
     </nav>
 
@@ -1207,6 +1289,28 @@
         <span class="status-badge status-ok" id="header-checks-pill">06_CHECKS: Diff = 0,00 kr</span>
       </div>
     </header>
+
+    <!-- ===================================================================
+         4 ARBEIDSROM / ROLLEBASERT HOVEDNAVIGASJON (DOKUMENT 06 & 07)
+         =================================================================== -->
+    <nav class="role-workspace-bar" id="role-workspace-bar" aria-label="Velg rolle og arbeidsrom">
+      <span class="role-bar-label">🎯 Velg Arbeidsrom:</span>
+      <button type="button" class="role-tab active" data-workspace-role="all" id="btn-role-all" title="Viser alle 16 moduler i systemet">
+        <span>🌐</span> <span>Alle Verktøy</span> <span class="role-badge">Ekspert / Controller</span>
+      </button>
+      <button type="button" class="role-tab" data-workspace-role="hverdag" data-target="view-min-okonomi" id="btn-role-hverdag" title="For Enhetsledere, rektorer og pleieledere: 30 sekunders avdelingsstatus">
+        <span>🏠</span> <span>1. Min Hverdag</span> <span class="role-badge">Enhetsleder &amp; Rektor</span>
+      </button>
+      <button type="button" class="role-tab" data-workspace-role="budsjett" data-target="view-budget" id="btn-role-budsjett" title="For økonomer og controllere: Simulering, Framsikt og EVM S-kurver">
+        <span>📊</span> <span>2. Budsjett &amp; Simulering</span> <span class="role-badge">Økonomirådgiver</span>
+      </button>
+      <button type="button" class="role-tab" data-workspace-role="innkjop" data-target="view-procurement" id="btn-role-innkjop" title="For innkjøpere og fagansvarlige: LOA, avtaler og tilskudd">
+        <span>🛒</span> <span>3. Innkjøp, Avtaler &amp; Tilskudd</span> <span class="role-badge">Fagansvarlig / LOA</span>
+      </button>
+      <button type="button" class="role-tab" data-workspace-role="politikk" data-target="view-aarshjul" id="btn-role-politikk" title="For toppledelse og bystyret: Årshjul, frister og saksfremlegg">
+        <span>📑</span> <span>4. Saksbehandling &amp; Politikk</span> <span class="role-badge">Kommunalsjef &amp; Bystyret</span>
+      </button>
+    </nav>
 
     <div class="views-host">
       <!-- ===================================================================
@@ -1298,6 +1402,70 @@
         <div id="min-subview-unit">
           
           <!-- Automatisk AI-Narrativ & Ledelseskommentar (NLG) -->
+          <!-- ===================================================================
+               ROM 1: «HVA BØR JEG GJØRE I DAG?» — LEDERENS ADMINISTRATIVE STYRINGSRETT (§ 13-1)
+               =================================================================== -->
+          <div class="card" style="margin-bottom:0.75rem; border-left:4px solid var(--clr-accent-indigo, #4F46E5); background:#FFFFFF;">
+            <div class="card-header" style="background:var(--bg-subtle); padding:0.5rem 0.85rem; border-bottom:1px solid var(--border-light); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+              <div style="display:flex; align-items:center; gap:0.4rem;">
+                <span style="font-size:1.05rem;">🎯</span>
+                <strong style="color:var(--text-primary); font-size:0.86rem;">Hva bør jeg gjøre i dag? (Enhetslederens Styringsrett jf. Kommuneloven § 13-1)</strong>
+              </div>
+              <span class="rag-badge rag-green" style="font-size:0.68rem;">✔ UMUMIDDELBARE ADMINISTRATIVE TILTAK</span>
+            </div>
+            <div class="card-body" style="padding:0.75rem 0.85rem; font-size:0.78rem;">
+              <div id="daily-action-card-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:0.65rem; margin-bottom:0.65rem;">
+                <div class="action-task-card" style="border:1px solid var(--border-light); border-radius:4px; padding:0.6rem; background:#F8FAFC;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
+                    <strong style="color:#1E293B;">1. Vikarstopp på administrasjon</strong>
+                    <span class="rag-badge rag-amber" style="font-size:0.66rem;">Art 1020/1270</span>
+                  </div>
+                  <p style="font-size:0.74rem; color:var(--text-secondary); margin-bottom:0.35rem; line-height:1.4;">
+                    Stans all ekstern innleie til merkantile oppgaver. Avlast med interne ressurser i avdelingen.
+                  </p>
+                  <span class="rag-badge rag-green" style="font-size:0.68rem;">Effekt: 65k–120k kr/mnd</span>
+                </div>
+
+                <div class="action-task-card" style="border:1px solid var(--border-light); border-radius:4px; padding:0.6rem; background:#F8FAFC;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
+                    <strong style="color:#1E293B;">2. Overtidsbegrensning &amp; Gat</strong>
+                    <span class="rag-badge rag-red" style="font-size:0.66rem;">Art 1040 (AML)</span>
+                  </div>
+                  <p style="font-size:0.74rem; color:var(--text-secondary); margin-bottom:0.35rem; line-height:1.4;">
+                    Godkjenn kun kritiske vakter ved fare for liv/helse. Kjør vaktomfordeling via Visma Gat Optur Plus.
+                  </p>
+                  <span class="rag-badge rag-green" style="font-size:0.68rem;">Sikrer 11t lovpålagt hvile</span>
+                </div>
+
+                <div class="action-task-card" style="border:1px solid var(--border-light); border-radius:4px; padding:0.6rem; background:#F8FAFC;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
+                    <strong style="color:#1E293B;">3. Stillingsfrys / Vakanssparing</strong>
+                    <span class="rag-badge rag-green" style="font-size:0.66rem;">Art 1010</span>
+                  </div>
+                  <p style="font-size:0.74rem; color:var(--text-secondary); margin-bottom:0.35rem; line-height:1.4;">
+                    Utsett utlysning av ledige stillinger i 2–4 måneder for å ta ned personallønnsmassen mot årets slutt.
+                  </p>
+                  <span class="rag-badge rag-green" style="font-size:0.68rem;">Fullmakt: Delegert § 13-1</span>
+                </div>
+              </div>
+
+              <!-- Spørsmål i naturlig norsk -->
+              <div style="padding-top:0.5rem; border-top:1px solid var(--border-light); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+                <div style="font-size:0.76rem; color:var(--text-secondary);">
+                  💬 <strong>Spørsmål om egen avdeling?</strong> Still spørsmål i naturlig norsk til rådgiverboten:
+                </div>
+                <div style="display:flex; gap:0.4rem;">
+                  <button type="button" class="btn btn-secondary" onclick="switchToView('view-chatbot')" style="font-size:0.73rem; padding:0.25rem 0.65rem;">
+                    🔍 Spør assistenten om din avdeling
+                  </button>
+                  <button type="button" class="btn btn-secondary" onclick="switchToView('view-recommender')" style="font-size:0.73rem; padding:0.25rem 0.65rem;">
+                    🎯 Se alle tiltakskort (§ 13-1)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="card" style="margin-bottom:0.75rem; border-left:4px solid var(--clr-fig-regnskap); background:#FFFFFF;">
             <div class="card-header" style="background:var(--bg-subtle); padding:0.45rem 0.85rem; border-bottom:1px solid var(--border-light); display:flex; justify-content:space-between; align-items:center;">
               <strong style="color:var(--text-primary); font-size:0.84rem;">🤖 Automatisk Ledelsesnotat (AI Natural Language Generation per M08)</strong>
@@ -10401,7 +10569,52 @@ Rådgiver økonomistyring, Kristiansand kommune
     let currentEvmMonth = 8;
     let currentEvmFormula = "cpi";
 
-    function initEvmModule() {
+        // =========================================================================
+    // 20. BRUKERSENTRERT UX & 4 ARBEIDSROM ENGINE (DOKUMENT 06 & 07)
+    // =========================================================================
+    let currentWorkspaceRole = "all";
+
+    function initWorkspaceRoleBar() {
+      const roleTabs = document.querySelectorAll(".role-tab");
+      const moduleNav = document.getElementById("module-nav");
+
+      roleTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          const role = tab.getAttribute("data-workspace-role");
+          currentWorkspaceRole = role;
+
+          // Update active state on role tabs
+          roleTabs.forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+
+          // Filter / Highlight sidebar items
+          if (role === "all") {
+            if (moduleNav) moduleNav.classList.remove("filter-active");
+            document.querySelectorAll(".module-nav .nav-btn").forEach(btn => {
+              btn.classList.remove("role-match");
+            });
+          } else {
+            if (moduleNav) moduleNav.classList.add("filter-active");
+            document.querySelectorAll(".module-nav .nav-btn").forEach(btn => {
+              const cats = (btn.getAttribute("data-role-category") || "").split(",");
+              if (cats.includes(role) || cats.includes("all")) {
+                btn.classList.add("role-match");
+              } else {
+                btn.classList.remove("role-match");
+              }
+            });
+
+            // Automatically switch to the primary default view for this role
+            const targetView = tab.getAttribute("data-target");
+            if (targetView && typeof switchToView === "function") {
+              switchToView(targetView);
+            }
+          }
+        });
+      });
+    }
+
+function initEvmModule() {
       const prjSelect = document.getElementById("evm-project-select");
       const mSelect = document.getElementById("evm-month-select");
       const fSelect = document.getElementById("evm-formula-select");
@@ -10784,6 +10997,7 @@ Rådgiver økonomistyring, Kristiansand kommune
     // UNIFIED APPLICATION BOOTSTRAP (100% ORDER GUARANTEED)
     // =========================================================================
     function bootApplication() {
+      try { if (typeof initWorkspaceRoleBar === 'function') initWorkspaceRoleBar(); } catch(e) { console.warn("initWorkspaceRoleBar:", e); }
       try { populateAnsvarOptions("ALL", "ALL"); } catch(e) { console.warn("populateAnsvarOptions:", e); }
       try { populateFunksjonOptions("ALL", "ALL"); } catch(e) { console.warn("populateFunksjonOptions:", e); }
       try { if (typeof initEdaModule === 'function') initEdaModule(); } catch(e) { console.warn("initEdaModule:", e); }

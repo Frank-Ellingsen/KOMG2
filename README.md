@@ -51,6 +51,70 @@ Denne applikasjonen fungerer som rådgiverens **digitale co-pilot og operative f
 
 ---
 
+## 🎨 Brukersentrert UX & Rollebasert Navigasjon (De 4 Arbeidsrommene)
+
+For at applikasjonen skal være 100 % intuitiv og handlingsrettet for alle kommunale roller – fra rektorer og pleieledere til økonomicontrollere, kommunalsjefer og bystyremedlemmer – er grensesnittet inndelt i **4 klare arbeidsrom uten teknisk AI-sjargong** (jf. `06_...` og `07_...`):
+
+```
+┌───────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                 KOMG2 ROLLEBASERT HOVEDNAVIGASJON                                 │
+├───────────────────┬────────────────────┬────────────────────────────┬─────────────────────────────┤
+│ 🏠 1. MIN HVERDAG │ 📊 2. BUDSJETT &   │ 🛒 3. INNKJØP, AVTALER &   │ 📑 4. SAKSER & POLITIKK     │
+│    (Enhetsleder)  │    SIMULERING      │    TILSKUDD                │    (Toppledelse/Politikk)   │
+│                   │    (Økonomer)      │    (Fagansvarlige)         │                             │
+└───────────────────┴────────────────────┴────────────────────────────┴─────────────────────────────┘
+```
+
+### 🏠 Rom 1: «Min Hverdag» (For Enhetsledere & Rektorer)
+* **Målgruppe:** Rektorer, avdelingsledere i pleie og omsorg, barnehageledere.
+* **Formål:** Full operasjonell avdelingsstatus på 30 sekunder.
+* **Kjernekomponenter:**
+  * **Trafikklys-status:** Grønn (I rute), Gul (Følg med), Rød (Tiltak kreves).
+  * **«Hva bør jeg gjøre i dag?»:** Liste med lovlige, administrative tiltak innenfor lederens egen styringsrett jf. Kommuneloven § 13-1 (vikarstopp art 1020, overtidsbegrensning art 1040 via Visma Gat Optur Plus, vakanssparing).
+  * **Søk i naturlig norsk:** Fritekstfelt for enhetsspørsmål (*«Hvorfor har vi merforbruk på vikarer i august?»*).
+
+### 📊 Rom 2: «Budsjett & Simulering» (For Økonomirådgivere & Controllere)
+* **Målgruppe:** Økonomirådgivere, økonomisjefer og prosjektcontrollere.
+* **Formål:** Modellere helårsprognosen (EOY), kjøre preskriptive simuleringer, overvåke prosjekt-S-kurver (EVM) og eksportere til Framsikt.
+* **Kjernekomponenter:**
+  * **Prognoseveien (EAC):** Interaktiv kurve over forventet årsresultat ved årets slutt.
+  * **Budsjettsimulator («Hva skjer hvis...»):** Test ansettelsesstopp (1–6 mnd), vikar- og overtidsstopp i sanntid.
+  * **Prosjektcontrolling & EVM (Umoe Mandal standard):** Earned Value Management, Tufte S-kurver (PV/EV/AC/EAC), CPI/SPI og WBS-fremdriftskontroll.
+  * **Framsikt 1-Klikks Eksport:** Genererer `framsikt_budsjettendringer_eoy.xlsx` med 0,00 kr feilmargin.
+
+### 🛒 Rom 3: «Innkjøp, Avtaler & Tilskudd» (For Fagansvarlige & Saksbehandlere)
+* **Målgruppe:** Anskaffelsesansvarlige, prosjektledere, saksbehandlere for tilskudd og selvkost.
+* **Formål:** LOA-terskelkontroll, avtalesjekk, tilskuddsforvaltning og selvkostberegninger.
+* **Kjernekomponenter:**
+  * **Innkjøpssjekk (LOA):** Terskelkontroll (<500k, 500k–1,3m, EØS 2,5m/62,9m), 30 % miljøvektlegging og Maverick spend-deteksjon.
+  * **Tilskuddsportal:** Inngående statlige midler (IMDi, Udir, Toppfinansiering av særlig ressurskrevende tjenester) og utgående kommunale tilskudd (500k-regel for utbetaling).
+  * **Fakturering & Selvkost:** Selvkostfond (VA/Renovasjon etter FOR-2019-12-11-1738) og interkommunal KOSTRA-konsolidering (art 380/780).
+
+### 📑 Rom 4: «Saksbehandling & Politikk» (For Kommunalsjefer & Bystyre)
+* **Målgruppe:** Kommunedirektør, kommunalsjefer, politisk sekretariat og bystyremedlemmer.
+* **Formål:** Forberede og behandle formelle saker som krever politisk vedtak.
+* **Kjernekomponenter:**
+  * **Politisk Vedtaksbrett:** Sortering av avvik som krever formelt bystyrevedtak jf. Kommuneloven § 14-6 (bruk av disposisjonsfond) eller § 14-10 (rammeomdisponeringer).
+  * **1-Klikks Saksfremlegg Generator:** Formelle saksnotater (Word `.doc` / A4) med brevhode, finansiell tabell og lovhjemler for eInnsyn / NOARK 5.
+
+---
+
+## 🔤 Ordbok for Språkomstilling (Teknisk ➔ Forståelig Norsk)
+
+Alt innhold i grensesnittet er vasket for teknisk AI- og IT-sjargong for å sikre at alle ledere opplever verktøyet som trygt og umiddelbart tilgjengelig:
+
+| Teknisk Utvikleruttrykk ❌ | Forståelig Uttrykk i Appen ✅ | Forklaring for Brukeren |
+| :--- | :--- | :--- |
+| **RAG Vector Search Engine** | **Søk i Lovverk & Reglement** | Søker i Kommuneloven, KOSTRA-veilederen og lokalt økonomireglement. |
+| **Preskriptiv LOY-Simulator** | **Budsjettsimulator («Hva skjer hvis...»)** | Viser effekten av vikarstopp eller stillingsfrys på årets sluttresultat. |
+| **Isolation Forest Anomaly Grid** | **Avviksvarsel & Hendelser** | Oppdager unormale utgiftseksplosjoner på konto eller ansvar. |
+| **Audit Agent (AML § 10-8)** | **Automatisk Lovsjekk** | Kontrollerer at kuttforslag ikke bryter Arbeidsmiljøloven eller forsvarlighetskrav. |
+| **Medallion Gold Layer Export** | **Last ned klar fil til Framsikt** | Eksporterer 12-kolonners importfil klar for direkte innlesning i Framsikt. |
+| **Tavily / DuckDuckGo Web Fallback** | **Eksternt Lovdatasøk** | Henter oppdaterte sirkulærer og lovhjemler fra Lovdata, DFØ og Regjeringen. |
+| **PII Privacy Gate / Anonymizer** | **Personvernsjekk (GDPR-sikret)** | Skjermer fødselsnumre, ansattnumre og personnavn automatisk før analyse. |
+
+---
+
 ## 🔑 Hovedgevinster i Rådgiverhverdagen
 
 ### 1. Lynrask Månedsavslutning mot Budsjettansvarlige

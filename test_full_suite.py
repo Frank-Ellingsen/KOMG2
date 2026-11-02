@@ -78,6 +78,71 @@ def run_all_tests():
                 record_test(f"Knapp for {label} finnes", False, f"Mangler .nav-btn for {target_id}")
 
         # -------------------------------------------------------------
+        # TEST 2B: De 4 Arbeidsrommene (Rollebasert Navigasjon & Tiltakskort)
+        # -------------------------------------------------------------
+        print("\n--- TESTBLOKK 2B: De 4 Arbeidsrommene & Rollebasert Navigasjon ---")
+        # 1. Arbeidsrom 1: Min Hverdag (Enhetsleder)
+        page.click("#btn-role-hverdag")
+        page.wait_for_timeout(100)
+        hverdag_active = page.evaluate('''() => {
+            const btn = document.getElementById("btn-role-hverdag");
+            const view = document.getElementById("view-min-okonomi");
+            const hasClass = btn?.classList.contains("active");
+            const viewVisible = view && !view.classList.contains("inactive");
+            const cards = document.querySelectorAll("#daily-action-card-container .action-task-card").length;
+            const navFiltered = document.querySelector(".module-nav")?.classList.contains("filter-active");
+            return { hasClass, viewVisible, cards, navFiltered };
+        }''')
+        record_test("Arbeidsrom 1 (Min Hverdag) aktiverer view-min-okonomi", 
+                    hverdag_active["hasClass"] and hverdag_active["viewVisible"], 
+                    f"Resultat: {hverdag_active}")
+        record_test("Handlingspanelet 'Hva bør jeg gjøre i dag?' har 3 tiltakskort",
+                    hverdag_active["cards"] == 3,
+                    f"Kort: {hverdag_active['cards']}")
+        record_test("Sidebar aktiverer rollefiltrering (.filter-active)",
+                    bool(hverdag_active["navFiltered"]))
+
+        # 2. Arbeidsrom 2: Budsjett & Simulering (Økonomirådgiver)
+        page.click("#btn-role-budsjett")
+        page.wait_for_timeout(100)
+        budsjett_active = page.evaluate('''() => {
+            const btn = document.getElementById("btn-role-budsjett");
+            const view = document.getElementById("view-budget");
+            return btn?.classList.contains("active") && view && !view.classList.contains("inactive");
+        }''')
+        record_test("Arbeidsrom 2 (Budsjett & Simulering) aktiverer view-budget", bool(budsjett_active))
+
+        # 3. Arbeidsrom 3: Innkjøp, Avtaler & Tilskudd (Fagansvarlig)
+        page.click("#btn-role-innkjop")
+        page.wait_for_timeout(100)
+        innkjop_active = page.evaluate('''() => {
+            const btn = document.getElementById("btn-role-innkjop");
+            const view = document.getElementById("view-procurement");
+            return btn?.classList.contains("active") && view && !view.classList.contains("inactive");
+        }''')
+        record_test("Arbeidsrom 3 (Innkjøp & Avtaler) aktiverer view-procurement", bool(innkjop_active))
+
+        # 4. Arbeidsrom 4: Saksbehandling & Politikk (Kommunalsjef/Bystyre)
+        page.click("#btn-role-politikk")
+        page.wait_for_timeout(100)
+        politikk_active = page.evaluate('''() => {
+            const btn = document.getElementById("btn-role-politikk");
+            const view = document.getElementById("view-aarshjul");
+            return btn?.classList.contains("active") && view && !view.classList.contains("inactive");
+        }''')
+        record_test("Arbeidsrom 4 (Saksbehandling & Politikk) aktiverer view-aarshjul", bool(politikk_active))
+
+        # 5. Tilbakestill til Alle Verktøy
+        page.click("#btn-role-all")
+        page.wait_for_timeout(100)
+        all_active = page.evaluate('''() => {
+            const btn = document.getElementById("btn-role-all");
+            const navFiltered = document.querySelector(".module-nav")?.classList.contains("filter-active");
+            return btn?.classList.contains("active") && !navFiltered;
+        }''')
+        record_test("Arbeidsrom 'Alle Verktøy' tilbakestiller filter i sidebar", bool(all_active))
+
+        # -------------------------------------------------------------
         # TEST 3: Global Filterkaskadering & Synkronisering
         # -------------------------------------------------------------
         print("\n--- TESTBLOKK 3: Dynamisk Filterkaskadering & Synkronisering ---")
