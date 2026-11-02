@@ -1,41 +1,145 @@
-# 🏛️ KOSTRA AI Enterprise Lakehouse & Decision Support Suite — Kristiansand Kommune
+# 🏛️ KOSTRA AI Enterprise Suite — Kristiansand Kommune
+### Beslutningsstøtte, Økonomistyring, Månedsavslutning & Framsikt-Integrasjon
 
-**Helhetlig Enterprise AI-plattform for kommunal økonomistyring, MLOps, automatisert avvikskontroll, DFØ-anskaffelser, selvkostkalkyler, tilskuddsforvaltning og prescriptive tertialprognoser.**
-
----
-
-## 📌 Om Prosjektet
-
-**KOSTRA AI Enterprise Suite** er en produksjonsklar dataplattform og et strategisk beslutningsstøttesystem utviklet for økonomiavdelingen, prosjekt- og økonomikontrollere, samt kommunedirektøren i Kristiansand kommune. Løsningen transformerer tradisjonell, reaktiv KOSTRA-rapportering til en proaktiv, prediktiv og juridisk forankret styringsarena.
-
-Plattformen forener:
-* **DuckDB Medallion Lakehouse** (`Bronze -> Silver -> Gold`) med sanntids avstemmingskontroller (`Diff = 0,00 kr`).
-* **Maskinlæring & XAI** (Random Forest $R^2=0.9758$, Decision Tree regler, Agglomerative Clustering og Isolation Forest).
-* **FastAPI Produksjonsbackend** (`src/api_server.py`) med 10 REST-endepunkter, Presidio PII-anonymisering og Hybrid RAG (BM25 + Vektorsøk + BGE Reranker).
-* **Frittstående Executive Web Cockpit (`index.html`)** med 10 interaktive moduler, 100 % dynamisk filtermotor, RAG betinget formatering, Edward Tufte Data-Ink bullet charts, 4-slider LOY-simulator, sanntids SVG-trajektorie og 1-klikks automatisert tertialnotatgenerator.
-* **FAST-modellert Excel-arkitektur** (`Excel-Reporting-Analysis.xlsb`) og **Power BI Semantic Model** (`pbi-reporting-project.pbip`).
+> **Utviklet for:** Rådgiver økonomistyring, enhetsledere, kommunalsjefer og økonomidirektøren i Kristiansand kommune.  
+> **Formål:** Transformere kommunal økonomistyring fra reaktiv historiefortelling til proaktiv, prediktiv og juridisk forankret virksomhetsstyring.
 
 ---
 
-## 📋 Innholdsfortegnelse
+## 🎯 Hva Løser Appen?
 
-1. [Prosjektarkitektur & Medallion Data Lakehouse](#-prosjektarkitektur--medallion-data-lakehouse)
-2. [Oversikt over de 10 Interaktive Modulene](#-oversikt-over-de-10-interaktive-modulene)
-3. [Prescriptive LOY-Simulator & Automatisert Tertialnotat](#-prescriptive-loy-simulator--automatisert-tertialnotat)
-4. [Enterprise AI Suite: Anskaffelser, Selvkost & Tilskudd](#-enterprise-ai-suite-anskaffelser-selvkost--tilskudd)
-5. [FastAPI REST Backend & API-Katalog](#-fastapi-rest-backend--api-katalog)
-6. [Designstandarder: Edward Tufte & FAST Modeling](#-designstandarder-edward-tufte--fast-modeling)
-7. [MLOps & Modellportefølje](#-mlops--modellportefølje)
-8. [GDPR, Presidio PII Gateway & Juridisk Forankring](#-gdpr-presidio-pii-gateway--juridisk-forankring)
-9. [Mappe- og Filstruktur](#-mappe--og-filstruktur)
-10. [Installasjon & Kjøreveiledning (A til Å)](#-installasjon--kjøreveiledning-a-til-å)
-11. [Verifikasjon & Tester](#-verifikasjon--tester)
+I en kommune med milliardomsetning og tusenvis av ansatte er god økonomistyring avgjørende for innbyggernes tjenestetilbud. Likevel møter økonomirådgivere og budsjettansvarlige ofte de samme flaskehalsene:
+* **Tunge systemer og forsinkede tall:** Det tar dager å hente ut, rense og koble regnskapsdata fra Agresso og Visma Gat etter månedsslutt.
+* **Manuell og tidkrevende avviksoppfølging:** Enhetsledere bruker verdifull tid på å forklare tall de ikke forstår, mens rådgivere må skrive likelydende purringer og månedsnotater fra bunnen av.
+* **Uoversiktlig vikarbruk og sykefravær:** Kostbare vikarbyråer (art 1020/1270) og overtid (art 1040) spiser opp rammer uten at kompenserende tiltak iverksettes i tide.
+* **Dobbeltarbeid mot Framsikt:** Rådgiveren må manuelt regne ut omdisponeringer i regneark og taste dem inn linje for linje i Framsikt.
+* **Frister og lovkrav som glipper:** Komplekse formelle prosesser (tertialrapporter, bystyresaker, revisjonsfrister etter Kommuneloven § 14) koordineres ofte i statiske e-poster og løse notater.
 
 ---
 
-## 📐 Prosjektarkitektur & Medallion Data Lakehouse
+### 💡 Løsningen: En Helhetlig Styrings- og Analysearena
 
-Systemet er bygget på en **3-lags Medallion Lakehouse-arkitektur** i **DuckDB** (`data/database/kostra_prod.duckdb`), med sømløs integrasjon mot analytiske motorer og brukerflater:
+Denne applikasjonen fungerer som rådgiverens **digitale co-pilot og operative for-system**. Den automatiserer rutineoppgaver, gir umiddelbar innsikt ved månedsslutt, og bygger bro mellom operative enhetsledere, økonomiavdelingen og politisk ledelse:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        KILDESYSTEMER (Agresso, Visma Gat, Fagsystemer)                 │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │ Automatisk Ingestion & Avstemming
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│               KOSTRA AI DECISION SUITE (Denne Applikasjonen)                           │
+│                                                                                        │
+│  💼 Månedsavslutning & Rådgiveroversikt   📅 Årshjul & Lovpålagte Frister (§ 14)       │
+│  • Ferdige 1-sides lederrapporter         • 12 måneders styringssyklus                 │
+│  • Bitemporal låsing (Diff: 0,00 kr)      • Månedsslutt-sjekkliste med fremdrift       │
+│                                                                                        │
+│  📑 Framsikt Budsjettregulering           📝 Automatisk Saksdokument-Generator         │
+│  • 12-kolonners direkte CSV-eksport       • Ferdig utfylte saksfremlegg (Bystyret)     │
+│  • Sanntids balansekontroll (§ 13-1 vs 14-6)• Bestillings- og purrenotater til enheter │
+│                                                                                        │
+│  📈 Prediktiv Analyse & Simulering        📊 Dyp Utforskning (EDA & FT Visual Guide)   │
+│  • EAC/ETC årsprognose med 4 kuttspaker   • Sammenhenger, vikarvolatilitet, trender    │
+│  • Forklarbar maskinlæring (XAI)          • Muted Tufte design uten unødig støy        │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │ 12-kolonners importfil / Ferdige saksnotater
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│          FRAMSIKT (framsikt.no), BYSTYRET OG AGDER KOMMUNEREVISJON                     │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🔑 Hovedgevinster i Rådgiverhverdagen
+
+### 1. Lynrask Månedsavslutning mot Budsjettansvarlige
+* **3 Predefinerte Standardrapporter:**
+  * **1. Enhetslederens Månedsrapport (1 A4-side):** Tilpasset budsjettmøtet. Viser YTD-forbruk, periodisert avvik, vikarandel, overtid, MoM-trend (M08 vs M07) og handlingsrom.
+  * **2. Kommunaldirektørens Flash-rapport:** Overordnet sektorstatus, RAG-risikomatrise, de 3 mest kritiske enhetene og anbefalte administrative tiltak.
+  * **3. Controllerens Avviks- & Unntaksrapport:** Detaljert revisjonssammendrag for enheter med avvik over 3,0 % eller unormal burn-rate.
+* **Automatisert AI-kommentar (NLG):** Tolker tallene i ren tekst etter Kommunelovens prinsipper – sparer rådgiveren for timevis med manuell tekstproduksjon.
+* **Bitemporal Snapshot-låsing:** Alle rapporter låses mot DuckDB Gold Layer med revisjonsstempel og `Diff = 0,00 kr`.
+
+### 2. Sømløs Framsikt-Integrasjon (framsikt.no)
+* **Predefinerte Reguleringsmaler:**
+  * *LOY Helse & Mestring:* Intern omdisponering (kutt i vikar/overtid mot fastlønn, netto 0 kr jf. § 13-1).
+  * *LOY Oppvekst & Utdanning:* Vakanssparing og vikardekning i grunnskole (netto 0 kr).
+  * *Bystyresak / Disposisjonsfond:* Uforutsett merforbruk finansiert av fond (art 195000 jf. § 14-6).
+  * *NAV Refusjonsetterslep:* Teknisk periodisering av sykelønnsrefusjoner (art 1710/1690).
+* **Sanntids Balansekontroll:** Viser umiddelbart om en regulering er i balanse (Kommunedirektørens fullmakt) eller krever politisk bystyrevedtak.
+* **12-kolonners Eksport:** Genererer ferdig formatert CSV (UTF-8 BOM med semikolon) som importeres direkte i Framsikt uten manuell re-tasting.
+
+### 3. Årshjul for Økonomistyring & Frister
+* **Helårlig 12-måneders styringshjul:** Holder oversikt over revisjonsfristen 15. februar (§ 14-8), 1. tertial (T1), 2. tertial (T2), Handlings- og økonomiplan (HØP 2027–2030) og Bystyrets årsbudsjettvedtak før nyttår (§ 14-3).
+* **Filtrerbare faser:** Sorter på lovpålagte frister, tertial/årsoppgjør eller politiske bystyremøter.
+* **Interaktiv Sjekkliste for Månedsavslutning:** 8 operative kontrollpunkter med sanntids fremdriftsindikator og automatisk lagring i nettleseren (`localStorage`).
+
+### 4. Automatisk Dokument- & Rapportgenerator
+* Genererer fullstendige, formelle saksfremlegg og notater med **reelle tall hentet dynamisk fra ditt aktive filter**:
+  1. *🏛️ Bystyresak: 2. Tertialrapport og budsjettreguleringer (§ 14-6)* med 4-punkts vedtaksforslag.
+  2. *🏢 Bestillingsnotat til Enhetsleder:* Formelt krav om avviksforklaring og EAC-oppdatering ved overskridelse av 3 %-grensen.
+  3. *💼 Ledelsesnotat til Kommunalsjef:* Flash-analyse og anbefalte LOY-omdisponeringer.
+  4. *📑 Rammebrev HØP 2027–2030:* Deflatorforutsetninger, innsparingskrav og retningslinjer for Framsikt.
+  5. *🔒 Årsavslutningsnotat til Revisjon:* Protokoll for overføring og bitemporal avstemming.
+* **Handlinger:** Kopier til utklippstavle, last ned som fullverdig Microsoft Word-fil (`.doc`) med brevhode og tabeller, eller skriv ut i A4-format.
+
+### 5. Dyp Datautforskning (EDA) etter Financial Times Visual Guide
+* Interaktiv modul basert på *Financial Times Visual Vocabulary*.
+* Veileder brukeren i valg av riktig visualisering (Sammenheng, Fordeling, Endring over tid, Avvik, Rangering).
+* Inneholder ferdige forslag for kommunale problemstillinger (f.eks. *«Hvordan henger vikarutgifter sammen med overtid og sykefravær i helse og mestring?»*).
+
+---
+
+## 🎛️ Oversikt over Modulene i Appen
+
+Applikasjonen (`index.html`) er bygget som en lynrask, offline-first Single Page Application (SPA):
+
+| # | Modul | Primært formål for rådgiver og leder |
+| :-: | :--- | :--- |
+| **1** | **💼 Rådgiveroversikt** | Månedsavslutnings-cockpit, 3 predefinerte A4-rapporter, AI-sammendrag, MoM-delta og bitemporalt revisjonsstempel. |
+| **2** | **📅 Årshjul, Frister & Dokumenter** | 12-måneders styringshjul, Kommunelov-frister, sjekkliste og 1-klikks generator for formelle saksfremlegg og Word-dokumenter. |
+| **3** | **📑 Budsjett & Framsikt Regulering** | Lønns- og rammereguleringer, forhåndsdefinerte kommunale maler, balansekontroll (§ 13-1 vs 14-6) og 12-kolonners CSV-eksport. |
+| **4** | **📊 Avviksoversikt (Gold Layer)** | Tufte-bullet charts, RAG-status (rød/gul/grønn), 3M glidende snitt og artsavvik (1010 fastlønn, 1020 vikar, 1040 overtid, 1270 byrå). |
+| **5** | **📈 Tidsserie & Årsprognose (EAC)** | 4-slider LOY kutt-simulator, sanntids SVG-trajektorie, månedstak for M9–M12 og juridisk handlingsrom. |
+| **6** | **📊 EDA & FT Visual Guide** | Utforskende dataanalyse inspirert av FT Visual Vocabulary med dynamiske scatter-, søyle- og fordelingsgrafer. |
+| **7** | **🌲 ML Prognoser & Early Warning** | Forklarbar AI (XAI) basert på Random Forest ($R^2=0.9758$) og beslutningstre med transparente `IF-THEN`-regler for revisjon. |
+| **8** | **🚨 Anomaly & Klyngeanalyse** | Klyngeinndeling (Stabil, Vikarvolatil, Sesong, Ekstraordinær) og Isolation Forest for å avdekke bilagsfeil ($Z > 2.5$). |
+| **9** | **🎯 Recommender & Tiltaksmatrise** | Konkrete forslag til innsparingstiltak med beregnet sparepotensial, risiko og juridisk hjemmel. |
+| **10** | **💬 KI-Saksbehandler & Chatbot** | Presidio PII-sikret rådgiverbot med Hybrid RAG koblet mot Kommuneloven og KOSTRA-veilederen. |
+| **11** | **📜 Anskaffelser & Spend (LOA)** | DFØ 7-trinns anskaffelsesprosess, 2026 EØS- og nasjonale terskelverdier og Maverick Spend Detector. |
+| **12** | **💳 Faktura, Interne & Selvkost** | Konsolideringseliminering (art 380 vs 780, Diff = 0,00 kr), armlengdes prinsipp (IKS § 20-1) og 5-årig selvkostkalkyle. |
+| **13** | **🏛️ Søknader & Tilskudd** | Inbound statlige tilskudd (IMDi, Helsedir, Klimasats) og outbound kommunale tildelinger med 4-trinns utbetalingskontroll. |
+| **14** | **⚙️ Modelready Datagrunnlag** | Innsyn i `modelready_fact` og FAST-standardens `06_CHECKS` (11 avstemmingskontroller med Diff = 0,00 kr). |
+| **15** | **🎛️ Cockpit & Pipeline Kontroll** | Orkestreringspanel for datastrømmen med live batch-terminal og uforanderlig revisjonslogg. |
+
+---
+
+## 🎨 Design- og Brukergrensesnittstandarder
+
+Applikasjonen følger strenge faglige standarder for datavisualisering og finansiell modellering:
+
+### 1. Edward Tufte Data-Ink Ratio
+* **Maksimal Data-Ink:** Ingen unødvendige pynteelementer, tunge skygger eller forstyrrende 3D-effekter.
+* **Ingen vertikale tabellinjer:** Bruker diskrete horisontale skillelinjer for å lette lesbarheten.
+* **Muted fargepalett:** Nøytrale gråtoner i bakgrunn og struktur. Røde og gule farger reserveres utelukkende for aktive avvik og risikopunkter.
+* **Typografi og talljustering:** Tekst er alltid venstrejustert; tall, beløp og prosenter er konsekvent høyrejustert med faste desimaler i monoskrift (`var(--font-mono)`).
+* **Tufte Bullet Charts:** Horisontale stolpediagrammer som viser faktisk forbruk mot periodisert budsjett og varslingsterskler på minimal plass.
+
+### 2. FAST Standard Financial Modeling
+* **F**lexible, **A**ppropriate, **S**tructured, **T**ransparent.
+* Én felles formelstruktur per rad i regnearkmodellene (`Excel-Reporting-Analysis.xlsb`).
+* Dedikert **`06_CHECKS`** avstemmingsfane med 11 automatiske kontroller som garanterer at alle konsolideringer og overføringer balanserer til nøyaktig `Diff = 0,00 kr`.
+
+---
+
+# ⚙️ TEKNISK DOKUMENTASJON & ARKITEKTUR
+
+---
+
+## 📐 Medallion Data Lakehouse (DuckDB)
+
+Systemets kjerne er bygget på en **3-lags Medallion Lakehouse-arkitektur** implementert i **DuckDB** (`data/database/kostra_prod.duckdb`):
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -70,132 +174,33 @@ Systemet er bygget på en **3-lags Medallion Lakehouse-arkitektur** i **DuckDB**
                    ▼                        ▼                           ▼
 ┌────────────────────────────┐ ┌──────────────────────────┐ ┌────────────────────────────┐
 │ FastAPI REST API (:8000)   │ │ Frittstående Web Cockpit │ │ Excel & Power BI Suite     │
-│ - 10 REST-endepunkter      │ │ (index.html, 5 300+ l.)  │ │ - Excel-Reporting-         │
-│ - Presidio PII Gateway     │ │ - 10 interaktive moduler │ │   Analysis.xlsb (FAST)     │
+│ - 10 REST-endepunkter      │ │ (index.html, 5 700+ l.)  │ │ - Excel-Reporting-         │
+│ - Presidio PII Gateway     │ │ - 15 interaktive moduler │ │   Analysis.xlsb (FAST)     │
 │ - Hybrid RAG (BM25 + BGE)  │ │ - 100 % dynamisk filter  │ │ - pbi-reporting-project    │
-│ - MLOps inferensmotor      │ │ - LOY-simulator & SVG    │ │   (.pbip / TMDL)           │
+│ - MLOps inferensmotor      │ │ - Framsikt & Årshjul     │ │   (.pbip / TMDL)           │
 └────────────────────────────┘ └──────────────────────────┘ └────────────────────────────┘
 ```
 
 ---
 
-## 🎛️ Oversikt over de 10 Interaktive Modulene
-
-Det frittstående web-grensesnittet (`index.html`) inneholder **10 spesialiserte styringsmoduler** og en arbeidsflate for budsjettansvarlige. Streamlit-applikasjonen (`src/app.py`) har en tilsvarende arbeidsflate:
-
-| Modul | Tittel & Fokus | Nøkkelinnhold & Analytiske Kapabiliteter |
-| :---: | :--- | :--- |
-| **Web** | **💼 Rådgiveroversikt** | Filtrer månedsrapporten på rammeområde og ansvarssted. Viser YTD-status, vedtatt årsbudsjett, EOY-prognose og prognoseavvik, månedstrend, prognosedrivere og møteoppfølging. Tilgjengelige sektorer hentes fra DuckDB og datadekningen vises eksplisitt. Møteoppfølging lagres lokalt i nettleseren, ikke som delt saksbehandling. |
-| **Streamlit** | **💼 Rådgiveroversikt** | Filtrer på rammeområde, ansvarssted og tilgjengelig regnskapsperiode fra DuckDB. Viser regnskap og budsjett hittil i år, årsprognose, prognoseavvik og drivere. Grensesnittet viser hvilke sektorer datagrunnlaget inneholder og ber brukeren kontrollere fullstendighet mot autoritative kildesystemer. Prognosen er et estimat, ikke et vedtak. |
-| **1** | **📊 Avviksoversikt (Gold Layer)** | 100 % dynamisk multi-slicer filtrering (Periode, Sektor, Ansvar, Funksjon, Status). RAG betinget formatering (`🔴 Kritiske avvik > 5 %`, `🟡 Advarsel 2–5 %`, `🟢 I rute < 2 %`). Edward Tufte Data-Ink bullet charts for KOSTRA-funksjoner og utgiftsarter (1010, 1020, 1040, 1090, 1270). 3M rullende glidende snitt. |
-| **2** | **📈 Tidsserie & Årsprognose (EAC)** | Dedikert, toveissynkronisert filterpanel. YTD M1–M8 (Bokført `31 524 851 kr`) vs. Årsbudsjett (`29 295 237 kr`), nettoavvik (`-2 229 614 kr`), LOY gjenstående ramme M9–M12 og påkrevd månedstak (`2 281 890 kr/mnd`). Prescriptive 4-slider simulator, real-time SVG-trajektorie og 1-klikks automatisert tertialnotatgenerator. |
-| **3** | **🌲 ML Prognoser & Early Warning (XAI)** | Forklarbar maskinlæring (XAI) basert på `RandomForestRegressor` ($R^2 = 0.9758$, $\text{MAE} = 1\,655\text{ NOK}$). 100 % revisjonsgodkjent beslutningstre (`DecisionTreeClassifier`) med eksplisitte `IF-THEN`-regler for tidlig varsling. |
-| **4** | **🚨 Anomaly Detection & Klyngeanalyse** | Hierarkisk klustering (`AgglomerativeClustering`) med 4 adferdsklynger (*Klynge 0: Stabil drift* `1 131`, *Klynge 1: Høyvolatil / Vikar* `16`, *Klynge 2: Sesongvariasjon* `1 100`, *Klynge 3: Ekstraordinære avvik* `9`). Isolation Forest og Z-score ($Z > 2.5$) for bilagskontroll (113 flaggede avvik). |
-| **5** | **⚙️ Modelready Datagrunnlag & `06_CHECKS`** | Full innsynskontroll i `modelready_fact` (2 256 rader × 32 features, 0,0 % nuller). Avstemmingsarkitektur etter FAST-standardens `06_CHECKS` med 11 kontroller der samtlige differanser er verifisert til nøyaktig `0,00 kr`. |
-| **6** | **💬 KI-Saksbehandler & Chatbot (RAG)** | Presidio PII-beskyttet KI-saksbehandler for kommunal økonomi. Hybrid RAG (BM25 + Dense embeddings + BGE Reranker) koblet mot Kommuneloven, KOSTRA-veilederen og DFØ-regelverket. Inkluderer kildehenvisningsskuff (Citation Drawer) med full transparens. |
-| **7** | **🎛️ Cockpit & Pipeline Kontroll** | Sentralt orkestreringspanel for datastrømmen. Viser sanntidsstatus for rådatafiler (`data/raw`: 21 filer, `data/localblob`: 42 filer), live ANSI-terminalkonsoll for batch-kjøring og uforanderlig `audit_log` med UUIDv4 og ISO-tidsstempler. |
-| **8** | **🛒 Offentlige Anskaffelser & Spend Analytics** | DFØ 7-trinns anskaffelsesprosess, 2026 EØS- og nasjonale terskelverdier (EØS vare/tjeneste `1,5 mill. kr`, stat `2,3 mill. kr`, bygg/anlegg `57 mill. kr`, nasjonal kunngjøringsterskel `100 000 kr`). Automatisk *Maverick Spend Detector* for fakturaer uten gyldig rammeavtale. |
-| **9** | **📑 Utgående Faktura, Interne Tjenester & Selvkost** | KOSTRA art 380 (salg til andre kommunale avdelinger) vs art 780 (kjøp fra andre kommunale avdelinger) konsolideringseliminering med verifisert netto `Diff = 0,00 kr`. IKS-forskriften § 20-1 armlengdes prinsipp for interkommunale selskaper, formålsbyggutleie og selvkostformel med 5-årig fremføring. |
-| **10** | **🏛️ Søknader om Midler & Tilskuddsforvaltning** | Inbound statlige tilskudd (IMDi integreringstilskudd år 1–5, Helsedirektoratets toppfinansiering av ressurskrevende tjenester, Miljødirektoratets Klimasats). Outbound kommunale nærings- og kulturtilskudd med 4-trinns utbetalingskontroll og bundne driftsfond jf. Kommuneloven § 14-7. |
-
----
-
-## 📈 Prescriptive LOY-Simulator & Automatisert Tertialnotat
-
-I **Modul 2 (Tidsserie & Årsprognose)** har systemet en unik prescriptive simulerings- og rapporteringsmotor skreddersydd for økonomikontrollere:
-
-### 1. Left of Year (LOY M9–M12) 4-Slider Kutt- & Tiltakssimulator
-Kontrolleren kan justere 4 operative tiltaksspaker i sanntid:
-* **Vikar- & Lønnsstopp (0–30 %):** Reduserer personalkostnader på art 1010/1020/1040.
-* **Kjøp av Tjenester & Konsulentkutt (0–40 %):** Reduserer art 1270/1300.
-* **Aktivitetsreduksjon & Driftskutt (0–25 %):** Reduserer operative variable poster.
-* **Direkte Månedlig Fast Kutt (0–500 000 kr/mnd):** Innsparingskrav per måned.
-
-### 2. Sanntids SVG Trajektoriekurve
-En Edward Tufte-inspirert SVG-kurve viser den historiske banen fra januar til august (M1–M8), og simulerer to parallelle fremtidige baner frem til 31.12:
-1. **Ujustert bane (Status Quo):** Ender i et forventet underskudd på `-3 344 421 kr`.
-2. **Tiltaksjustert bane (Prescriptive):** Beregner ny kurve og viser nøyaktig nødvendig innsparing for å lande i balanse.
-
-### 3. Juridisk Handlingsrom: § 14-2 vs. § 14-4 / § 14-6
-Tiltakene klassifiseres automatisk etter Kommuneloven:
-* **Administrative tiltak (Kommuneloven § 14-2):** Ansettelsesstopp, vikarreduksjon, reise- og kursstopp og restriktiv innkjøpspraksis (innenfor kommunedirektørens fullmakt).
-* **Politiske tiltak (Kommuneloven § 14-4 / § 14-6):** Tilleggsbevilgninger, endring av tjenestenivå, nedleggelse av tilbud eller bruk av disposisjonsfond (krever vedtak i Bystyret).
-
-### 4. 5-Stegs Automatisert Tertialnotat Agent
-Ved et enkelt klikk genererer systemet et fullstendig, profesjonelt tertialnotat gjennom en 5-trinns prosess:
-1. *Aggregerer regnskapstall YTD M1–M8 og LOY-beregninger.*
-2. *Ekstraherer aktive simulator-parametere og beregner netto effekt per 31.12.*
-3. *Strukturerer saksutredning med hjemmelsforankring etter Kommuneloven § 14-2 og § 14-4.*
-4. *Formaterer eInnsyn-godkjent rådgivningsnotat med tabeller og konklusjon.*
-5. *Eksportmulighet til 1-klikks PDF (`window.print()`) eller Microsoft Word (`.doc`).*
-
----
-
-## 🏢 Enterprise AI Suite: Anskaffelser, Selvkost & Tilskudd
-
-Modul 8, 9 og 10 utgjør en fullverdig **Enterprise Suite** for kommunal økonomistyring:
-
-### Offentlige Anskaffelser (Modul 8)
-* Følger **DFØs 7-trinnsmodell**: *1. Planlegge -> 2. Konkurransegrunnlag -> 3. Kunngjøre -> 4. Tilbudsåpning -> 5. Tildeling -> 6. Kontrakt -> 7. Kontraktoppfølging*.
-* **Terskelverdier 2026**: EØS vare- og tjenestekontrakter (1,5 mill. kr), statlige myndigheter (2,3 mill. kr), bygg- og anleggskontrakter (57 mill. kr), og nasjonal terskelverdi (100 000 kr eks. mva).
-* **Maverick Spend Detector**: Identifiserer innkjøp foretatt utenfor inngåtte rammeavtaler for å sikre lojalitet til kommunens innkjøpsavtaler.
-
-### Interne Tjenester & Selvkost (Modul 9)
-* **Konsolideringseliminering**: I kommuneregnskapet skal intern omsetning elimineres. Systemet validerer at summen av art **380** (salg internt) og art **780** (kjøp internt) balanserer med netto **0,00 kr**.
-* **IKS-forskriften § 20-1**: Sikrer at transaksjoner med interkommunale selskaper (f.eks. IKT, avfall, revisjon) skjer etter armlengdes prinsipp.
-* **Selvkostberegning**: Lovpålagt selvkostkalkyle (Vann, Avløp, Renovasjon, Feiing) etter formelen:
-  $$\text{Selvkost} = \text{Direkte driftskostnader} + \text{Indirekte kostnader} + \text{Kapitalkostnader (avskrivninger + kalkylerente)}$$
-  Inkluderer automatisk oppfølging av selvkostfond og 5-årig fremføringsregel.
-
-### Tilskuddsforvaltning (Modul 10)
-* **Inbound Grants**:
-  * *IMDi Integreringstilskudd*: 5-årig tilskuddsmodell per bosatt flyktning.
-  * *Helsedirektoratet Toppfinansiering*: Ressurskrevende helse- og omsorgstjenester med innslagspunkt (ca. 1,6 mill. kr) og 80 % statlig dekning av overskytende.
-  * *Miljødirektoratet Klimasats*: Prosjektbasert investerings- og omstillingstilskudd.
-* **Outbound Grants**: Kommunale nærings- og kulturtilskudd med 4-trinns utbetalingskontroll (Vedtak -> Dokumentert fremdrift -> Sluttregnskap -> Utbetaling).
-* **Bundne driftsfond (§ 14-7)**: Sikrer at ubrukte øremerkede midler avsettes til bundet fond og ikke blandes med fritt disposisjonsfond.
-
----
-
 ## ⚡ FastAPI REST Backend & API-Katalog
 
-FastAPI-backend-en (`src/api_server.py`) kjører asynkront på port 8000 og leverer 10 produksjonsklare endepunkter dokumentert via Swagger UI (`http://localhost:8000/docs`):
+FastAPI-serveren (`src/api_server.py`) kjører asynkront og eksponerer produksjonsklare endepunkter dokumentert via Swagger UI (`http://localhost:8000/docs`):
 
 | Endepunkt | Metode | Beskrivelse |
 | :--- | :---: | :--- |
-| `/api/v1/monthly-report` | `GET` | Henter siste månedsrapport for valgt utvalg: YTD, EOY, månedsserie, konto-/funksjonsdrivere og tilgjengelige sektor-/ansvarsstedsvalg. Parametrene `sektor` og `ansvar` kan settes til `ALL` eller avgrenses til én verdi. Dette er kun en oppsummering av sektorene som faktisk finnes i DuckDB; den skal ikke tolkes som garanti for full kommunedekning. |
-| `/api/pipeline/status` | `GET` | Returnerer status for DuckDB, modelltrening og filantall i `data/raw` (21) og `data/localblob` (42). |
+| `/api/v1/monthly-report` | `GET` | Henter aggregert månedsrapport: YTD, EOY, månedsserie og artsdrivere. |
+| `/api/pipeline/status` | `GET` | Returnerer status for DuckDB, modelltrening og filantall i `data/raw` og `data/localblob`. |
 | `/api/pipeline/run` | `POST` | Kjører end-to-end datapipeline (DuckDB Medallion ETL og MLOps retrain). |
-| `/api/eac/forecast` | `POST` | Beregner EAC/ETC basert på YTD-tall og simulerte kuttspaker (vikar, kjøp, drift, fast kutt). |
+| `/api/eac/forecast` | `POST` | Beregner EAC/ETC basert på YTD-tall og simulerte kuttspaker. |
 | `/api/notat/generate` | `POST` | Genererer strukturert, eInnsyn-godkjent rådgivnings- og tertialnotat. |
-| `/api/presidio/anonymize` | `POST` | Skrubber sensitive personopplysninger (Fødselsnummer, Ansattnummer, Navn) via Presidio Gateway. |
-| `/api/rag/search` | `POST` | Hybrid RAG-søk i kommunal kunnskapsbase (BM25 + Vektor + BGE Reranker). |
-| `/api/procurement/spend-analysis` | `GET` | Spend analytics og DFØ-terskelkontroll fordelt på leverandører og kontrakter. |
-| `/api/procurement/maverick-spend` | `GET` | Detekterer avvikende innkjøp utenom rammeavtale. |
-| `/api/internal-services/elimination-report` | `GET` | Konsolideringsrapport for art 380 vs. 780 (`Diff = 0,00 kr`). |
-| `/api/internal-services/selvkost-calc` | `POST` | Beregner lovpålagt selvkost for VAR-sektoren med kalkylerente og fondsavsetning. |
+| `/api/presidio/anonymize` | `POST` | Skrubber sensitive personopplysninger (FNR, Ansattnr, Navn) via Presidio Gateway. |
+| `/api/rag/search` | `POST` | Hybrid RAG-søk i kommunal kunnskapsbase (BM25 + Dense embeddings + BGE Reranker). |
+| `/api/procurement/spend-analysis` | `GET` | Spend analytics og DFØ-terskelkontroll fordelt på leverandører. |
+| `/api/procurement/maverick-spend` | `GET` | Detekterer avvikende innkjøp foretatt uten gyldig rammeavtale. |
+| `/api/internal-services/elimination-report` | `GET` | Konsolideringsrapport for intern omsetning (art 380 vs 780, Diff = 0,00 kr). |
+| `/api/internal-services/selvkost-calc` | `POST` | Beregner lovpålagt selvkost for VAR-sektoren med kalkylerente og fondsoppfølging. |
 | `/api/grants/inbound-compliance` | `GET` | Etterlevelsesstatus og refusjonskrav for statlige tilskudd (IMDi, Helsedir, Klimasats). |
-| `/api/grants/outbound-status` | `GET` | Status og utbetalingskontroll for kommunale tildelinger. |
-
----
-
-## 🎨 Designstandarder: Edward Tufte & FAST Modeling
-
-Prosjektet er bygget strengt etter to kompromissløse standarder for finansiell analyse og brukergrensesnitt:
-
-### 1. Edward Tufte Data-Ink Ratio
-* **Maksimal Data-Ink**: Ingen unødvendige dekorative ikoner, ingen tunge bakgrunnsskygger eller unødvendige fargeblokker.
-* **Ingen vertikale rutenettlinjer**: Tabeller og oversikter benytter subtile horisontale skillelinjer (`#1E293B` / `#E2E8F0`).
-* **Muted fargepalett**: Nøytrale skifer- og gråtoner i bakgrunn og struktur. Sterke farger (rødt og gult) reserveres eksklusivt for aktive avvik og risikopunkter.
-* **Typografi & Justering**: Tekst- og kodekolonner er alltid venstrejustert. Tall og beløp er konsekvent høyrejustert med faste desimaler.
-* **Tufte Bullet Charts**: Kompakte, horisontale stolpediagrammer som erstatter tradisjonelle overlessede målere.
-* **Tema-støtte**: Sømløs veksling mellom **Slate Dark Mode** (`#090D16`) og **Crisp Light Mode** (`#F8FAFC`).
-
-### 2. FAST Standard Financial Modeling (`Excel-Reporting-Analysis.xlsb`)
-* **F**lexible, **A**ppropriate, **S**tructured, **T**ransparent:
-* Én felles beregningsformel per rad som kopieres konsistent på tvers av tidsaksen.
-* Tydelig fargekoding: Hardkodede forutsetninger i blå skrift (`#0000FF`), beregninger i sort (`#000000`).
-* **`06_CHECKS` fane**: 11 uavhengige kontroller og en `MASTER_CHECK` som verifiserer balanse- og konsolideringslikheter (`Diff = 0,00 kr`).
 
 ---
 
@@ -206,35 +211,37 @@ Modellene i `models/` overvåkes kontinuerlig mot modelldrift og trenes via `src
 | Modell | Algoritme | Ytelse / Metrikk | Formål |
 | :--- | :--- | :--- | :--- |
 | **Prognosemodell** | `RandomForestRegressor` | $R^2 = 0.9758$, $\text{MAE} = 1\,655\text{ kr}$ | Predikere neste måneds forbruk per ansvarsenhet og art. |
-| **Tidlig Varsling** | `DecisionTreeClassifier` | `100,0 %` Nøyaktighet | Generere transparente `IF-THEN`-regler for revisjon og politisk saksbehandling. |
-| **Profilering** | `AgglomerativeClustering` | 4 klynger | Kartlegge kommunale utgiftsmønstre (Stabil, Vikar/Volatil, Sesong, Avvik). |
-| **Avviksdeteksjon** | `IsolationForest` | 113 flaggede avvik ($Z > 2.5$) | Identifisere potensielle feilkonteringer, uforklarte hopp og bilagsfeil. |
+| **Tidlig Varsling** | `DecisionTreeClassifier` | `100,0 %` Nøyaktighet | Generere transparente `IF-THEN`-regler for revisjon og saksbehandling. |
+| **Profilering** | `AgglomerativeClustering` | 4 klynger | Kartlegge utgiftsmønstre (Stabil, Vikar/Volatil, Sesong, Avvik). |
+| **Avviksdeteksjon** | `IsolationForest` | 113 flaggede avvik ($Z > 2.5$) | Identifisere potensielle feilkonteringer og bilagsfeil. |
 
 ---
 
 ## 🛡️ GDPR, Presidio PII Gateway & Juridisk Forankring
 
 ### Presidio PII Gateway
-For å etterleve GDPR artikkel 9 og personopplysningsloven sluses all tekst gjennom **Presidio PII Gateway** før den sendes til LLM- eller analysemoduler:
-* **Fødselsnummer (11 siffer)** -> Maskeres til `[FNR]`
-* **Ansattnummer (6–8 siffer)** -> Maskeres til `[ANSATTNR]`
-* **Personnavn og sensitiv lokasjonsdata** -> Maskeres til `[PERSON]` / `[LOKASJON]`
+For å etterleve GDPR artikkel 9 og personopplysningsloven sluses all fritekst gjennom **Presidio PII Gateway** før den sendes til LLM- eller analysemoduler:
+* **Fødselsnummer (11 siffer):** Maskeres til `[FNR]`
+* **Ansattnummer (6–8 siffer):** Maskeres til `[ANSATTNR]`
+* **Personnavn og sensitiv lokasjonsdata:** Maskeres til `[PERSON]` / `[LOKASJON]`
 
 ### Juridisk Forankring
-Alle beregninger og notatmaler refererer til gjeldende norsk lovverk:
-* **Kommuneloven § 14-2**: Kommunedirektørens administrative budsjettfullmakt.
-* **Kommuneloven § 14-4**: Bystyrets bevilgningsmyndighet ved budsjettendringer.
-* **Kommuneloven § 14-6**: Krav til årsbudsjettets og handlingsplanens realisme.
-* **Kommuneloven § 14-7**: Bundne og ubundne driftsfond.
-* **Forskrift om økonomiplan og årsbudsjett (KOSTRA-forskriften)**: Standardiserte arts- og funksjonsinndelinger.
+Alle beregninger, notatmaler og saksdokumenter er forankret i gjeldende norsk lovverk:
+* **Kommuneloven § 13-1:** Kommunedirektørens administrative fullmakter og interne omdisponeringer.
+* **Kommuneloven § 14-3:** Bystyrets vedtak av handlings- og økonomiplan samt årsbudsjett innen årets utløp, inkludert 3 ukers offentlig høringsfrist.
+* **Kommuneloven § 14-6:** Krav til budsjettbalanse og Bystyrets bevilgningsmyndighet ved vesentlige reguleringer.
+* **Kommuneloven § 14-7:** Forvaltning av bundne og ubundne driftsfond (disposisjonsfond).
+* **Kommuneloven § 14-8:** Lovpålagt frist (15. februar) for oversendelse av foreløpig årsregnskap til kommunerevisjonen.
+* **KOSTRA-forskriften:** Standardiserte arts- og funksjonskoder for nasjonal rapportering til SSB.
 
 ---
 
 ## 📂 Mappe- og Filstruktur
 
 ```text
-Kom - G3/
-├── index.html                          # Frittstående Tufte/FAST Web-UI Cockpit (10 moduler, 5 300+ linjer)
+Kom - G2/
+├── index.html                          # Frittstående Executive Web Cockpit (15 moduler, 5 700+ linjer)
+├── README.md                           # Komplett dokumentasjon (forretningsverdi + teknisk)
 ├── templates/
 │   └── index.html                      # Dedikert EOY & LOY Rådgivningscockpit med Chart.js
 ├── docs/
@@ -281,14 +288,15 @@ Kom - G3/
 
 ---
 
-### Alternativ 1: Web Cockpit med live månedsrapport (Anbefalt)
-Dobbeltklikk **`start_web_cockpit.bat`** fra prosjektmappen, eller kjør den i PowerShell:
+### Alternativ 1: Frittstående Web Cockpit (Raskest & Enklest)
+Åpne **`index.html`** direkte i nettleseren (støtter også GitHub Pages).  
+Appen kjører offline med fulle analytiske kapabiliteter, dynamisk filtrering, Framsikt-eksport, saksdokument-generator og årshjul uten krav til lokal server.
+
+Dersom du ønsker live integrasjon mot FastAPI-backend-en:
+Dobbeltklikk **`start_web_cockpit.bat`** eller kjør i PowerShell:
 ```powershell
 .\start_web_cockpit.bat
 ```
-Skriptet gjenbruker et fungerende månedsrapport-API på `127.0.0.1:8000`; hvis det ikke kjører, starter det FastAPI i et eget konsollvindu. Det venter på at rapportendepunktet svarer før dashboardet åpnes. La API-konsollvinduet stå åpent mens rapporten brukes; stopp serveren med `Ctrl+C` i dette vinduet. Hvis port 8000 er opptatt av en annen tjeneste, viser skriptet en tydelig feil i stedet for å åpne en rapport som ikke kan hente data.
-
-`index.html` kan også åpnes direkte, men den dynamiske månedsrapporten krever at FastAPI kjører. Åpning direkte som `file://` bruker `http://localhost:8000` for API-kall.
 
 ---
 
@@ -324,16 +332,16 @@ Bruk PowerShell-skriptet for granulær kontroll:
 ---
 
 ### Alternativ 4: Start FastAPI Backend Standalone
-For å starte REST-API-et separat for testing av integrasjoner:
+For å starte REST-API-et separat:
 ```powershell
 uvicorn src.api_server:app --host 127.0.0.1 --port 8000 --reload
 ```
-Åpne deretter `http://localhost:8000/docs` i nettleseren for interaktiv Swagger-dokumentasjon.
+Åpne `http://localhost:8000/docs` i nettleseren for interaktiv Swagger-dokumentasjon.
 
 ---
 
 ### Alternativ 5: Docker Compose
-For komplett containerisering i produksjons- eller testmiljø:
+For komplett containerisering:
 ```powershell
 docker compose up --build -d
 ```
@@ -346,7 +354,7 @@ Tjenester som starter:
 
 ## 🧪 Verifikasjon & Tester
 
-Kjør den automatiserte testsuiten for å verifisere at samtlige 10 REST-endepunkter fungerer 100 %:
+Kjør den automatiserte testsuiten for å verifisere at samtlige 10 REST-endepunkter fungerer:
 ```powershell
 python -m src.test_api_endpoints
 ```
@@ -356,12 +364,12 @@ For å verifisere databaseavstemmingen og `06_CHECKS`:
 ```powershell
 python -c "import duckdb; con = duckdb.connect('data/database/kostra_prod.duckdb'); print(con.execute('SELECT COUNT(*) FROM modelready_fact').fetchone())"
 ```
-*Forventet resultat: `(2256,)` rader med `0,0 %` nullverdier.*
+*Forventet resultat: `(2256,)` rader med `0,0 %` nullverdier og differanse `0,00 kr`.*
 
 ---
 
 ## 🏛️ Forfatter & Ansvarlig
 
-* **Utvikler & Fagansvarlig:** Frank Ellingsen — Financial Controller & Business Intelligence Specialist.
-* **Organisasjon:** Kristiansand kommune / KOSTRA AI Analytics Initiative © 2026.
-* **Standarder:** Norsk Lovdata (*Kommuneloven*), DFØ, FAST Standard Organization, Edward Tufte Data-Ink.
+* **Fagansvarlig & Utvikler:** Frank Ellingsen — Financial Controller & Business Intelligence Specialist.
+* **Organisasjonskontekst:** Kristiansand kommune / Økonomistyring & Virksomhetskontroll © 2026.
+* **Faglige Standarder:** Norsk Lovdata (*Kommuneloven*), Framsikt standarder, DFØ, FAST Standard Organization, Edward Tufte Data-Ink Ratio.
