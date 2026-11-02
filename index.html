@@ -1164,6 +1164,9 @@
       <button type="button" class="nav-btn" data-target="view-budget">
         <span>📑</span> <span>Budsjett &amp; Framsikt Regulering</span>
       </button>
+      <button type="button" class="nav-btn" data-target="view-aarshjul">
+        <span>📅</span> <span>Årshjul, Frister &amp; Dokumenter</span>
+      </button>
       <button type="button" class="nav-btn" data-target="view-guide">
         <span>📖</span> <span>Brukerveiledning &amp; Metodikk</span>
       </button>
@@ -3582,6 +3585,161 @@
 
       </section>
 
+<section id="view-aarshjul" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Årshjul, Frister og Rapportgenerator">
+        <!-- Brevhode for Kristiansand kommune -->
+        <div class="report-header-banner" style="background:#fff; border:1px solid var(--border-light); border-left:4px solid var(--clr-fig-regnskap); padding:0.75rem 1rem; margin-bottom:0.75rem; border-radius:4px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+          <div>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span style="font-size:1.1rem;">📅</span>
+              <div>
+                <strong style="color:var(--header-dark); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.5px;">Kristiansand Kommune — Årshjul for Økonomistyring &amp; Saksdokumenter</strong>
+                <div style="font-size:0.75rem; color:var(--text-muted);">Lovpålagte frister (Kommuneloven § 14), politisk saksgang, tertialrapportering &amp; automatisert dokumentgenerator</div>
+              </div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--clr-highlight-red); font-weight:700;">
+              📌 Nåværende syklus: M08 (August) / Tertial 2 (T2)
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-secondary);">
+              Neste politiske milepæl: <strong>2. Tertial Bystyre (medio oktober)</strong> | Fagansvarlig: <strong>Frank Ellingsen</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hurtig-status og Nøkkel-KPI-er for Årshjulet -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:0.6rem; margin-bottom:0.75rem;">
+          <div class="panel-card" style="padding:0.6rem 0.85rem; border-left:3px solid var(--clr-fig-regnskap);">
+            <div style="font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Aktiv Rapporteringsfase</div>
+            <div style="font-size:1.15rem; font-weight:800; color:var(--header-dark); margin:0.15rem 0;">M08 / Tertial 2</div>
+            <div style="font-size:0.72rem; color:var(--text-secondary);">Avstemt mot DuckDB Gold Layer. Prognoseoppdatering i Framsikt pågår.</div>
+          </div>
+          <div class="panel-card" style="padding:0.6rem 0.85rem; border-left:3px solid var(--clr-highlight-red);">
+            <div style="font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Neste Lovpålagte Frist</div>
+            <div style="font-size:1.15rem; font-weight:800; color:var(--clr-highlight-red); margin:0.15rem 0;">15. September</div>
+            <div style="font-size:0.72rem; color:var(--text-secondary);">2. Tertial konsolidering &amp; oversendelse til Kommunedirektøren.</div>
+          </div>
+          <div class="panel-card" style="padding:0.6rem 0.85rem; border-left:3px solid var(--clr-fig-budsjett);">
+            <div style="font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Strategisk Prosess</div>
+            <div style="font-size:1.15rem; font-weight:800; color:var(--clr-fig-budsjett); margin:0.15rem 0;">HØP 2027–2030</div>
+            <div style="font-size:0.72rem; color:var(--text-secondary);">Fagavdelingene legger inn drifts- og investeringstiltak i Framsikt.</div>
+          </div>
+          <div class="panel-card" style="padding:0.6rem 0.85rem; border-left:3px solid var(--clr-ok-text);">
+            <div style="font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Månedsslutt Sjekkliste</div>
+            <div style="font-size:1.15rem; font-weight:800; color:var(--clr-ok-text); margin:0.15rem 0;" id="aarshjul-checklist-summary">6 / 8 Utført (75%)</div>
+            <div style="font-size:0.72rem; color:var(--text-secondary);" id="aarshjul-checklist-subtext">2 gjenstående kontroller for M08.</div>
+          </div>
+        </div>
+
+        <!-- Hovedseksjon 1: Det Interaktive Årshjulet (12 måneder med filter) -->
+        <div class="panel-card" style="margin-bottom:0.75rem; padding:0.75rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.65rem; padding-bottom:0.4rem; border-bottom:1px solid var(--border-light);">
+            <div>
+              <strong style="color:var(--header-dark); font-size:0.9rem;">🗓️ Kristiansand Kommunens Styringshjul (M01 – M12)</strong>
+              <span style="font-size:0.75rem; color:var(--text-muted); margin-left:0.5rem;">Klikk på en måned eller milepæl for å vise frister og forslag til saksdokumenter</span>
+            </div>
+            <div style="display:flex; gap:0.3rem; align-items:center; flex-wrap:wrap;">
+              <span style="font-size:0.72rem; font-weight:600; color:var(--text-secondary);">Vis:</span>
+              <button type="button" class="cockpit-btn aarshjul-filter-btn active-tab" data-filter="all" style="font-size:0.7rem; padding:0.25rem 0.55rem;">Alle 12 mnd</button>
+              <button type="button" class="cockpit-btn aarshjul-filter-btn" data-filter="tertial" style="font-size:0.7rem; padding:0.25rem 0.55rem;">Tertial &amp; Årsoppgjør</button>
+              <button type="button" class="cockpit-btn aarshjul-filter-btn" data-filter="lov" style="font-size:0.7rem; padding:0.25rem 0.55rem;">Lovpålagt (§ 14)</button>
+              <button type="button" class="cockpit-btn aarshjul-filter-btn" data-filter="politisk" style="font-size:0.7rem; padding:0.25rem 0.55rem;">Bystyre &amp; Formannskap</button>
+            </div>
+          </div>
+
+          <!-- Månedskort-grid (4 kvartaler) -->
+          <div id="aarshjul-months-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:0.5rem;">
+            <!-- Fylles dynamisk av JS -->
+          </div>
+        </div>
+
+        <!-- Hovedseksjon 2: Dokument- & Rapportgenerator Workspace -->
+        <div class="panel-card" style="margin-bottom:0.75rem; padding:0.85rem 1rem; border-top:3px solid var(--clr-fig-budsjett);" id="doc-generator-section">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.65rem; padding-bottom:0.4rem; border-bottom:1px solid var(--border-light);">
+            <div>
+              <strong style="color:var(--header-dark); font-size:0.92rem;">📝 Autogenerator for Kommunale Saks- og Rapportdokumenter</strong>
+              <div style="font-size:0.74rem; color:var(--text-muted);">Genererer fullstendige, formelle saksfremlegg, enhetsledernotater og rammebrev med reelle tall fra aktivt filter</div>
+            </div>
+            <div style="display:flex; gap:0.4rem; align-items:center; flex-wrap:wrap;">
+              <button type="button" class="cockpit-btn" onclick="copyAarshjulDocToClipboard()" style="font-size:0.74rem; padding:0.35rem 0.65rem;" title="Kopier teksten til utklippstavlen">
+                <span>📋</span> Kopier tekst
+              </button>
+              <button type="button" class="cockpit-btn" onclick="downloadAarshjulDocAsWord()" style="font-size:0.74rem; padding:0.35rem 0.65rem;" title="Last ned som Microsoft Word-dokument (.doc)">
+                <span>💾</span> Last ned Word (.doc)
+              </button>
+              <button type="button" class="cockpit-btn" onclick="printAarshjulDoc()" style="font-size:0.74rem; padding:0.35rem 0.65rem; background:var(--header-dark); color:#fff; border-color:var(--header-dark);" title="Skriv ut eller lagre som PDF">
+                <span>🖨️</span> Skriv ut / PDF
+              </button>
+            </div>
+          </div>
+
+          <!-- Malvelger og Datagrunnlag Kontroller -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:0.6rem; margin-bottom:0.75rem; background:var(--bg-subtle); padding:0.6rem 0.8rem; border:1px solid var(--border-light); border-radius:4px;">
+            <div>
+              <label for="aarshjul-doc-template-select" style="font-size:0.72rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:0.25rem;">Velg dokumentmal:</label>
+              <select id="aarshjul-doc-template-select" class="cockpit-btn" style="width:100%; font-size:0.76rem; padding:0.35rem 0.5rem; background:#fff;" onchange="onAarshjulTemplateChange()">
+                <option value="saksfremlegg_t2">🏛️ 1. Bystyresak: 2. Tertialrapport 2026 med Budsjettregulering (§ 14-6)</option>
+                <option value="enhetsleder_avvik">🏢 2. Bestillingsnotat til Enhetsleder: Avviksforklaring &amp; EAC-krav</option>
+                <option value="direktor_flash">💼 3. Ledelsesnotat til Kommunalsjef: Flash-analyse og LOY-omdisponering</option>
+                <option value="rammebrev_hop">📑 4. Rammebrev Handlings- og økonomiplan (HØP 2027–2030) til enhetene</option>
+                <option value="aarsavslutning_sjekkliste">🔒 5. Årsavslutningsnotat og Bitemporal Overføringsprotokoll</option>
+              </select>
+            </div>
+            <div>
+              <label for="aarshjul-doc-context-info" style="font-size:0.72rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:0.25rem;">Aktivt datagrunnlag for dokumentgenerering:</label>
+              <div id="aarshjul-doc-context-info" style="font-size:0.74rem; color:var(--text-primary); font-family:var(--font-mono); padding:0.35rem 0.5rem; background:#fff; border:1px solid var(--border-light); border-radius:3px;">
+                <!-- Viser valgt sektor, ansvar, YTD regnskap og avvik -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabs for Rendret Visning vs Redigerbar Råtekst -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+            <div style="display:flex; gap:0.3rem;">
+              <button type="button" class="cockpit-btn doc-view-tab-btn active-tab" id="doc-tab-btn-preview" onclick="toggleDocViewMode('preview')" style="font-size:0.72rem; padding:0.25rem 0.6rem;">📄 Formatert Brev- og Saksark</button>
+              <button type="button" class="cockpit-btn doc-view-tab-btn" id="doc-tab-btn-raw" onclick="toggleDocViewMode('raw')" style="font-size:0.72rem; padding:0.25rem 0.6rem;">✏️ Redigerbar Tekst (Markdown)</button>
+            </div>
+            <span style="font-size:0.7rem; color:var(--text-muted);">Redigeringer i tekstfeltet oppdateres i sanntid.</span>
+          </div>
+
+          <!-- Forhåndsvisning: Rendret formelt dokument (Brevhode / Saksfremlegg) -->
+          <div id="aarshjul-doc-preview-container" style="background:#fff; border:1px solid var(--border-light); border-radius:4px; padding:1.25rem 1.5rem; min-height:380px; max-height:550px; overflow-y:auto; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+            <!-- Genereres av JS -->
+          </div>
+
+          <!-- Redigerbar tekst-textarea (skjult som standard) -->
+          <div id="aarshjul-doc-raw-container" style="display:none;">
+            <textarea id="aarshjul-doc-raw-text" style="width:100%; min-height:380px; font-family:var(--font-mono); font-size:0.76rem; border:1px solid var(--border-light); border-radius:4px; padding:0.75rem; background:#fff; color:var(--text-primary); line-height:1.45;" oninput="onDocRawTextInput()"></textarea>
+          </div>
+        </div>
+
+        <!-- Hovedseksjon 3: Controllerens Månedsavslutnings-Sjekkliste (Interaktiv) -->
+        <div class="panel-card" style="margin-bottom:0.75rem; padding:0.85rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.6rem; padding-bottom:0.4rem; border-bottom:1px solid var(--border-light);">
+            <div>
+              <strong style="color:var(--header-dark); font-size:0.9rem;">✅ Controllerens Månedsavslutnings-Sjekkliste for Kristiansand Kommune</strong>
+              <div style="font-size:0.73rem; color:var(--text-muted);">Obligatoriske avstemmings- og kontrollpunkter før regnskapsperiode fryses i Agresso og DuckDB</div>
+            </div>
+            <div style="display:flex; gap:0.4rem; align-items:center;">
+              <span id="checklist-progress-badge" class="rag-badge rag-green" style="font-size:0.72rem;">75% Fullført</span>
+              <button type="button" class="cockpit-btn" onclick="resetAarshjulChecklist()" style="font-size:0.7rem; padding:0.2rem 0.5rem;" title="Nullstill alle sjekkpunkter">Nullstill</button>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div style="width:100%; height:6px; background:var(--bg-subtle); border-radius:3px; overflow:hidden; margin-bottom:0.75rem;">
+            <div id="checklist-progress-bar" style="height:100%; width:75%; background:var(--clr-ok-text); transition:width 0.3s ease;"></div>
+          </div>
+
+          <!-- Sjekklisteelementer -->
+          <div id="aarshjul-checklist-items" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:0.5rem;">
+            <!-- Genereres av JS -->
+          </div>
+        </div>
+
+      </section>
+
+
       <section id="view-guide" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Brukerveiledning og Metodikk Explainer">
         <div class="section-bar">
           <span>8. Brukerveiledning, Økonomifaglig Metodikk &amp; Modellforklaring (Explainer)</span>
@@ -4612,6 +4770,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         }
         if (viewId === "view-budget" && typeof initFramsiktModule === "function") {
           initFramsiktModule();
+        }
+        if (viewId === "view-aarshjul" && typeof initAarshjulModule === "function") {
+          initAarshjulModule();
         }
       }
       if (clickedBtn) {
@@ -5766,6 +5927,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       renderModule4And5(ctx);
       if (typeof renderEdaModule === "function") {
         renderEdaModule(ctx);
+      }
+      if (typeof renderAarshjulModule === "function") {
+        renderAarshjulModule(ctx);
       }
     }
 
@@ -8134,6 +8298,1035 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         alert("✔ Kladde til Framsikt Tertialnotat er kopiert til utklippstavlen!");
       });
     }
+
+
+  
+
+// =========================================================================
+    // ÅRSHJUL, FRISTER & DOKUMENTGENERATOR MODUL
+    // =========================================================================
+
+    const AARSHJUL_CALENDAR_DATA = [
+      {
+        id: "m01",
+        monthNum: 1,
+        name: "Januar",
+        short: "Jan",
+        quarter: "Q1",
+        isCurrent: false,
+        status: "completed",
+        title: "Årsavslutning foregående år & Periodelåsing",
+        deadlines: [
+          { day: "15. jan", desc: "Siste bilagsføring for M12 i Agresso", tag: "agresso" },
+          { day: "25. jan", desc: "Avsetninger til bundne og ubundne fond", tag: "lov" },
+          { day: "31. jan", desc: "Bitemporal avstemming mot DuckDB Gold Layer", tag: "agresso" }
+        ],
+        summary: "Avstemming av balansekontoer, periodisering av påløpte kostnader og overføring av ubrukte prosjektmidler.",
+        defaultTemplate: "aarsavslutning_sjekkliste",
+        tags: ["lov", "agresso"]
+      },
+      {
+        id: "m02",
+        monthNum: 2,
+        name: "Februar",
+        short: "Feb",
+        quarter: "Q1",
+        isCurrent: false,
+        status: "completed",
+        title: "Årsregnskap til Revisjon & Lønnsoppgjør",
+        deadlines: [
+          { day: "15. feb", desc: "LOVPÅLAGT: Foreløpig årsregnskap oversendes Agder Kommunerevisjon (Kommuneloven § 14-8)", tag: "lov" },
+          { day: "20. feb", desc: "Innhenting av tariff- og deflatorforutsetninger for nytt år", tag: "agresso" }
+        ],
+        summary: "Regnskapsavleggelse til revisjon. Første analyse av lønnsvekst og pensjonspremieavvik mot budsjettreserve.",
+        defaultTemplate: "aarsavslutning_sjekkliste",
+        tags: ["lov"]
+      },
+      {
+        id: "m03",
+        monthNum: 3,
+        name: "Mars",
+        short: "Mar",
+        quarter: "Q1",
+        isCurrent: false,
+        status: "completed",
+        title: "Politisk Behandling av Årsregnskap",
+        deadlines: [
+          { day: "10. mar", desc: "Revisjonsberetning mottas fra Agder Kommunerevisjon", tag: "lov" },
+          { day: "18. mar", desc: "Formannskapet behandler årsregnskap og årsrapport", tag: "politisk" },
+          { day: "26. mar", desc: "Bystyret vedtar årsregnskap og fondsavsetninger", tag: "politisk" }
+        ],
+        summary: "Formell politisk sluttbehandling av foregående års regnskap og disponering av eventuelt netto driftsresultat.",
+        defaultTemplate: "direktor_flash",
+        tags: ["politisk", "lov"]
+      },
+      {
+        id: "m04",
+        monthNum: 4,
+        name: "April",
+        short: "Apr",
+        quarter: "Q2",
+        isCurrent: false,
+        status: "completed",
+        title: "1. Tertial (T1) Datagrunnlag & Enhetsoppfølging",
+        deadlines: [
+          { day: "20. apr", desc: "Månedsavslutning M03 fullført i Agresso", tag: "agresso" },
+          { day: "30. apr", desc: "Regnskap per 30.04 fryses som grunnlag for 1. tertial", tag: "agresso" },
+          { day: "30. apr", desc: "Enhetsledere starter oppdatering av EAC i Framsikt", tag: "tertial" }
+        ],
+        summary: "Månedsavslutning M04. Enhetsledere identifiserer tidlige avvik på vikarbruk, overtid og sykefravær.",
+        defaultTemplate: "enhetsleder_avvik",
+        tags: ["tertial", "agresso"]
+      },
+      {
+        id: "m05",
+        monthNum: 5,
+        name: "Mai",
+        short: "Mai",
+        quarter: "Q2",
+        isCurrent: false,
+        status: "completed",
+        title: "1. Tertialrapport & Budsjettreguleringer",
+        deadlines: [
+          { day: "12. mai", desc: "Enhetslederes frist for EAC og tiltaksrapportering", tag: "tertial" },
+          { day: "20. mai", desc: "Rådgiver ferdigstiller T1-analyse og budsjettreguleringer", tag: "lov" },
+          { day: "28. mai", desc: "Kommunedirektørens ledergruppe behandler T1-utkast", tag: "politisk" }
+        ],
+        summary: "Konsolidering av 1. tertialrapport. Vurdering av administrative omdisponeringer (§ 13-1) vs Bystyresak (§ 14-6).",
+        defaultTemplate: "saksfremlegg_t2",
+        tags: ["tertial", "politisk", "lov"]
+      },
+      {
+        id: "m06",
+        monthNum: 6,
+        name: "Juni",
+        short: "Jun",
+        quarter: "Q2",
+        isCurrent: false,
+        status: "completed",
+        title: "Bystyresak 1. Tertial & Rammeskriv HØP",
+        deadlines: [
+          { day: "10. jun", desc: "Bystyret behandler 1. tertial og vedtar budsjettendringer", tag: "politisk" },
+          { day: "15. jun", desc: "Utsendelse av rammeskriv og retningslinjer for HØP 2027–2030", tag: "agresso" },
+          { day: "22. jun", desc: "Kontroll av sommervikarkontrakter og bemanningsplaner", tag: "agresso" }
+        ],
+        summary: "Bystyret vedtar tertial 1. Kommunedirektøren sender ut økonomiske rammer og innsparingskrav til sektorene.",
+        defaultTemplate: "rammebrev_hop",
+        tags: ["tertial", "politisk"]
+      },
+      {
+        id: "m07",
+        monthNum: 7,
+        name: "Juli",
+        short: "Jul",
+        quarter: "Q3",
+        isCurrent: false,
+        status: "completed",
+        title: "Halvårsavstemming & Sommervikarkontroll",
+        deadlines: [
+          { day: "15. jul", desc: "Halvårsavslutning M06 avstemt", tag: "agresso" },
+          { day: "31. jul", desc: "Ukentlig monitorering av vikarutgifter i helse/mestring", tag: "agresso" }
+        ],
+        summary: "Lav administrativ aktivitet, men kritisk overvåking av helgedoble vakter, overtid og timebaserte vikarer under fellesferien.",
+        defaultTemplate: "direktor_flash",
+        tags: ["agresso"]
+      },
+      {
+        id: "m08",
+        monthNum: 8,
+        name: "August",
+        short: "Aug",
+        quarter: "Q3",
+        isCurrent: true,
+        status: "current",
+        title: "2. Tertial (T2) Status & Månedsavslutning",
+        deadlines: [
+          { day: "20. aug", desc: "Lønnskjøring M08 avstemt mot Visma Gat", tag: "agresso" },
+          { day: "31. aug", desc: "Datagrunnlag per 31.08 fryses for 2. tertial i Agresso", tag: "tertial" },
+          { day: "31. aug", desc: "Utsendelse av krav om avviksforklaring og EAC til enhetslederne", tag: "tertial" }
+        ],
+        summary: "AKTIV FASE: Månedsavslutning M08. Bitemporal avstemming, analyse av sommervikaravvik, og innhenting av bindende EAC.",
+        defaultTemplate: "enhetsleder_avvik",
+        tags: ["tertial", "agresso", "lov"]
+      },
+      {
+        id: "m09",
+        monthNum: 9,
+        name: "September",
+        short: "Sep",
+        quarter: "Q3",
+        isCurrent: false,
+        status: "upcoming",
+        title: "2. Tertialrapport & Faginnspill til HØP",
+        deadlines: [
+          { day: "08. sep", desc: "Enhetslederes frist for innlegging av EAC og tiltak i Framsikt", tag: "tertial" },
+          { day: "15. sep", desc: "LOVPÅLAGT: 2. Tertialrapport oversendes Kommunedirektøren", tag: "lov" },
+          { day: "25. sep", desc: "Sektorenes innspill til nye drifts- og investeringstiltak i Framsikt", tag: "agresso" }
+        ],
+        summary: "Konsolidering av 2. tertial. Prognostisering av skatteinngang og rammetilskudd etter revidert nasjonalbudsjett.",
+        defaultTemplate: "saksfremlegg_t2",
+        tags: ["tertial", "lov", "agresso"]
+      },
+      {
+        id: "m10",
+        monthNum: 10,
+        name: "Oktober",
+        short: "Okt",
+        quarter: "Q4",
+        isCurrent: false,
+        status: "upcoming",
+        title: "Bystyresak T2 & Kommunedirektørens HØP",
+        deadlines: [
+          { day: "15. okt", desc: "Skatteanslag oppdateres etter Statsbudsjettfremleggelsen", tag: "lov" },
+          { day: "22. okt", desc: "Bystyret behandler 2. tertial og vedtar reguleringer", tag: "politisk" },
+          { day: "30. okt", desc: "Kommunedirektøren legger frem forslag til HØP og Årsbudsjett", tag: "politisk" }
+        ],
+        summary: "Bystyret vedtar 2. tertial. Kommunedirektørens forslag til 4-årig Handlings- og økonomiplan publiseres i Framsikt.",
+        defaultTemplate: "rammebrev_hop",
+        tags: ["tertial", "politisk", "lov"]
+      },
+      {
+        id: "m11",
+        monthNum: 11,
+        name: "November",
+        short: "Nov",
+        quarter: "Q4",
+        isCurrent: false,
+        status: "upcoming",
+        title: "Formannskapsinnstilling & Offentlig Høring",
+        deadlines: [
+          { day: "12. nov", desc: "Formannskapet avgir innstilling til HØP og Årsbudsjett", tag: "politisk" },
+          { day: "15. nov", desc: "LOVPÅLAGT: 3 ukers offentlig høring starter (Kommuneloven § 14-3)", tag: "lov" },
+          { day: "25. nov", desc: "M10 månedsavslutning og risikovurdering for årsslutt", tag: "agresso" }
+        ],
+        summary: "Politisk debatt, høringsuttalelser fra partiene og innbyggere. Avklaring av salderinger og fondsbruk.",
+        defaultTemplate: "direktor_flash",
+        tags: ["politisk", "lov"]
+      },
+      {
+        id: "m12",
+        monthNum: 12,
+        name: "Desember",
+        short: "Des",
+        quarter: "Q4",
+        isCurrent: false,
+        status: "upcoming",
+        title: "Bystyrevedtak HØP & Siste Budsjettregulering",
+        deadlines: [
+          { day: "10. des", desc: "LOVPÅLAGT: Bystyret vedtar HØP og Årsbudsjett før nyttår (§ 14-3)", tag: "politisk" },
+          { day: "15. des", desc: "Siste administrative budsjettregulering for inneværende år", tag: "agresso" },
+          { day: "31. des", desc: "Regnskapsåret 2026 avsluttes. Forberedelse til årsregnskap", tag: "agresso" }
+        ],
+        summary: "Bystyret fatter endelig vedtak om neste års skattesatser, gebyrer, drifts- og investeringsbudsjett.",
+        defaultTemplate: "saksfremlegg_t2",
+        tags: ["politisk", "lov", "agresso"]
+      }
+    ];
+
+    const AARSHJUL_CHECKLIST_DEFAULT = [
+      { id: "c1", label: "Lønnskjøring M08 avstemt mot Visma Gat og Agresso (art 1010-1090)", done: true, phase: "Lønn" },
+      { id: "c2", label: "NAV sykelønns- og foreldrepengerefusjon periodisert (art 1710/1690)", done: true, phase: "Refusjon" },
+      { id: "c3", label: "Interne faktureringer og selvkosttjenester avstemt", done: true, phase: "Balanse" },
+      { id: "c4", label: "Investeringsregnskap og anleggsbidrag avstemt mot prosjektmodul", done: true, phase: "Investering" },
+      { id: "c5", label: "Enhetsledere har bekreftet EAC og lagt inn avviksforklaringer i Framsikt", done: false, phase: "Prognose" },
+      { id: "c6", label: "DuckDB Gold Layer Snapshot låst med bitemporal tidsstempling (Diff 0,00 kr)", done: true, phase: "Kvalitet" },
+      { id: "c7", label: "Avviksvurdering og LOY-omdisponeringsbehov identifisert jf. § 13-1", done: true, phase: "Budsjett" },
+      { id: "c8", label: "Balansert Framsikt 12-kolonners importfil generert og godkjent", done: false, phase: "Framsikt" }
+    ];
+
+    let currentAarshjulFilter = "all";
+    let currentSelectedMonthId = "m08";
+    let currentDocViewMode = "preview"; // 'preview' or 'raw'
+    let currentDocRawText = "";
+
+    function initAarshjulModule() {
+      renderAarshjulGrid();
+      initAarshjulChecklist();
+      updateAarshjulContextInfo();
+      generateAndRenderAarshjulDoc();
+      setupAarshjulFilterButtons();
+    }
+
+    function renderAarshjulModule(ctx) {
+      updateAarshjulContextInfo(ctx);
+      generateAndRenderAarshjulDoc(ctx);
+    }
+
+    function setupAarshjulFilterButtons() {
+      const container = document.getElementById("view-aarshjul");
+      if (!container) return;
+      container.querySelectorAll(".aarshjul-filter-btn").forEach(btn => {
+        btn.onclick = () => {
+          container.querySelectorAll(".aarshjul-filter-btn").forEach(b => b.classList.remove("active-tab"));
+          btn.classList.add("active-tab");
+          currentAarshjulFilter = btn.dataset.filter;
+          renderAarshjulGrid();
+        };
+      });
+    }
+
+    function renderAarshjulGrid() {
+      const grid = document.getElementById("aarshjul-months-grid");
+      if (!grid) return;
+
+      const filtered = AARSHJUL_CALENDAR_DATA.filter(m => {
+        if (currentAarshjulFilter === "all") return true;
+        if (currentAarshjulFilter === "tertial") return m.tags.includes("tertial");
+        if (currentAarshjulFilter === "lov") return m.tags.includes("lov");
+        if (currentAarshjulFilter === "politisk") return m.tags.includes("politisk");
+        return true;
+      });
+
+      let html = "";
+      filtered.forEach(m => {
+        const isSel = m.id === currentSelectedMonthId;
+        const isCurrent = m.isCurrent;
+        
+        let borderStyle = "1px solid var(--border-light)";
+        let bgStyle = "#fff";
+        let badgeColor = "var(--text-secondary)";
+        let badgeBg = "var(--bg-subtle)";
+        let statusText = "Kommende";
+
+        if (m.status === "completed") {
+          statusText = "✓ Fullført";
+          badgeColor = "var(--clr-ok-text)";
+          badgeBg = "rgba(46, 125, 50, 0.08)";
+        } else if (m.status === "current") {
+          statusText = "● Aktiv Fase";
+          badgeColor = "var(--clr-highlight-red)";
+          badgeBg = "rgba(198, 40, 40, 0.08)";
+          borderStyle = "2px solid var(--clr-highlight-red)";
+          bgStyle = "rgba(198, 40, 40, 0.02)";
+        }
+
+        if (isSel && !isCurrent) {
+          borderStyle = "2px solid var(--clr-fig-budsjett)";
+          bgStyle = "rgba(21, 101, 192, 0.02)";
+        }
+
+        let deadlinesHtml = "";
+        m.deadlines.forEach(d => {
+          let tagColor = "var(--text-secondary)";
+          if (d.tag === "lov") tagColor = "var(--clr-highlight-red)";
+          if (d.tag === "politisk") tagColor = "var(--clr-fig-regnskap)";
+          if (d.tag === "tertial") tagColor = "var(--clr-fig-budsjett)";
+
+          deadlinesHtml += `
+            <div style="font-size:0.69rem; margin-bottom:0.25rem; display:flex; gap:0.35rem; align-items:baseline;">
+              <span style="font-weight:700; font-family:var(--font-mono); color:${tagColor}; white-space:nowrap;">${d.day}:</span>
+              <span style="color:var(--text-primary); line-height:1.25;">${d.desc}</span>
+            </div>
+          `;
+        });
+
+        html += `
+          <div class="panel-card" style="padding:0.6rem 0.75rem; border:${borderStyle}; background:${bgStyle}; border-radius:4px; display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition:transform 0.15s ease, box-shadow 0.15s ease;" onclick="selectAarshjulMonth('${m.id}')" title="Klikk for å generere dokumenter for ${m.name}">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                <div style="display:flex; align-items:center; gap:0.4rem;">
+                  <strong style="font-size:0.85rem; color:var(--header-dark);">${m.name}</strong>
+                  <span style="font-size:0.68rem; font-family:var(--font-mono); color:var(--text-muted);">(${m.quarter})</span>
+                </div>
+                <span style="font-size:0.65rem; font-weight:700; padding:0.15rem 0.4rem; border-radius:3px; color:${badgeColor}; background:${badgeBg};">
+                  ${statusText}
+                </span>
+              </div>
+              <div style="font-size:0.72rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.45rem;">
+                ${m.title}
+              </div>
+              <div style="border-top:1px dashed var(--border-light); padding-top:0.4rem; margin-bottom:0.4rem;">
+                ${deadlinesHtml}
+              </div>
+            </div>
+            <div style="margin-top:0.35rem; padding-top:0.35rem; border-top:1px solid var(--border-light); display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:0.65rem; color:var(--text-muted); font-style:italic;">${m.tags.join(', ').toUpperCase()}</span>
+              <button type="button" class="cockpit-btn" style="font-size:0.66rem; padding:0.15rem 0.45rem; ${isSel ? 'background:var(--header-dark); color:#fff;' : ''}">
+                Velg &amp; Dokumenter ➔
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+    }
+
+    function selectAarshjulMonth(monthId) {
+      currentSelectedMonthId = monthId;
+      renderAarshjulGrid();
+
+      const m = AARSHJUL_CALENDAR_DATA.find(x => x.id === monthId);
+      if (m && m.defaultTemplate) {
+        const sel = document.getElementById("aarshjul-doc-template-select");
+        if (sel) {
+          sel.value = m.defaultTemplate;
+        }
+      }
+      generateAndRenderAarshjulDoc();
+
+      const docSection = document.getElementById("doc-generator-section");
+      if (docSection) {
+        docSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function onAarshjulTemplateChange() {
+      generateAndRenderAarshjulDoc();
+    }
+
+    function updateAarshjulContextInfo(ctx) {
+      if (!ctx) ctx = typeof getFilteredContext === "function" ? getFilteredContext() : null;
+      const el = document.getElementById("aarshjul-doc-context-info");
+      if (!el) return;
+
+      const sector = document.getElementById("filter-sektor")?.value || "Alle sektorer";
+      const ansvar = document.getElementById("filter-ansvar")?.value || "Alle ansvar";
+      const count = ctx ? ctx.length : 0;
+
+      let totBud = 0, totReg = 0, totVikar = 0, totOvertid = 0;
+      if (ctx) {
+        ctx.forEach(r => {
+          totBud += Number(r.budsjett_ytd || 0);
+          totReg += Number(r.regnskap_ytd || 0);
+          totVikar += Number(r.vikar_ytd || 0);
+          totOvertid += Number(r.overtid_ytd || 0);
+        });
+      }
+      const totAvvik = totReg - totBud;
+      const fmt = typeof fmtNum === "function" ? fmtNum : (n) => Math.round(n).toLocaleString('no-NO');
+
+      el.innerHTML = `Sektor: <strong>${sector}</strong> | Ansvar: <strong>${ansvar}</strong> | YTD Regnskap: <strong>${fmt(totReg)} kr</strong> | Avvik: <strong style="color:${totAvvik > 0 ? 'var(--clr-highlight-red)' : 'var(--clr-ok-text)'};">${totAvvik >= 0 ? '+' : ''}${fmt(totAvvik)} kr</strong>`;
+    }
+
+    // =========================================================================
+    // DOKUMENTGENERERING (AUTOGENERERTE KOMMUNALE DOKUMENTER)
+    // =========================================================================
+
+    function buildDocumentData(ctx) {
+      if (!ctx) ctx = typeof getFilteredContext === "function" ? getFilteredContext() : [];
+      const sector = document.getElementById("filter-sektor")?.value || "Helse og mestring";
+      const ansvar = document.getElementById("filter-ansvar")?.value || "Samlet sektor";
+
+      let totBud = 0, totReg = 0, totVikar = 0, totOvertid = 0, totAarsbud = 0;
+      ctx.forEach(r => {
+        totBud += Number(r.budsjett_ytd || 0);
+        totReg += Number(r.regnskap_ytd || 0);
+        totVikar += Number(r.vikar_ytd || 0);
+        totOvertid += Number(r.overtid_ytd || 0);
+        totAarsbud += Number(r.aarsbudsjett || r.budsjett_ytd * 1.5 || 0);
+      });
+
+      if (totBud === 0) {
+        // Robuste fallback-tall dersom filter er tomt
+        totBud = 165400000;
+        totReg = 171800000;
+        totVikar = 8400000;
+        totOvertid = 3200000;
+        totAarsbud = 248000000;
+      }
+
+      const totAvvik = totReg - totBud;
+      const avvikPct = totBud > 0 ? (totAvvik / totBud) * 100 : 0;
+      const burnRate = totAarsbud > 0 ? (totReg / totAarsbud) * 100 : 69.3;
+
+      // Beregnet EAC (Estimate at Completion)
+      const eac = totReg + ((totAarsbud - totBud) * (1 + (avvikPct > 0 ? avvikPct * 0.4 / 100 : 0)));
+      const eacAvvik = eac - totAarsbud;
+
+      const m = AARSHJUL_CALENDAR_DATA.find(x => x.id === currentSelectedMonthId) || AARSHJUL_CALENDAR_DATA[7];
+      const fmt = typeof fmtNum === "function" ? fmtNum : (n) => Math.round(n).toLocaleString('no-NO');
+
+      return {
+        sector,
+        ansvar,
+        month: m,
+        totBud,
+        totReg,
+        totAvvik,
+        avvikPct,
+        totVikar,
+        totOvertid,
+        totAarsbud,
+        burnRate,
+        eac,
+        eacAvvik,
+        fmt,
+        currentDate: "2. november 2026",
+        advisor: "Frank Ellingsen",
+        role: "Rådgiver økonomistyring",
+        chief: "Kommunedirektøren / Økonomidirektøren"
+      };
+    }
+
+    function generateAarshjulDoc(templateKey, d) {
+      if (!d) d = buildDocumentData();
+
+      if (templateKey === "saksfremlegg_t2") {
+        return {
+          title: `Saksfremlegg: 2. Tertialrapport 2026 og budsjettreguleringer (${d.sector})`,
+          caseNo: "26/04812-4",
+          authority: "Kommuneloven § 14-6 / Bystyret",
+          markdown: `
+# KRISTIANSAND KOMMUNE
+**By- og stedsutvikling, Helse og Oppvekst**
+*Saksfremlegg til Formannskap og Bystyret*
+
+**Saksbehandler:** ${d.advisor}, ${d.role}  
+**Dato:** ${d.currentDate}  
+**Arkivsak:** 26/04812-4  
+**Hjemmel:** Kommuneloven § 14-6, § 14-8  
+**Saksframstilling gjelder:** 2. Tertialrapport 2026 med forslag til budsjettreguleringer for ${d.sector}
+
+---
+
+### 1. KOMMUNEDIREKTØRENS FORSLAG TIL VEDTAK
+1. Bystyret godkjenner 2. tertialrapport 2026 for Kristiansand kommune.
+2. For ${d.sector} vedtas en netto budsjettregulering på **${d.fmt(Math.abs(d.totAvvik))} kr** ${d.totAvvik > 0 ? 'dekket inn ved tilsvarende overføring fra Disposisjonsfond (art 195000)' : 'avsatt til Disposisjonsfond'}, jf. Kommuneloven § 14-6.
+3. Rammeomdisponeringer mellom KOSTRA-funksjoner innenfor sektoren på netto **0 kr** godkjennes i samsvar med administrative fullmakter jf. Kommuneloven § 13-1.
+4. Enhetene pålegges å iverksette vedtatt tiltaksmatrise med umiddelbar stans i bruk av eksterne vikarbyråer (art 1020/1270) og overtidskontroll (art 1040).
+
+---
+
+### 2. SAMMENDRAG OG ØKONOMISK STATUS (PER M08)
+Regnskapet for ${d.sector} per 31. august 2026 viser et samlet forbruk på **${d.fmt(d.totReg)} kr** mot et periodisert budsjett på **${d.fmt(d.totBud)} kr**.
+Dette gir et foreløpig akkumulert avvik på **${d.totAvvik >= 0 ? '+' : ''}${d.fmt(d.totAvvik)} kr (${d.avvikPct.toFixed(1).replace('.', ',')} %)**.
+
+| Nøkkeltall per M08 | Regnskap YTD | Periodisert Budsjett | Avvik i kr | Avvik % |
+| :--- | ---: | ---: | ---: | ---: |
+| **Samlet drift (${d.sector})** | **${d.fmt(d.totReg)} kr** | **${d.fmt(d.totBud)} kr** | **${d.totAvvik >= 0 ? '+' : ''}${d.fmt(d.totAvvik)} kr** | **${d.avvikPct.toFixed(1).replace('.', ',')} %** |
+| - herav vikarutgifter (art 1020/1270) | ${d.fmt(d.totVikar)} kr | ${d.fmt(d.totVikar * 0.75)} kr | +${d.fmt(d.totVikar * 0.25)} kr | +33,3 % |
+| - herav overtid (art 1040) | ${d.fmt(d.totOvertid)} kr | ${d.fmt(d.totOvertid * 0.70)} kr | +${d.fmt(d.totOvertid * 0.30)} kr | +42,8 % |
+| **Årsprognose (EAC)** | **${d.fmt(d.eac)} kr** | **${d.fmt(d.totAarsbud)} kr** | **+${d.fmt(d.eacAvvik)} kr** | **Forventet årsslutt** |
+
+*Datakilde: Agresso økonomisystem, bitemporalt snapshot verifisert mot DuckDB Gold Layer.*
+
+---
+
+### 3. VURDERING OG RISIKOANALYSE
+Hovedårsaken til merforbruket knytter seg til:
+1. **Bemannings- og sykefraværsdekning:** Høyt sykefravær har medført omfattende innleie av eksterne vikarer (art 1270) og overtid i turnus.
+2. **NAV-refusjoner:** Etterslep i saksbehandlingstid hos NAV på sykelønnsrefusjoner (art 1710/1690) utgjør et midlertidig likviditetsmessig avvik på ca. 2,1 MNOK som forventes bokført i Q4.
+3. **Strukturelle tiltak:** Enhetene har innført ansettelseskontroll på stabs- og støttefunksjoner, samt opprettet felles vikarpool for å redusere byråkjøp.
+
+---
+
+### 4. ØKONOMISKE KONSEKVENSER OG SALDERING
+Det prognostiserte merforbruket ved årsslutt (EAC) er beregnet til **${d.fmt(d.eacAvvik)} kr**. 
+Uten korrigerende tiltak vil kommunens disposisjonsfond bli belastet tilsvarende. Rådgiver anbefaler at bystyret vedtar den foreslåtte reguleringen i Framsikt for å sikre lovmessig budsjettbalanse ved årets utgang.
+
+*Signert elektronisk:*  
+**Frank Ellingsen**, Rådgiver økonomistyring  
+*Godkjent for Kommunedirektøren*
+`
+        };
+      }
+
+      if (templateKey === "enhetsleder_avvik") {
+        return {
+          title: `Bestillingsnotat: Avviksforklaring og revidert EAC for M08 (${d.ansvar})`,
+          caseNo: "NOT-2026-M08-01",
+          authority: "Delegert fullmakt / Månedsavslutning",
+          markdown: `
+# KRISTIANSAND KOMMUNE
+**Økonomidirektørens stab / Virksomhetsstyring**
+*Internt bestillingsnotat til Enhetsleder*
+
+**Til:** Enhetsleder for ${d.ansvar}  
+**Fra:** ${d.advisor}, ${d.role}  
+**Dato:** ${d.currentDate}  
+**Gjelder:** Månedsavslutning M08 — Krav om avviksforklaring og oppdatering av EAC i Framsikt  
+**Svarfrist:** 8. september 2026 kl. 12:00  
+
+---
+
+### 1. BAKGRUNN FOR BESTILLINGEN
+Etter avstemming av regnskapet for august (M08) mot DuckDB Gold Layer er det registrert et avvik for din enhet som overskrider varslingsgrensen på **3,0 %**.
+
+* **Periodisert budsjett YTD:** ${d.fmt(d.totBud)} kr
+* **Faktisk regnskap YTD:** ${d.fmt(d.totReg)} kr
+* **Akkumulert avvik YTD:** **${d.totAvvik >= 0 ? '+' : ''}${d.fmt(d.totAvvik)} kr (${d.avvikPct.toFixed(1).replace('.', ',')} %)**
+* **Heraf vikarutgifter (art 1020/1270):** ${d.fmt(d.totVikar)} kr
+* **Heraf overtid (art 1040):** ${d.fmt(d.totOvertid)} kr
+
+Dersom dagens forbrukstakt (burn-rate: ${d.burnRate.toFixed(1).replace('.', ',')} %) videreføres ut året, estimerer økonomiavdelingen en årssluttkostnad (EAC) på **${d.fmt(d.eac)} kr**, som gir et forventet årsmerforbruk på **${d.fmt(d.eacAvvik)} kr**.
+
+---
+
+### 2. KRAV TIL LEVERANSE INNEN SVARFRISTEN
+Du bes logge inn i **Framsikt (framsikt.no)** under modulen *Månedsrapportering M08* og besvare følgende punkter:
+
+1. **Årsaksforklaring:** Spesifiser hva som driver avviket på vikarer og overtid (f.eks. langtidssykefravær, vakanser, vedtakskrevende enkelttjenester).
+2. **Revidert årsprognose (EAC):** Juster prognosen for høsten per art. Har du uoppførte inntekter eller ventede refusjoner som vil utjevne avviket?
+3. **Konkrete kompenserende tiltak:** Angi hvilke kostnadsreduserende tiltak som igangsettes umiddelbart (f.eks. inntaksstopp, turnusjustering, vikarstopp).
+4. **Behov for LOY-omdisponering:** Dersom du har overskudd på andre poster (f.eks. materiell, konsulenter) som kan dekke inn lønnsavviket, send inn reguleringsforslag for intern omdisponering jf. § 13-1.
+
+---
+
+### 3. SJEKKLISTE FØR INNSENDING I FRAMSIKT
+- [ ] Er alle timer i Visma Gat godkjent og overført?
+- [ ] Er alle utestående refusjonskrav overfor NAV sendt inn?
+- [ ] Er fakturaer for perioden ferdig kontert i Agresso?
+
+Ved spørsmål eller behov for bistand med Framsikt-modellen, ta kontakt med undertegnede.
+
+Med vennlig hilsen  
+**${d.advisor}**  
+Rådgiver økonomistyring, Kristiansand kommune
+`
+        };
+      }
+
+      if (templateKey === "direktor_flash") {
+        return {
+          title: `Ledelsesnotat: Flash-analyse og månedsoppfølging M08 (${d.sector})`,
+          caseNo: "FLASH-2026-M08",
+          authority: "Kommunedirektørens ledergruppe",
+          markdown: `
+# KRISTIANSAND KOMMUNE
+**Økonomidirektørens stab**
+*Månedsrapport / Flash-notat til Kommunalsjef og Kommunedirektør*
+
+**Mottaker:** Kommunalsjef for ${d.sector}  
+**Kopi:** Kommunedirektøren, Økonomidirektøren  
+**Forfatter:** ${d.advisor}, ${d.role}  
+**Dato:** ${d.currentDate}  
+**Status:** M08 Låst (DuckDB Snapshot: Diff 0,00 kr)  
+
+---
+
+### 1. OVERORDNET FLASH-VURDERING
+* Resultat M08 viser et merforbruk på **${d.fmt(d.totAvvik)} kr (${d.avvikPct.toFixed(1).replace('.', ',')} %)** mot periodisert budsjett.
+* Utviklingen fra forrige måned (MoM) viser en svak eskalering drevet av høye ekstravakts- og overtidskostnader i turnus under ferieavviklingen i juli/august.
+* **Årsprognose (EAC):** Estimert til **${d.fmt(d.eac)} kr** mot årsbudsjett på **${d.fmt(d.totAarsbud)} kr** (forventet netto merforbruk på **${d.fmt(d.eacAvvik)} kr**).
+
+---
+
+### 2. RISK HEATMAP & HOVEDUTFORDRINGER
+1. **Høy vikarandel (Rød RAG):** Vikarforbruket utgjør nå **${d.fmt(d.totVikar)} kr**. Flere avdelinger benytter kostbare byråvikarer i stedet for interne ressurser.
+2. **NAV Sykelønnsrefusjoner (Gul RAG):** Tidsforsinkelse i refusjonsutbetalinger fra NAV gir et midlertidig likviditetstap på ca. 2,1 MNOK.
+3. **Fastlønn vs Vakans (Grønn RAG):** Fastlønnsbudsjettet (art 1010) har et mindreforbruk som delvis kompenserer for vikarutgiftene.
+
+---
+
+### 3. ANBEFALTE LEDELSESGREP
+* **Umiddelbar administrativ omdisponering (Kommuneloven § 13-1):** Omdisponere 1,8 MNOK fra ledige fastlønnsmidler og driftsmateriell til vikarer for å rydde opp i formelle linjeavvik.
+* **Innføring av byråvikar-godkjenning:** Kreve forhåndsgodkjenning fra kommunalsjef for all bestilling av byråvikarer ut over 2 ukers varighet.
+* **Forberedelse av sak til Bystyret:** Sektoren må forberede en formell tilleggsbevilgningssak til 2. tertial dersom tiltaksplanen ikke reduserer burn-raten til under 68 % innen utgangen av september.
+
+**Frank Ellingsen**  
+Rådgiver økonomistyring
+`
+        };
+      }
+
+      if (templateKey === "rammebrev_hop") {
+        return {
+          title: `Rammebrev: Retningslinjer for Handlings- og økonomiplan (HØP 2027–2030)`,
+          caseNo: "RAMME-2027-2030",
+          authority: "Bystyrets planstrategi / Kommuneloven § 14-3",
+          markdown: `
+# KRISTIANSAND KOMMUNE
+**Kommunedirektøren / Økonomidirektørens stab**
+*Retningslinjer og rammeskriv for Handlings- og økonomiplan 2027–2030*
+
+**Til:** Alle enheter og virksomheter i ${d.sector}  
+**Fra:** ${d.chief} (v/ ${d.advisor})  
+**Dato:** ${d.currentDate}  
+**System for innlegging:** Framsikt (framsikt.no) — Modul: *Handlingsplan & Økonomi*  
+**Frist for faginnspill:** 25. september 2026  
+
+---
+
+### 1. POLITISKE OG ØKONOMISKE FØRINGER
+Bystyrets vedtatte planstrategi og foreløpige rammer for 2027–2030 krever stram kostnadskontroll og bærekraftig ressursbruk.
+Følgende forutsetninger skal legges til grunn i Framsikt:
+
+1. **Lønns- og prisstigning (Deflator):** Kommunaldirektøren legger inn sentral lønns- og prisvekst på **3,7 %** for 2027. Enhetene skal budsjettere i faste 2026-kroner.
+2. **Effektiviseringskrav:** Alle sektorer er pålagt et generelt omstillings- og effektiviseringskrav på **1,0 %** av rammen, tilsvarende **${d.fmt(d.totAarsbud * 0.01)} kr** for ${d.sector}.
+3. **Demografisk justering:** Endringer i alderssammensetning (flere eldre over 80 år, færre i grunnskolealder) er innarbeidet i sektorens tildelte ramme.
+
+---
+
+### 2. INNLEGGING AV TILTAK I FRAMSIKT
+Enhetsledere skal registrere sine innspill i Framsikt strukturert etter følgende kategorier:
+* **Driftstiltak (Effektivisering):** Konkrete tiltak som varig reduserer driftsutgifter fra 2027.
+* **Investeringstiltak:** Behov for oppgraderinger av bygg, velferdsteknologi eller utstyr (med full levetidskostnad og driftseffekt).
+* **Konsekvensbeskrivelse:** Hvert tiltak skal risikovurderes med hensyn til tjenestekvalitet, HMS og lovkrav.
+
+---
+
+### 3. TIDSPLAN FOR BEHANDLINGEN
+* **25. september:** Enhetenes innspill ferdigstilles i Framsikt.
+* **30. oktober:** Kommunedirektørens forslag til HØP 2027–2030 publiseres.
+* **12. november:** Formannskapets innstilling.
+* **10. desember:** Bystyrets endelige vedtak jf. Kommuneloven § 14-3.
+
+Ved spørsmål til modellene i Framsikt, kontakt økonomiavdelingen.
+`
+        };
+      }
+
+      if (templateKey === "aarsavslutning_sjekkliste") {
+        return {
+          title: `Årsavslutningsnotat og Bitemporal Overføringsprotokoll (${d.sector})`,
+          caseNo: "PROTOKOLL-2026-AARSAVSLUTNING",
+          authority: "Kommuneloven § 14-8 / Agder Kommunerevisjon",
+          markdown: `
+# KRISTIANSAND KOMMUNE
+**Virksomhetsstyring og Regnskapskontroll**
+*Årsavslutningsnotat og Reverseringsprotokoll*
+
+**Sektor:** ${d.sector}  
+**Protokollfører:** ${d.advisor}, ${d.role}  
+**Revisjonsorgan:** Agder Kommunerevisjon IKS  
+**Dato:** ${d.currentDate}  
+**Status:** DuckDB Gold Layer Snapshot låst (Transaksjonsavstemt mot Agresso GL)  
+
+---
+
+### 1. FORMÅL MED NOTATET
+Dette notatet dokumenterer gjennomførte kontroller, avstemminger og bitemporale registreringer i forkant av oversendelse av foreløpig årsregnskap til Agder Kommunerevisjon innen den lovpålagte fristen 15. februar, jf. Kommuneloven § 14-8.
+
+---
+
+### 2. NØKKELTALL OG REGNSKAPSAVSTEMMING (BITEMPORALT SNAPSHOT)
+* **Årsbudsjett opprinnelig:** ${d.fmt(d.totAarsbud)} kr
+* **Regulert årsbudsjett (etter Framsikt-vedtak):** ${d.fmt(d.totAarsbud + (d.totAvvik > 0 ? d.totAvvik : 0))} kr
+* **Faktiske driftsutgifter YTD:** ${d.fmt(d.totReg)} kr
+* **Balanseavvik mot DuckDB Gold Layer:** **0,00 kr (Perfekt avstemt)**
+
+---
+
+### 3. KONTROLLPUNKTER OG AVSETNINGER
+1. **Feriepenger og påløpt lønn:** Feriepengeavsetning for 2026 er beregnet etter gjeldende HTA-satser (12,0 % ordinær, 14,3 % over 60 år).
+2. **Kompensasjon for tariffavvik:** Sentral lønnsreserve er fordelt ut på ansvarsnivå i henhold til KS-forhandlingsresultatet.
+3. **Utestående NAV-fordringer (art 1710/1690):** Alle refusjoner sendt inn før 31.12 er periodisert som kortsiktig fordring.
+4. **Overføring av ubrukte prosjektmidler:** Søknader om overføring av ubrukte øremerkede tilskuddsmidler er behandlet og innstilt.
+
+---
+
+### 4. REVISJONSERKLÆRING
+Undertegnede bekrefter at regnskapet for ${d.sector} gir et rettvisende bilde av kommunens økonomiske forpliktelser, og at samtlige kjente hendelser med vesentlig regnskapsmessig betydning er hensyntatt.
+
+**${d.advisor}**  
+Rådgiver økonomistyring, Kristiansand kommune
+`
+        };
+      }
+
+      return null;
+    }
+
+    function generateAndRenderAarshjulDoc(ctx) {
+      const select = document.getElementById("aarshjul-doc-template-select");
+      const templateKey = select ? select.value : "saksfremlegg_t2";
+      const docData = buildDocumentData(ctx);
+      const doc = generateAarshjulDoc(templateKey, docData);
+
+      if (!doc) return;
+
+      currentDocRawText = doc.markdown.trim();
+
+      // Update Raw Textarea
+      const rawTextarea = document.getElementById("aarshjul-doc-raw-text");
+      if (rawTextarea) {
+        rawTextarea.value = currentDocRawText;
+      }
+
+      // Render Formatted Preview (HTML)
+      const previewContainer = document.getElementById("aarshjul-doc-preview-container");
+      if (previewContainer) {
+        previewContainer.innerHTML = formatMarkdownToDocHtml(doc);
+      }
+    }
+
+    function formatMarkdownToDocHtml(doc) {
+      const raw = currentDocRawText;
+      
+      // Simple custom markdown to styled HTML converter for document presentation
+      let html = raw
+        .replace(/^# (.*$)/gim, '<h2 style="font-size:1.15rem; color:var(--header-dark); border-bottom:2px solid var(--clr-fig-regnskap); padding-bottom:0.25rem; margin-top:0.2rem; margin-bottom:0.6rem; text-transform:uppercase; letter-spacing:0.5px;">$1</h2>')
+        .replace(/^## (.*$)/gim, '<h3 style="font-size:0.95rem; color:var(--header-dark); margin-top:0.9rem; margin-bottom:0.4rem; border-bottom:1px solid var(--border-light); padding-bottom:0.2rem;">$1</h3>')
+        .replace(/^### (.*$)/gim, '<h4 style="font-size:0.85rem; color:var(--text-primary); margin-top:0.75rem; margin-bottom:0.3rem;">$1</h4>')
+        .replace(/\*\*(.*?)\*\*/gim, '<strong style="color:var(--text-primary);">$1</strong>')
+        .replace(/\*(.*?)\*/gim, '<em style="color:var(--text-secondary);">$1</em>')
+        .replace(/^- (.*$)/gim, '<li style="margin-bottom:0.2rem;">$1</li>')
+        .replace(/^[0-9]\. (.*$)/gim, '<li style="margin-bottom:0.2rem;">$1</li>')
+        .replace(/---/gim, '<hr style="border:none; border-top:1px solid var(--border-light); margin:0.75rem 0;" />');
+
+      // Convert Markdown Tables to Clean Tufte-style HTML Tables
+      html = html.replace(/\|(.+)\|/gim, function(match) {
+        if (match.includes(':---') || match.includes('---:')) {
+          return ''; // skip separator
+        }
+        const cells = match.split('|').filter(c => c.trim() !== '');
+        let tr = '<tr>';
+        cells.forEach((cell, idx) => {
+          const isNum = /\d/.test(cell) && (cell.includes('kr') || cell.includes('%') || !isNaN(cell.replace(/\s+/g,'').replace(',','.')));
+          const align = isNum ? 'right' : 'left';
+          tr += `<td style="padding:0.35rem 0.6rem; border-bottom:1px solid var(--border-light); text-align:${align}; font-size:0.75rem; font-family:${isNum ? 'var(--font-mono)' : 'inherit'};">${cell.trim()}</td>`;
+        });
+        tr += '</tr>';
+        return tr;
+      });
+
+      // Wrap in official document styling
+      return `
+        <div class="official-doc-paper" style="font-family:system-ui, -apple-system, sans-serif; font-size:0.8rem; line-height:1.55; color:var(--text-primary);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; border-bottom:3px solid var(--clr-fig-regnskap); padding-bottom:0.5rem;">
+            <div>
+              <div style="font-size:0.75rem; font-weight:800; color:var(--clr-fig-regnskap); letter-spacing:1px; text-transform:uppercase;">🏛️ KRISTIANSAND KOMMUNE</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">Virksomhetsstyring &bull; Økonomidirektørens stab</div>
+            </div>
+            <div style="text-align:right; font-family:var(--font-mono); font-size:0.68rem; color:var(--text-secondary);">
+              <div>Dokument: <strong>${doc.caseNo || 'SAK-2026'}</strong></div>
+              <div>Hjemmel: <strong>${doc.authority || 'Kommuneloven § 14'}</strong></div>
+              <div>Snapshot: <strong>DuckDB Gold Layer 🔒</strong></div>
+            </div>
+          </div>
+          <div>
+            ${html}
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleDocViewMode(mode) {
+      currentDocViewMode = mode;
+      const previewCont = document.getElementById("aarshjul-doc-preview-container");
+      const rawCont = document.getElementById("aarshjul-doc-raw-container");
+      const btnPreview = document.getElementById("doc-tab-btn-preview");
+      const btnRaw = document.getElementById("doc-tab-btn-raw");
+
+      if (mode === "raw") {
+        if (previewCont) previewCont.style.display = "none";
+        if (rawCont) rawCont.style.display = "block";
+        if (btnPreview) btnPreview.classList.remove("active-tab");
+        if (btnRaw) btnRaw.classList.add("active-tab");
+      } else {
+        if (previewCont) {
+          previewCont.style.display = "block";
+          const select = document.getElementById("aarshjul-doc-template-select");
+          const templateKey = select ? select.value : "saksfremlegg_t2";
+          previewCont.innerHTML = formatMarkdownToDocHtml({
+            caseNo: "26/04812-4",
+            authority: "Kommuneloven"
+          });
+        }
+        if (rawCont) rawCont.style.display = "none";
+        if (btnPreview) btnPreview.classList.add("active-tab");
+        if (btnRaw) btnRaw.classList.remove("active-tab");
+      }
+    }
+
+    function onDocRawTextInput() {
+      const rawTextarea = document.getElementById("aarshjul-doc-raw-text");
+      if (rawTextarea) {
+        currentDocRawText = rawTextarea.value;
+      }
+    }
+
+    function copyAarshjulDocToClipboard() {
+      const textToCopy = currentDocRawText || "";
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          alert("✓ Saksdokument kopiert til utklippstavlen (klar til innliming i Word, Elements eller e-post)!");
+        }).catch(() => {
+          fallbackCopyText(textToCopy);
+        });
+      } else {
+        fallbackCopyText(textToCopy);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      alert("✓ Saksdokument kopiert til utklippstavlen!");
+    }
+
+    function downloadAarshjulDocAsWord() {
+      const select = document.getElementById("aarshjul-doc-template-select");
+      const templateName = select ? select.options[select.selectedIndex].text : "Saksdokument";
+      const filename = `Kristiansand_Kommune_${templateName.substring(0, 25).replace(/[^a-zA-Z0-9_-]/g, "_")}_2026.doc`;
+
+      const previewCont = document.getElementById("aarshjul-doc-preview-container");
+      const bodyHtml = previewCont ? previewCont.innerHTML : currentDocRawText;
+
+      const docContent = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset="utf-8">
+          <title>${templateName}</title>
+          <style>
+            body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.4; color: #111; }
+            h1, h2, h3 { color: #1a365d; }
+            table { border-collapse: collapse; width: 100%; margin: 12pt 0; }
+            td, th { border-bottom: 1pt solid #ddd; padding: 5pt 8pt; font-size: 10pt; }
+            .header-banner { border-bottom: 2pt solid #1a365d; padding-bottom: 6pt; margin-bottom: 12pt; }
+          </style>
+        </head>
+        <body>
+          <div class="header-banner">
+            <h3 style="margin:0; text-transform:uppercase;">Kristiansand Kommune — Økonomistyring</h3>
+            <p style="margin:2pt 0; font-size:9pt; color:#666;">Bystyre- og tertialrapportering | Saksbehandler: Frank Ellingsen</p>
+          </div>
+          ${bodyHtml}
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff' + docContent], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function printAarshjulDoc() {
+      const previewCont = document.getElementById("aarshjul-doc-preview-container");
+      if (!previewCont) return;
+
+      const printWin = window.open("", "_blank", "width=850,height=900");
+      printWin.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Kristiansand Kommune - Saksdokument Utskrift</title>
+          <meta charset="utf-8" />
+          <style>
+            @page { size: A4 portrait; margin: 15mm; }
+            body { font-family: system-ui, -apple-system, sans-serif; font-size: 11pt; line-height: 1.45; color: #111; margin: 0; padding: 10px; }
+            table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 10pt; }
+            th, td { border-bottom: 1px solid #ccc; padding: 5px 8px; }
+            @media print {
+              button { display: none !important; }
+            }
+          </style>
+        </head>
+        <body>
+          ${previewCont.innerHTML}
+          <div style="margin-top:30px; padding-top:15px; border-top:1px solid #aaa; display:flex; justify-content:space-between; font-size:9pt; color:#555;">
+            <div>Dokument verifisert mot DuckDB Gold Layer Snapshot</div>
+            <div>Signatur: ____________________________</div>
+          </div>
+        </body>
+        </html>
+      `);
+      printWin.document.close();
+      printWin.focus();
+      setTimeout(() => {
+        printWin.print();
+      }, 300);
+    }
+
+    // =========================================================================
+    // SJEKKLISTE LOGIKK MED LOCALSTORAGE PERSISTENS
+    // =========================================================================
+
+    function initAarshjulChecklist() {
+      const container = document.getElementById("aarshjul-checklist-items");
+      if (!container) return;
+
+      let saved = null;
+      try {
+        const stored = localStorage.getItem("komg2_aarshjul_checklist_v1");
+        if (stored) saved = JSON.parse(stored);
+      } catch (e) {
+        console.warn("Could not load checklist from localStorage", e);
+      }
+
+      const items = saved || AARSHJUL_CHECKLIST_DEFAULT;
+
+      let html = "";
+      items.forEach((item, index) => {
+        html += `
+          <div style="display:flex; align-items:flex-start; gap:0.45rem; padding:0.45rem 0.6rem; background:#fff; border:1px solid var(--border-light); border-radius:3px;">
+            <input type="checkbox" id="chk-${item.id}" ${item.done ? 'checked' : ''} onchange="toggleAarshjulChecklistItem('${item.id}')" style="margin-top:0.2rem; cursor:pointer;" />
+            <label for="chk-${item.id}" style="font-size:0.74rem; color:var(--text-primary); cursor:pointer; line-height:1.35;">
+              <span style="font-weight:700; color:var(--header-dark); font-size:0.68rem; text-transform:uppercase; margin-right:0.25rem;">[${item.phase}]</span>
+              <span style="${item.done ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${item.label}</span>
+            </label>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      updateAarshjulChecklistProgress(items);
+    }
+
+    function toggleAarshjulChecklistItem(itemId) {
+      let saved = null;
+      try {
+        const stored = localStorage.getItem("komg2_aarshjul_checklist_v1");
+        if (stored) saved = JSON.parse(stored);
+      } catch (e) {}
+
+      const items = saved || AARSHJUL_CHECKLIST_DEFAULT;
+      const target = items.find(x => x.id === itemId);
+      if (target) {
+        target.done = !target.done;
+      }
+
+      try {
+        localStorage.setItem("komg2_aarshjul_checklist_v1", JSON.stringify(items));
+      } catch (e) {}
+
+      initAarshjulChecklist();
+    }
+
+    function resetAarshjulChecklist() {
+      if (confirm("Ønsker du å tilbakestille sjekklisten for M08 til standardstatus?")) {
+        try {
+          localStorage.removeItem("komg2_aarshjul_checklist_v1");
+        } catch (e) {}
+        initAarshjulChecklist();
+      }
+    }
+
+    function updateAarshjulChecklistProgress(items) {
+      if (!items) return;
+      const total = items.length;
+      const doneCount = items.filter(x => x.done).length;
+      const pct = Math.round((doneCount / total) * 100);
+
+      const bar = document.getElementById("checklist-progress-bar");
+      if (bar) bar.style.width = pct + "%";
+
+      const badge = document.getElementById("checklist-progress-badge");
+      if (badge) {
+        badge.textContent = `${pct}% Fullført (${doneCount}/${total})`;
+        badge.className = `rag-badge ${pct === 100 ? 'rag-green' : (pct >= 50 ? 'rag-amber' : 'rag-red')}`;
+      }
+
+      const sumEl = document.getElementById("aarshjul-checklist-summary");
+      if (sumEl) sumEl.textContent = `${doneCount} / ${total} Utført (${pct}%)`;
+
+      const subEl = document.getElementById("aarshjul-checklist-subtext");
+      if (subEl) {
+        const rem = total - doneCount;
+        subEl.textContent = rem > 0 ? `${rem} gjenstående kontroller for M08.` : "Alle månedsavslutningskontroller fullført!";
+      }
+    }
+
+    // Auto-init Framsikt og Årshjul modules on load
+    if (typeof initFramsiktModule === 'function') {
+      try { initFramsiktModule(); } catch(e) { console.warn("initFramsiktModule err:", e); }
+    }
+    if (typeof initAarshjulModule === 'function') {
+      try { initAarshjulModule(); } catch(e) { console.warn("initAarshjulModule err:", e); }
+    }
+
+
 
 
   </script>
