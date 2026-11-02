@@ -368,6 +368,29 @@ def run_all_tests():
         record_test("Art 1710 er postet direkte under 102000 med motpost NAV refusjon", bool(sal_refund_info["hasArt1710Subrow"]))
         record_test("Netto fraværsbelastning etter Art 1710 er beregnet i tabellen", bool(sal_refund_info["hasNettoSubrow"]))
 
+        # Sjekk Mindreforbruksanalyse (Horisontal bar chart for TOP 5 konti med mindreforbruk)
+        fav_chart_info = page.evaluate('''() => {
+            const panel = document.getElementById("min-favorable-panel");
+            const svg = document.querySelector("#min-favorable-chart-wrap svg");
+            const rects = document.querySelectorAll("#min-favorable-chart-wrap svg rect").length;
+            const texts = document.querySelectorAll("#min-favorable-chart-wrap svg text").length;
+            const tableRows = document.querySelectorAll("#min-favorable-tbody tr").length;
+            const kpiText = document.getElementById("min-favorable-kpi")?.textContent || "";
+            return {
+                panelVisible: panel && getComputedStyle(panel).display !== "none",
+                hasSvg: !!svg,
+                rects,
+                texts,
+                tableRows,
+                kpiText
+            };
+        }''')
+        record_test("Mindreforbruksanalyse-panel er synlig", bool(fav_chart_info["panelVisible"]))
+        record_test("Horisontal bar chart har 5 grønne søyler for topp 5 mindreforbruk", 
+                    fav_chart_info["hasSvg"] and fav_chart_info["rects"] == 5,
+                    f"SVG: {fav_chart_info['hasSvg']}, Søyler: {fav_chart_info['rects']}")
+        record_test("Mindreforbruk data-tabell har 5 rader", fav_chart_info["tableRows"] == 5, f"Rader: {fav_chart_info['tableRows']}")
+
         # Test fanevelger
         tabs = page.query_selector_all(".min-tab-btn")
         record_test("Predefinerte rapporter har 3 visningsfaner", len(tabs) == 3, f"Faner: {len(tabs)}")

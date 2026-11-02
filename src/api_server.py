@@ -487,6 +487,27 @@ def get_monthly_report(
         """,
         latest_params,
     )
+    favorable_rows = query_duckdb(
+        f"""
+        SELECT
+            sektor_navn,
+            funksjon_code,
+            funksjon_navn,
+            konto_code,
+            kontonavn,
+            COALESCE(SUM(cum_regnskap_ytd_nok), 0) AS ytd_actual_nok,
+            COALESCE(SUM(annual_budget_eoy_nok), 0) AS annual_budget_nok,
+            COALESCE(SUM(eoy_forecast_unadjusted_nok), 0) AS eoy_forecast_nok,
+            COALESCE(SUM(eoy_variance_projected_nok), 0) AS eoy_variance_nok
+        FROM modelready_fact
+        WHERE {where_sql} AND accounting_period = ?
+        GROUP BY sektor_navn, funksjon_code, funksjon_navn, konto_code, kontonavn
+        HAVING SUM(eoy_variance_projected_nok) < 0
+        ORDER BY eoy_variance_nok ASC
+        LIMIT 5
+        """,
+        latest_params,
+    )
     personnel_rows = query_duckdb(
         f"""
         SELECT
@@ -728,6 +749,20 @@ def get_monthly_report(
                 "eoy_variance_nok": round(float(row["eoy_variance_nok"] or 0.0), 2),
             }
             for row in driver_rows
+        ],
+        "favorable_drivers": [
+            {
+                "sektor_navn": row["sektor_navn"],
+                "funksjon_code": str(row["funksjon_code"]),
+                "funksjon_navn": row["funksjon_navn"],
+                "konto_code": str(row["konto_code"]),
+                "kontonavn": row["kontonavn"],
+                "ytd_actual_nok": round(float(row["ytd_actual_nok"] or 0.0), 2),
+                "annual_budget_nok": round(float(row["annual_budget_nok"] or 0.0), 2),
+                "eoy_forecast_nok": round(float(row["eoy_forecast_nok"] or 0.0), 2),
+                "eoy_variance_nok": round(float(row["eoy_variance_nok"] or 0.0), 2),
+            }
+            for row in favorable_rows
         ],
         "personnel_profile": personnel_profile,
     }
