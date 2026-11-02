@@ -1461,6 +1461,12 @@
         </div>
 
         <!-- Sticky Responsive KOSTRA Table -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:0.75rem 0 0.4rem; gap:0.75rem; flex-wrap:wrap;">
+          <div style="display:flex; align-items:center; gap:0.4rem; flex:1; max-width:400px;">
+            <input type="search" id="kostra-table-search" placeholder="🔍 Hurtigsøk i tabell (funksjonsnavn, kode, sektor)..." style="width:100%; padding:0.35rem 0.6rem; font-size:0.78rem; border:1px solid var(--border-light); border-radius:4px; background:var(--bg-surface); color:var(--text-primary);" />
+          </div>
+          <div id="kostra-active-filter-badge" style="font-size:0.75rem; color:var(--text-muted); font-weight:600;"></div>
+        </div>
         <div tabindex="0" role="region" aria-labelledby="kostra-table-caption" class="table-wrapper">
           <table class="data-table" style="--label-2:'Budsjett'; --label-3:'Regnskap'; --label-4:'Netto Avvik'; --label-5:'Avvik %'; --label-6:'Burn Rate'; --label-7:'EAC Prognose'; --label-8:'Status';">
             <caption id="kostra-table-caption">📋 KOSTRA Funksjonsanalyse — CUBE &amp; Gold Layer Avvikstabell (NOK)</caption>
@@ -3565,6 +3571,16 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         return true;
       });
 
+      const searchInp = document.getElementById("kostra-table-search");
+      const searchStr = (searchInp?.value || "").toLowerCase().trim();
+      if (searchStr) {
+        filteredFns = filteredFns.filter(fn =>
+          fn.name.toLowerCase().includes(searchStr) ||
+          fn.code.toLowerCase().includes(searchStr) ||
+          fn.sektor.toLowerCase().includes(searchStr)
+        );
+      }
+
       const isFallbackEmpty = filteredFns.length === 0;
       const effectiveFns = filteredFns.length > 0 ? filteredFns : allFnEvaluated.filter(fn => {
         if (ansvar !== "ALL" && fn.unitMatchScale <= 0) return false;
@@ -3723,6 +3739,11 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       const slicerTag = document.getElementById("slicer-context-tag");
       if (slicerTag) {
         slicerTag.innerHTML = renderRagBadge(`${pMeta.short} • ${filteredFns.length} funksjoner • ${overallStatus}`);
+      }
+      const searchBadge = document.getElementById("kostra-active-filter-badge");
+      if (searchBadge) {
+        const sVal = document.getElementById("kostra-table-search")?.value.trim();
+        searchBadge.textContent = sVal ? `Søk: "${sVal}" (${filteredFns.length} treff)` : `${filteredFns.length} av ${KOSTRA_FUNCTIONS.length} funksjoner vist`;
       }
 
       // KPI Cards + RAG Card Borders
@@ -4699,7 +4720,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       const unitSelect = document.getElementById("min-ansvar");
       unitSelect.innerHTML = '<option value="ALL">Alle ansvarssteder i utvalget</option>' +
         report.available_responsibilities.map(code => {
-          return `<option value="${escapeHtml(code)}">Ansvar ${escapeHtml(code)}</option>`;
+          const uMeta = ANSVAR_UNITS[code];
+          const label = uMeta ? uMeta.name : `Ansvar ${code}`;
+          return `<option value="${escapeHtml(code)}">${escapeHtml(label)}</option>`;
         }).join("");
       unitSelect.value = report.responsibility;
 
@@ -4778,11 +4801,178 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         "Velg et annet ansvarssted eller start FastAPI lokalt med .\\start_web_cockpit.ps1.";
     }
 
-    document.getElementById("min-sector")?.addEventListener("change", () => {
-      document.getElementById("min-ansvar").value = "ALL";
-      refreshMonthlyReport();
+    function renderAllDynamicReports() {
+      const ctx = getFilteredContext();
+      renderModule1(ctx);
+      renderModule2(ctx);
+      renderModule3(ctx);
+      renderModule4And5(ctx);
+    }
+
+    // =========================================================================
+    // DYNAMISK KASKADERENDE FILTRERING (POWER BI / FAST STYLE)
+    // =========================================================================
+    let isFilterSyncing = false;
+
+    function populateAnsvarOptions(sektorVal, selectedAnsvar = "ALL", matchingFn = null) {
+      const selects = [document.getElementById("flt-ansvar"), document.getElementById("ts-flt-ansvar")];
+      const validUnits = Object.entries(ANSVAR_UNITS).filter(([code, u]) => {
+        if (code === "ALL") return false;
+        if (matchingFn && u.fn !== matchingFn) return false;
+        if (sektorVal !== "ALL" && u.sektor !== sektorVal) return false;
+        return true;
+      });
+
+      const countLabel = validUnits.length > 0 ? `${validUnits.length} aktive` : "ingen";
+      const scopeLabel = sektorVal === "ALL" ? `Alle Ansvarssteder (${countLabel})` : `Alle ansvarssteder i ${sektorVal} (${countLabel})`;
+      const optionsHtml = `<option value="ALL">${scopeLabel}</option>` +
+        validUnits.map(([code, u]) => `<option value="${code}">${u.name}</option>`).join("");
+
+      selects.forEach(sel => {
+        if (!sel) return;
+        sel.innerHTML = optionsHtml;
+        const exists = validUnits.some(([code]) => code === selectedAnsvar) || selectedAnsvar === "ALL";
+        sel.value = exists ? selectedAnsvar : "ALL";
+      });
+    }
+
+    function populateFunksjonOptions(sektorVal, selectedFn = "ALL") {
+      const selects = [document.getElementById("flt-funksjon"), document.getElementById("ts-flt-funksjon")];
+      const validFns = KOSTRA_FUNCTIONS.filter(fn => {
+        return sektorVal === "ALL" || fn.sektor === sektorVal;
+      });
+
+      const scopeLabel = sektorVal === "ALL" ? `Alle KOSTRA-Funksjoner (${validFns.length})` : `Alle funksjoner i ${sektorVal} (${validFns.length})`;
+      const optionsHtml = `<option value="ALL">${scopeLabel}</option>` +
+        validFns.map(fn => `<option value="${fn.code}">${fn.name}</option>`).join("");
+
+      selects.forEach(sel => {
+        if (!sel) return;
+        sel.innerHTML = optionsHtml;
+        const exists = validFns.some(fn => fn.code === selectedFn) || selectedFn === "ALL";
+        sel.value = exists ? selectedFn : "ALL";
+      });
+    }
+
+    function syncDynamicFilters(changedType, changedValue) {
+      if (isFilterSyncing) return;
+      isFilterSyncing = true;
+
+      try {
+        let curPeriod = document.getElementById("flt-period")?.value || "ALL";
+        let curSektor = document.getElementById("flt-sektor")?.value || "ALL";
+        let curAnsvar = document.getElementById("flt-ansvar")?.value || "ALL";
+        let curFunksjon = document.getElementById("flt-funksjon")?.value || "ALL";
+        let curStatus = document.getElementById("flt-status")?.value || "ALL";
+
+        if (changedType === "sektor") {
+          curSektor = changedValue;
+          // Kaskadering: Oppdater ansvarssteder og funksjoner til valgt sektor
+          populateAnsvarOptions(curSektor, "ALL");
+          populateFunksjonOptions(curSektor, "ALL");
+          curAnsvar = "ALL";
+          curFunksjon = "ALL";
+        } else if (changedType === "ansvar") {
+          curAnsvar = changedValue;
+          if (curAnsvar !== "ALL" && ANSVAR_UNITS[curAnsvar]) {
+            const u = ANSVAR_UNITS[curAnsvar];
+            curSektor = u.sektor;
+            curFunksjon = u.fn;
+            populateFunksjonOptions(curSektor, curFunksjon);
+            populateAnsvarOptions(curSektor, curAnsvar);
+          } else if (curAnsvar === "ALL") {
+            populateFunksjonOptions(curSektor, curFunksjon);
+            populateAnsvarOptions(curSektor, "ALL");
+          }
+        } else if (changedType === "funksjon") {
+          curFunksjon = changedValue;
+          if (curFunksjon !== "ALL") {
+            const fn = KOSTRA_FUNCTIONS.find(x => x.code === curFunksjon);
+            if (fn) {
+              curSektor = fn.sektor;
+              populateFunksjonOptions(curSektor, curFunksjon);
+              populateAnsvarOptions(curSektor, curAnsvar, curFunksjon);
+              const selAns = document.getElementById("flt-ansvar");
+              curAnsvar = selAns ? selAns.value : "ALL";
+            }
+          } else {
+            populateAnsvarOptions(curSektor, "ALL");
+            populateFunksjonOptions(curSektor, "ALL");
+            curAnsvar = "ALL";
+          }
+        } else if (changedType === "period") {
+          curPeriod = changedValue;
+        } else if (changedType === "status") {
+          curStatus = changedValue;
+        } else if (changedType === "reset") {
+          curPeriod = "ALL";
+          curSektor = "ALL";
+          curAnsvar = "ALL";
+          curFunksjon = "ALL";
+          curStatus = "ALL";
+          const sInp = document.getElementById("kostra-table-search");
+          if (sInp) sInp.value = "";
+          populateAnsvarOptions("ALL", "ALL");
+          populateFunksjonOptions("ALL", "ALL");
+        }
+
+        // Synkroniser verdiene på tvers av View 1 (flt-*) og View 2 (ts-flt-*)
+        const setVal = (id, val) => {
+          const el = document.getElementById(id);
+          if (el && el.value !== val) el.value = val;
+        };
+        setVal("flt-period", curPeriod);
+        setVal("ts-flt-period", curPeriod);
+        setVal("flt-sektor", curSektor);
+        setVal("ts-flt-sektor", curSektor);
+        setVal("flt-ansvar", curAnsvar);
+        setVal("ts-flt-ansvar", curAnsvar);
+        setVal("flt-funksjon", curFunksjon);
+        setVal("ts-flt-funksjon", curFunksjon);
+        setVal("flt-status", curStatus);
+        setVal("ts-flt-status", curStatus);
+
+        // Synkroniser også Modul 12 (Min Økonomi / Månedsrapport)
+        const minSec = document.getElementById("min-sector");
+        if (minSec && minSec.value !== curSektor) {
+          minSec.value = curSektor;
+        }
+        const minAns = document.getElementById("min-ansvar");
+        if (minAns && minAns.value !== curAnsvar) {
+          minAns.value = curAnsvar;
+        }
+        refreshMonthlyReport();
+
+        // Kjør re-render av alle dynamiske analyser og grafer
+        renderAllDynamicReports();
+        const ctx = getFilteredContext();
+        renderCitationDrawer(ctx.ansvar !== "ALL" ? ctx.ansvarMeta.name : ctx.sektor);
+      } finally {
+        isFilterSyncing = false;
+      }
+    }
+
+    // Filterhendelser for View 1 og View 2
+    [
+      { id1: "flt-period", id2: "ts-flt-period", type: "period" },
+      { id1: "flt-sektor", id2: "ts-flt-sektor", type: "sektor" },
+      { id1: "flt-ansvar", id2: "ts-flt-ansvar", type: "ansvar" },
+      { id1: "flt-funksjon", id2: "ts-flt-funksjon", type: "funksjon" },
+      { id1: "flt-status", id2: "ts-flt-status", type: "status" }
+    ].forEach(({ id1, id2, type }) => {
+      const e1 = document.getElementById(id1);
+      const e2 = document.getElementById(id2);
+      if (e1) e1.addEventListener("change", () => syncDynamicFilters(type, e1.value));
+      if (e2) e2.addEventListener("change", () => syncDynamicFilters(type, e2.value));
     });
-    document.getElementById("min-ansvar")?.addEventListener("change", refreshMonthlyReport);
+
+    // Hendelser for Modul 12 (Min Økonomi)
+    document.getElementById("min-sector")?.addEventListener("change", (e) => {
+      syncDynamicFilters("sektor", e.target.value);
+    });
+    document.getElementById("min-ansvar")?.addEventListener("change", (e) => {
+      syncDynamicFilters("ansvar", e.target.value);
+    });
     document.getElementById("min-refresh")?.addEventListener("click", refreshMonthlyReport);
     document.getElementById("min-print")?.addEventListener("click", () => window.print());
     document.getElementById("min-measure-effect")?.addEventListener("input", renderAdjustedForecast);
@@ -4818,60 +5008,14 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       }
     });
 
-    function renderAllDynamicReports() {
-      const ctx = getFilteredContext();
-      renderModule1(ctx);
-      renderModule2(ctx);
-      renderModule3(ctx);
-      renderModule4And5(ctx);
-    }
+    // Nullstill-knapper
+    document.getElementById("btn-reset-filters")?.addEventListener("click", () => syncDynamicFilters("reset"));
+    document.getElementById("btn-reset-filters-ts")?.addEventListener("click", () => syncDynamicFilters("reset"));
 
-    // Two-way Filter Synchronization between View 1 (flt-*) and View 2 (ts-flt-*)
-    const FILTER_PAIRS = [
-      { v1: "flt-period", v2: "ts-flt-period" },
-      { v1: "flt-sektor", v2: "ts-flt-sektor" },
-      { v1: "flt-ansvar", v2: "ts-flt-ansvar" },
-      { v1: "flt-funksjon", v2: "ts-flt-funksjon" },
-      { v1: "flt-status", v2: "ts-flt-status" }
-    ];
-
-    FILTER_PAIRS.forEach(({ v1, v2 }) => {
-      const el1 = document.getElementById(v1);
-      const el2 = document.getElementById(v2);
-
-      if (el1) {
-        el1.addEventListener("change", () => {
-          if (el2) el2.value = el1.value;
-          renderAllDynamicReports();
-          const ctx = getFilteredContext();
-          renderCitationDrawer(ctx.ansvar !== "ALL" ? ctx.ansvarMeta.name : ctx.sektor);
-        });
-      }
-
-      if (el2) {
-        el2.addEventListener("change", () => {
-          if (el1) el1.value = el2.value;
-          renderAllDynamicReports();
-          const ctx = getFilteredContext();
-          renderCitationDrawer(ctx.ansvar !== "ALL" ? ctx.ansvarMeta.name : ctx.sektor);
-        });
-      }
-    });
-
-    // Reset filters handler (wired to both View 1 and View 2 buttons)
-    const resetAllFilterInputs = () => {
-      FILTER_PAIRS.forEach(({ v1, v2 }) => {
-        const el1 = document.getElementById(v1);
-        const el2 = document.getElementById(v2);
-        if (el1) el1.value = "ALL";
-        if (el2) el2.value = "ALL";
-      });
+    // Hurtigsøk i tabell
+    document.getElementById("kostra-table-search")?.addEventListener("input", () => {
       renderAllDynamicReports();
-      renderCitationDrawer();
-    };
-
-    document.getElementById("btn-reset-filters")?.addEventListener("click", resetAllFilterInputs);
-    document.getElementById("btn-reset-filters-ts")?.addEventListener("click", resetAllFilterInputs);
+    });
 
     // Q4 Forecast sensitivity sliders
     ["inp-wage-q4", "inp-eff-q4", "inp-dec-weight"].forEach(id => {
@@ -5417,6 +5561,8 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     renderRecommenderTable();
 
     // Initial render
+    populateAnsvarOptions("ALL", "ALL");
+    populateFunksjonOptions("ALL", "ALL");
     renderAllDynamicReports();
     renderCitationDrawer();
     updateSelvkostCalc();
