@@ -2728,120 +2728,21 @@
             Automatisk krysssjekk mellom bokførte leverandørfakturaer (art 110–130) og Kristiansand kommunes godkjente rammeavtaler i KAS.
           </p>
           <table class="tufte-table" style="font-size:0.77rem;">
-            <thead>
-              <tr>
-                <th>Bilagsnummer</th>
-                <th>Ansvar</th>
-                <th>Leverandør</th>
-                <th>Art / Beskrivelse</th>
-                <th class="num-col">Beløp (NOK)</th>
-                <th>Avtalestatus</th>
-                <th>Handlingsanbefaling</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>BIL-2024-8841</code></td>
-                <td>25310</td>
-                <td>Bemanningspartner Sør AS</td>
-                <td>127000 Konsulent &amp; vikarbyrå</td>
-                <td class="num-col rag-red">248 500,00</td>
-                <td><span class="rag-badge rag-red">🔴 Maverick Spend</span></td>
-                <td>Avviksbehandles: Innkjøp skal rettes mot rammeavtale RAM-2023-04 (Adecco/Randstad)</td>
-              </tr>
-              <tr>
-                <td><code>BIL-2024-9102</code></td>
-                <td>20210</td>
-                <td>Kontor &amp; Skolemateriell Direkte</td>
-                <td>115000 Undervisningsmateriell</td>
-                <td class="num-col rag-amber">42 100,00</td>
-                <td><span class="rag-badge rag-amber">🟡 Enkeltkjøp (&lt;500k)</span></td>
-                <td>Sjekk fellesavtale for skolemateriell før neste bestilling</td>
-              </tr>
-              <tr>
-                <td><code>BIL-2024-9330</code></td>
-                <td>25710</td>
-                <td>Atea Norge AS</td>
-                <td>119500 IT-utstyr &amp; lisenser</td>
-                <td class="num-col rag-green">189 000,00</td>
-                <td><span class="rag-badge rag-green">🟢 Godkjent Avtale</span></td>
-                <td>I henhold til felles KommIT-avtale</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="view-invoicing" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Utgående Faktura og Selvkost">
-        <div class="section-bar">
-          <span>9. Utgående Faktura, Interne Tjenester &amp; Selvkost (GKRS &amp; KOSTRA)</span>
-          <span>Konsolidering • Eliminering Art 380/780 • Selvkostkalkulator</span>
-        </div>
-
-        <!-- KOSTRA Konsolidering & Eliminering -->
-        <div class="panel" style="margin-bottom:1rem;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-            <h3 style="font-size:0.9rem; font-weight:700; color:var(--text-primary);">
-              ⚖️ KOSTRA Konsolidering &amp; Interne Tjenesteelimineringer (Art 780 vs. Art 380)
-            </h3>
-            <span class="rag-badge rag-green" id="elim-reconciled-badge">🟢 Avstemt: Netto Diff = 0,00 kr</span>
-          </div>
-          <p style="font-size:0.79rem; color:var(--text-secondary); margin-bottom:0.6rem;">
-            Interne viderefaktureringer mellom kommunale produksjonsenheter (Byggservice, Felleskjøkken, IT) elimineres automatisk slik at kommunens bruttotall ikke blåses opp i KOSTRA-rapporteringen til SSB jf. GKRS 11.4.
-          </p>
-          <table class="tufte-table" style="font-size:0.77rem;">
-            <thead>
-              <tr>
-                <th>Intern Tjenesteleveranse</th>
-                <th>Selger (Art 780/750)</th>
-                <th>Kjøper (Art 380/350)</th>
-                <th>Funksjon Selger &rarr; Kjøper</th>
-                <th class="num-col">Beløp (NOK)</th>
-                <th>Konsolideringsstatus</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Byggservice &amp; Teknisk Drift</td>
-                <td>Art 780000 Intern salgsinntekt</td>
-                <td>Art 380000 Intern kjøpsutgift</td>
-                <td>Fn 130 &rarr; Fn 254</td>
-                <td class="num-col fast-link">4 120 000,00</td>
-                <td><span class="rag-badge rag-green">🟢 0,00 kr Diff</span></td>
-              </tr>
-              <tr>
-                <td>Felleskjøkken Catering til Omsorgssentre</td>
-                <td>Art 780000 Intern salgsinntekt</td>
-                <td>Art 380000 Intern kjøpsutgift</td>
-                <td>Fn 261 &rarr; Fn 254</td>
-                <td class="num-col fast-link">1 850 000,00</td>
-                <td><span class="rag-badge rag-green">🟢 0,00 kr Diff</span></td>
-              </tr>
-              <tr>
-                <td>IT-drift &amp; Digitaliseringstjenester</td>
-                <td>Art 780000 Intern salgsinntekt</td>
-                <td>Art 380000 Intern kjøpsutgift</td>
-                <td>Fn 120 &rarr; Fn 202</td>
-                <td class="num-col fast-link">2 450 000,00</td>
-                <td><span class="rag-badge rag-green">🟢 0,00 kr Diff</span></td>
-              </tr>
-              <tr>
-                <td>IKS Renovasjon &amp; Avfall (§ 20-1 Samarbeid)</td>
-                <td>Art 750000 Salg til interkom. selskap</td>
-                <td>Art 350000 Kjøp fra interkom. selskap</td>
-                <td>Fn 340 &rarr; Fn 340</td>
-                <td class="num-col fast-link">5 890 000,00</td>
-                <td><span class="rag-badge rag-green">🟢 0,00 kr Diff</span></td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <th colspan="4">Sum Interne Elimineringer (Sum Selger = Sum Kjøper)</th>
-                <td class="num-col rag-green">14 310 000,00</td>
-                <td><span class="rag-badge rag-green">🟢 06_CHECKS: 0,00 kr</span></td>
-              </tr>
-            </tfoot>
-          </table>
+              <thead>
+                <tr>
+                  <th>Lønnsart / Kontogruppe</th>
+                  <th>KOSTRA Art</th>
+                  <th class="num-col col-budget">Budsjett 2024</th>
+                  <th class="num-col col-regnskap">Regnskap YTD (M08)</th>
+                  <th class="num-col">Fullårs EAC</th>
+                  <th class="num-col">Avvik År (NOK)</th>
+                  <th class="num-col">Avvik %</th>
+                  <th>Status &amp; Driver</th>
+                </tr>
+              </thead>
+              <tbody id="salary-art-table-body"></tbody>
+              <tfoot id="salary-art-table-foot"></tfoot>
+            </table>
         </div>
 
         <!-- Interaktiv Selvkostkalkulator -->
@@ -3114,37 +3015,52 @@
           <span>Fastlønn • Fraværsdekning • Lønnsoppgjør KS (5,2 %) • Årsverk (FTE) • Sosiale Kostnader (KLP &amp; AGA)</span>
         </div>
 
-        <!-- 6 KPI-kort for Lønn & Bemanning -->
+        <!-- DYNAMISK FILTERSTRIPE FOR BUDSJETT OG LØNNSMODUL -->
+        <div id="budget-active-filter-strip" style="background:#fff; border:1px solid var(--border-light); border-left:4px solid var(--clr-fig-regnskap); padding:0.6rem 0.85rem; margin-bottom:0.75rem; border-radius:4px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+          <div>
+            <strong style="color:var(--header-dark); font-size:0.85rem; text-transform:uppercase;">
+              ⚡ Dynamisk Lønnsfilter:
+            </strong>
+            <span id="budget-active-filter-text" style="font-size:0.76rem; color:var(--text-secondary); margin-left:0.4rem;">
+              📅 Periode: YTD M01–M08 | 🏛️ Sektor: Alle Sektorer | 📍 Ansvar: Alle Ansvarssteder | 📂 Funksjon: Alle Funksjoner
+            </span>
+          </div>
+          <div style="font-size:0.75rem; font-family:var(--font-mono); color:var(--clr-fig-regnskap); font-weight:700;" id="budget-active-filter-fte-stat">
+            Årsverk i utvalg: 328,0 FTE • 9 Enheter
+          </div>
+        </div>
+
+        <!-- 6 DYNAMISKE KPI-KORT FOR LØNN & BEMANNING -->
         <div class="kpi-grid">
           <div class="kpi-card">
             <span class="kpi-label">Vedtatt Lønnsramme (År 2024)</span>
-            <span class="kpi-value col-budget">315 738 884 kr</span>
+            <span id="budget-kpi-ramme" class="kpi-value col-budget">315 738 884 kr</span>
             <span class="kpi-sub">Brutto personalkostnader før NAV-refusjon</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-label">Bokført Lønn YTD (M01–M08)</span>
-            <span class="kpi-value col-regnskap">140 074 468 kr</span>
+            <span id="budget-kpi-bokfort" class="kpi-value col-regnskap">140 074 468 kr</span>
             <span class="kpi-sub">Ordinær fastlønn, vikarer, overtid og tillegg</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-label">Forventet Årsavvik Lønn (EAC)</span>
-            <span class="kpi-value" style="color:var(--clr-err-text);">+24 374 815 kr</span>
+            <span id="budget-kpi-eac" class="kpi-value" style="color:var(--clr-err-text);">+24 374 815 kr</span>
             <span class="kpi-sub">Forventet brutto merforbruk før refusjoner</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-label">Bemanningsramme (Årsverk / FTE)</span>
-            <span class="kpi-value">328,0 planlagt</span>
-            <span class="kpi-sub">319,5 besatte årsverk • 8,5 vakanser (2,6 %)</span>
+            <span id="budget-kpi-fte" class="kpi-value">328,0 planlagt</span>
+            <span id="budget-kpi-fte-sub" class="kpi-sub">319,5 besatte årsverk • 8,5 vakanser (2,6 %)</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-label">Sosiale Kostnader (KLP &amp; AGA)</span>
-            <span class="kpi-value">78 286 992 kr</span>
+            <span id="budget-kpi-sosial" class="kpi-value">78 286 992 kr</span>
             <span class="kpi-sub">KLP Pensjon 14,8 % + Arbeidsgiveravgift 14,1 %</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-label">NAV Sykelønnsrefusjoner (Art 1710)</span>
-            <span class="kpi-value" style="color:var(--clr-ok-text);">-10 341 130 kr</span>
-            <span class="kpi-sub">Bokført YTD mot periodisert -3 223 731 kr</span>
+            <span id="budget-kpi-refusjon" class="kpi-value" style="color:var(--clr-ok-text);">-10 341 130 kr</span>
+            <span class="kpi-sub">Bokført YTD mot periodisert refusjon</span>
           </div>
         </div>
 
@@ -3301,110 +3217,8 @@
                     <th>Status</th>
                   </tr>
                 </thead>
-                <tbody id="salary-fte-table-body">
-                  <tr>
-                    <th scope="row">20210 - Grunnskole A</th>
-                    <td>Oppvekst</td>
-                    <td class="num-col">54,0</td>
-                    <td class="num-col">52,5</td>
-                    <td class="num-col rag-green">1,5</td>
-                    <td class="num-col col-budget">642 000</td>
-                    <td class="num-col col-regnskap">5 499 740</td>
-                    <td><span class="rag-badge rag-amber">🟡 Vikarpress</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">20220 - Grunnskole B</th>
-                    <td>Oppvekst</td>
-                    <td class="num-col">48,0</td>
-                    <td class="num-col">47,0</td>
-                    <td class="num-col rag-green">1,0</td>
-                    <td class="num-col col-budget">638 000</td>
-                    <td class="num-col col-regnskap">4 920 820</td>
-                    <td><span class="rag-badge rag-amber">🟡 Vikarpress</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">20230 - Grunnskole C</th>
-                    <td>Oppvekst</td>
-                    <td class="num-col">38,0</td>
-                    <td class="num-col">37,0</td>
-                    <td class="num-col rag-green">1,0</td>
-                    <td class="num-col col-budget">635 000</td>
-                    <td class="num-col col-regnskap">4 052 440</td>
-                    <td><span class="rag-badge rag-green">🟢 I rute</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">21310 - Voksenopplæring</th>
-                    <td>Oppvekst</td>
-                    <td class="num-col">8,0</td>
-                    <td class="num-col">8,0</td>
-                    <td class="num-col">0,0</td>
-                    <td class="num-col col-budget">613 700</td>
-                    <td class="num-col col-regnskap">490 960</td>
-                    <td><span class="rag-badge rag-green">🟢 I rute</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">22110 - PPT og veiledning</th>
-                    <td>Oppvekst</td>
-                    <td class="num-col">12,0</td>
-                    <td class="num-col">11,0</td>
-                    <td class="num-col rag-green">1,0</td>
-                    <td class="num-col col-budget">677 500</td>
-                    <td class="num-col col-regnskap">983 000</td>
-                    <td><span class="rag-badge rag-amber">🟡 Merforbruk</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">25310 - Omsorgssenter A</th>
-                    <td>Helse</td>
-                    <td class="num-col">48,0</td>
-                    <td class="num-col">46,0</td>
-                    <td class="num-col rag-red">2,0</td>
-                    <td class="num-col col-budget">595 000</td>
-                    <td class="num-col col-regnskap">3 534 398</td>
-                    <td><span class="rag-badge rag-red">🔴 Overtid/vikar</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">25320 - Omsorgssenter B</th>
-                    <td>Helse</td>
-                    <td class="num-col">36,0</td>
-                    <td class="num-col">35,0</td>
-                    <td class="num-col rag-green">1,0</td>
-                    <td class="num-col col-budget">592 000</td>
-                    <td class="num-col col-regnskap">2 777 027</td>
-                    <td><span class="rag-badge rag-red">🔴 Vikarbruk</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">25710 - Hjemmetjeneste Nord</th>
-                    <td>Helse</td>
-                    <td class="num-col">42,0</td>
-                    <td class="num-col">41,5</td>
-                    <td class="num-col rag-green">0,5</td>
-                    <td class="num-col col-budget">588 000</td>
-                    <td class="num-col col-regnskap">3 155 713</td>
-                    <td><span class="rag-badge rag-red">🔴 Overtid</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">25720 - Hjemmetjeneste Sør</th>
-                    <td>Helse</td>
-                    <td class="num-col">42,0</td>
-                    <td class="num-col">41,5</td>
-                    <td class="num-col rag-green">0,5</td>
-                    <td class="num-col col-budget">588 000</td>
-                    <td class="num-col col-regnskap">3 155 713</td>
-                    <td><span class="rag-badge rag-red">🔴 Overtid</span></td>
-                  </tr>
-                </tbody>
-                <tfoot>
-                  <tr style="font-weight:700;">
-                    <th scope="row">Sum Kommunale Stillinger</th>
-                    <td>Alle</td>
-                    <td class="num-col">328,0</td>
-                    <td class="num-col">319,5</td>
-                    <td class="num-col rag-green">8,5</td>
-                    <td class="num-col col-budget">618 500</td>
-                    <td class="num-col col-regnskap">28 570 711</td>
-                    <td><span class="rag-badge rag-amber">8,5 Vakanser</span></td>
-                  </tr>
-                </tfoot>
+                <tbody id="salary-fte-table-body"></tbody>
+                <tfoot id="salary-fte-table-foot"></tfoot>
               </table>
             </div>
           </div>
@@ -4806,8 +4620,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
           if (typeof initEdaModule === "function") initEdaModule();
           else renderEdaModule();
         }
-        if (viewId === "view-budget" && typeof initFramsiktModule === "function") {
-          initFramsiktModule();
+        if (viewId === "view-budget") {
+          if (typeof renderSalaryBudgetModule === "function") renderSalaryBudgetModule();
+          if (typeof initFramsiktModule === "function") initFramsiktModule();
         }
         if (viewId === "view-aarshjul" && typeof initAarshjulModule === "function") {
           initAarshjulModule();
@@ -5978,6 +5793,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       if (typeof renderRecommenderModule === "function") {
         renderRecommenderModule(ctx);
       }
+      if (typeof renderSalaryBudgetModule === "function") {
+        renderSalaryBudgetModule(ctx);
+      }
     }
 
     // =========================================================================
@@ -6117,7 +5935,10 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
           minAns.value = curAnsvar;
         }
         refreshMonthlyReport();
-    updateSalaryBudgetSimulator();
+        if (typeof renderSalaryBudgetModule === "function") {
+          renderSalaryBudgetModule();
+        }
+        updateSalaryBudgetSimulator();
 
         // Kjør re-render av alle dynamiske analyser og grafer
         renderAllDynamicReports();
@@ -7413,6 +7234,221 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     // =========================================================================
     // 16. BUDSJETTMODUL: LØNNSSIMULATOR (KS, VIKARER, VAKANSER, KLP)
     // =========================================================================
+    
+    // =========================================================================
+    // DYNAMISK LØNNS- OG BEMANNINGSBUDSJETTMODUL (KOSTRA ART 1010-1099, 1270, 1710)
+    // =========================================================================
+    const SALARY_UNITS_DATA = [
+      { code: "20210", name: "20210 - Grunnskole A", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 54.0, fteBesatt: 52.5, vakans: 1.5, snittLonn: 642000, ytdReg: 5499740, status: "🟡 Vikarpress", statusClass: "rag-amber" },
+      { code: "20220", name: "20220 - Grunnskole B", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 48.0, fteBesatt: 47.0, vakans: 1.0, snittLonn: 638000, ytdReg: 4920820, status: "🟡 Vikarpress", statusClass: "rag-amber" },
+      { code: "20230", name: "20230 - Grunnskole C", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 38.0, fteBesatt: 37.0, vakans: 1.0, snittLonn: 635000, ytdReg: 4052440, status: "🟢 I rute", statusClass: "rag-green" },
+      { code: "21310", name: "21310 - Voksenopplæring", sektor: "Oppvekst og Utdanning", fn: "213", ftePlan: 8.0, fteBesatt: 8.0, vakans: 0.0, snittLonn: 613700, ytdReg: 490960, status: "🟢 I rute", statusClass: "rag-green" },
+      { code: "22110", name: "22110 - PPT og veiledning", sektor: "Oppvekst og Utdanning", fn: "221", ftePlan: 12.0, fteBesatt: 11.0, vakans: 1.0, snittLonn: 677500, ytdReg: 983000, status: "🟡 Merforbruk", statusClass: "rag-amber" },
+      { code: "25310", name: "25310 - Omsorgssenter A", sektor: "Helse og Omsorg", fn: "254", ftePlan: 48.0, fteBesatt: 46.0, vakans: 2.0, snittLonn: 595000, ytdReg: 3534398, status: "🔴 Overtid/vikar", statusClass: "rag-red" },
+      { code: "25320", name: "25320 - Omsorgssenter B", sektor: "Helse og Omsorg", fn: "254", ftePlan: 36.0, fteBesatt: 35.0, vakans: 1.0, snittLonn: 592000, ytdReg: 2777027, status: "🔴 Vikarbruk", statusClass: "rag-red" },
+      { code: "25710", name: "25710 - Hjemmetjeneste Nord", sektor: "Helse og Omsorg", fn: "254", ftePlan: 42.0, fteBesatt: 41.5, vakans: 0.5, snittLonn: 588000, ytdReg: 3155713, status: "🔴 Overtid", statusClass: "rag-red" },
+      { code: "25720", name: "25720 - Hjemmetjeneste Sør", sektor: "Helse og Omsorg", fn: "254", ftePlan: 42.0, fteBesatt: 41.5, vakans: 0.5, snittLonn: 588000, ytdReg: 3155713, status: "🔴 Overtid", statusClass: "rag-red" }
+    ];
+
+    const BASE_KOSTRA_ARTS = [
+      { name: "Fastlønn ordinære stillinger", art: "Art 1010", baseBud: 233062968, baseReg: 95087904, baseEac: 252800011, driverHelse: "KS-oppgjør 5,2 % + ansiennitet", driverOppvekst: "KS-oppgjør 5,2 %" },
+      { name: "Vikarlønn ved fravær & sykdom", art: "Art 1020", baseBud: 11491584, baseReg: 8430708, baseEac: 21396331, driverHelse: "Høyt sykefravær pleie/turnus", driverOppvekst: "Korttidsfravær lærere" },
+      { name: "Overtidslønn & ekstravakter (Gat)", art: "Art 1040", baseBud: 906048, baseReg: 2406818, baseEac: 6382121, driverHelse: "AML-bruddrisiko & Gat-vakter", driverOppvekst: "Tilsyn og eksamensavvikling" },
+      { name: "Ekstrahjelp & midlertidig ansatte", art: "Art 1030", baseBud: 480000, baseReg: 1572649, baseEac: 3921059, driverHelse: "Sommer- og ferieavlastning", driverOppvekst: "SFO-ekstrahjelp" },
+      { name: "Variable turnustillegg (helg/natt/helligdag)", art: "Art 1050", baseBud: 167904, baseReg: 456999, baseEac: 1023954, driverHelse: "Turnusavtaler jf. HTA kap. 1 § 5", driverOppvekst: "Kveldsarrangementer" },
+      { name: "Kjøp av vikarbyråtjenester (innleie)", art: "Art 1270", baseBud: 0, baseReg: 512136, baseEac: 795950, driverHelse: "Sykepleiermangel natt (Omsorg A)", driverOppvekst: "Spesialpedagogisk innleie" },
+      { name: "Pensjonspremie KLP fellesordning", art: "Art 1090", baseBud: 43621188, baseReg: 17105485, baseEac: 42650943, driverHelse: "Reguleringspremie KLP", driverOppvekst: "KLP / SPK Pensjon" },
+      { name: "Arbeidsgiveravgift (Sone 1, 14,1 %)", art: "Art 1099", baseBud: 34665804, baseReg: 14399520, baseEac: 37804681, driverHelse: "Følger lønnsmasseøkning", driverOppvekst: "14,1 % AGA" },
+      { name: "Refusjoner for sykepenger & foreldrepenger", art: "Art 1710", baseBud: -8596620, baseReg: -10341130, baseEac: -26390140, driverHelse: "Høy innbetaling fra NAV", driverOppvekst: "NAV sykelønnsrefusjon" }
+    ];
+
+    function renderSalaryBudgetModule(ctx) {
+      if (!ctx) ctx = getFilteredContext();
+      const { period, pMeta, sektor, ansvar, funksjon } = ctx;
+
+      // 1. Filtrer årsverksenheter
+      const filteredUnits = SALARY_UNITS_DATA.filter(u => {
+        if (sektor !== "ALL" && u.sektor !== sektor) return false;
+        if (ansvar !== "ALL" && u.code !== ansvar) return false;
+        if (funksjon !== "ALL" && u.fn !== funksjon) return false;
+        return true;
+      });
+
+      // Beregn summer for utvalget
+      let totPlanFte = 0;
+      let totBesattFte = 0;
+      let totVakansFte = 0;
+      let totLonnYtd = 0;
+      let weightedSnittLonnSum = 0;
+
+      filteredUnits.forEach(u => {
+        totPlanFte += u.ftePlan;
+        totBesattFte += u.fteBesatt;
+        totVakansFte += u.vakans;
+        totLonnYtd += u.ytdReg;
+        weightedSnittLonnSum += u.snittLonn * u.ftePlan;
+      });
+
+      const avgSnittLonn = totPlanFte > 0 ? Math.round(weightedSnittLonnSum / totPlanFte) : 618500;
+      const vakansPct = totPlanFte > 0 ? (totVakansFte / totPlanFte) * 100 : 0;
+      const fteRatio = totPlanFte > 0 ? (totPlanFte / 328.0) : 1.0;
+
+      // 2. Oppdater Filterstripe
+      const ansLabel = ansvar === "ALL" 
+        ? (sektor === "ALL" ? "Alle Ansvarssteder (9 enheter)" : `Alle ansvarssteder i ${sektor} (${filteredUnits.length} aktive)`) 
+        : (ANSVAR_UNITS[ansvar]?.name || ansvar);
+      const fnLabel = funksjon === "ALL" ? "Alle Funksjoner" : `Funksjon ${funksjon}`;
+      const sekLabel = sektor === "ALL" ? "Alle Sektorer" : sektor;
+
+      const filterTextEl = document.getElementById("budget-active-filter-text");
+      if (filterTextEl) {
+        filterTextEl.textContent = `📅 Periode: ${pMeta.short} | 🏛️ Sektor: ${sekLabel} | 📍 Ansvar: ${ansLabel} | 📂 ${fnLabel}`;
+      }
+      const filterFteStatEl = document.getElementById("budget-active-filter-fte-stat");
+      if (filterFteStatEl) {
+        filterFteStatEl.textContent = `Årsverk i utvalg: ${totPlanFte.toFixed(1).replace(".", ",")} FTE • ${filteredUnits.length} Enheter`;
+      }
+
+      // 3. Dynamiske KPI-kort
+      const rammeBud = Math.round(315738884 * fteRatio);
+      const bokfortLonn = Math.round(140074468 * fteRatio);
+      const eacLonn = Math.round(340113700 * fteRatio);
+      const eacAvvik = eacLonn - rammeBud;
+      const sosialKost = Math.round(78286992 * fteRatio);
+      const refusjonKost = Math.round(-10341130 * fteRatio);
+
+      const elRamme = document.getElementById("budget-kpi-ramme");
+      const elBokfort = document.getElementById("budget-kpi-bokfort");
+      const elEac = document.getElementById("budget-kpi-eac");
+      const elFte = document.getElementById("budget-kpi-fte");
+      const elFteSub = document.getElementById("budget-kpi-fte-sub");
+      const elSosial = document.getElementById("budget-kpi-sosial");
+      const elRefusjon = document.getElementById("budget-kpi-refusjon");
+
+      if (elRamme) elRamme.textContent = fmtNum(rammeBud) + " kr";
+      if (elBokfort) elBokfort.textContent = fmtNum(bokfortLonn) + " kr";
+      if (elEac) {
+        elEac.textContent = `${eacAvvik >= 0 ? "+" : ""}${fmtNum(eacAvvik)} kr`;
+        elEac.style.color = eacAvvik > 0 ? "var(--clr-err-text)" : "var(--clr-ok-text)";
+      }
+      if (elFte) elFte.textContent = `${totPlanFte.toFixed(1).replace(".", ",")} planlagt`;
+      if (elFteSub) {
+        elFteSub.textContent = `${totBesattFte.toFixed(1).replace(".", ",")} besatte årsverk • ${totVakansFte.toFixed(1).replace(".", ",")} vakanser (${vakansPct.toFixed(1).replace(".", ",")} %)`;
+      }
+      if (elSosial) elSosial.textContent = fmtNum(sosialKost) + " kr";
+      if (elRefusjon) elRefusjon.textContent = fmtNum(refusjonKost) + " kr";
+
+      // 4. Render KOSTRA Art Tabell
+      renderKostraArtTable(fteRatio, sektor);
+
+      // 5. Render Bemanningsramme (FTE) Tabell
+      renderFteTable(filteredUnits, totPlanFte, totBesattFte, totVakansFte, avgSnittLonn, totLonnYtd, sekLabel);
+    }
+
+    function renderKostraArtTable(ratio, currentSektor) {
+      const tbody = document.getElementById("salary-art-table-body");
+      const tfoot = document.getElementById("salary-art-table-foot");
+      if (!tbody) return;
+
+      let sumBud = 0;
+      let sumReg = 0;
+      let sumEac = 0;
+
+      tbody.innerHTML = BASE_KOSTRA_ARTS.map(a => {
+        const rowBud = Math.round(a.baseBud * ratio);
+        const rowReg = Math.round(a.baseReg * ratio);
+        const rowEac = Math.round(a.baseEac * ratio);
+        const rowAvvik = rowEac - rowBud;
+        const rowPct = rowBud !== 0 ? (rowAvvik / Math.abs(rowBud)) * 100 : 0;
+
+        sumBud += rowBud;
+        sumReg += rowReg;
+        sumEac += rowEac;
+
+        const isRef = a.art === "Art 1710";
+        const driverNote = currentSektor === "Helse og Omsorg" ? a.driverHelse : (currentSektor === "Oppvekst og Utdanning" ? a.driverOppvekst : a.driverHelse);
+        const ragClass = isRef ? "rag-green" : (rowAvvik > 1000000 ? "rag-red" : (rowAvvik > 0 ? "rag-amber" : "rag-green"));
+
+        return `
+          <tr>
+            <th scope="row">${a.name}</th>
+            <td>${a.art}</td>
+            <td class="num-col col-budget" style="${isRef ? 'color:var(--clr-ok-text);' : ''}">${rowBud !== 0 ? fmtNum(rowBud) : '0'}</td>
+            <td class="num-col col-regnskap" style="${isRef ? 'color:var(--clr-ok-text);' : ''}">${fmtNum(rowReg)}</td>
+            <td class="num-col" style="${isRef ? 'color:var(--clr-ok-text);' : ''}">${fmtNum(rowEac)}</td>
+            <td class="num-col ${ragClass}">${rowAvvik >= 0 ? '+' : ''}${fmtNum(rowAvvik)}</td>
+            <td class="num-col ${ragClass}">${rowBud !== 0 ? (rowAvvik >= 0 ? '+' : '') + rowPct.toFixed(1).replace(".", ",") + ' %' : '—'}</td>
+            <td><span class="rag-badge ${ragClass}">${driverNote}</span></td>
+          </tr>
+        `;
+      }).join("");
+
+      if (tfoot) {
+        const netAvvik = sumEac - sumBud;
+        const netPct = sumBud !== 0 ? (netAvvik / Math.abs(sumBud)) * 100 : 0;
+        const netRag = netAvvik > 5000000 ? "rag-red" : (netAvvik > 0 ? "rag-amber" : "rag-green");
+        tfoot.innerHTML = `
+          <tr style="border-top:2px solid var(--border-light); font-weight:700;">
+            <th scope="row" colspan="2">Netto Lønns- og Personalkostnader (Inkl. Refusjoner)</th>
+            <td class="num-col col-budget">${fmtNum(sumBud)}</td>
+            <td class="num-col col-regnskap">${fmtNum(sumReg)}</td>
+            <td class="num-col">${fmtNum(sumEac)}</td>
+            <td class="num-col ${netRag}">${netAvvik >= 0 ? '+' : ''}${fmtNum(netAvvik)}</td>
+            <td class="num-col ${netRag}">${(netAvvik >= 0 ? '+' : '') + netPct.toFixed(1).replace(".", ",") + ' %'}</td>
+            <td><span class="rag-badge ${netRag}">${netAvvik > 0 ? '🟡 Netto Merforbruk ' + (netAvvik/1000000).toFixed(2).replace(".",",") + ' MNOK' : '🟢 I Balanse'}</span></td>
+          </tr>
+        `;
+      }
+    }
+
+    function renderFteTable(units, totPlan, totBesatt, totVakans, avgSnitt, totReg, scopeLabel) {
+      const tbody = document.getElementById("salary-fte-table-body");
+      const tfoot = document.getElementById("salary-fte-table-foot");
+      if (!tbody) return;
+
+      if (units.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align:center; padding:1.2rem; color:var(--text-muted);">
+              ⚠️ Ingen enheter matcher gjeldende filterkriterier.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = units.map(u => {
+        const vakansClass = u.vakans > 1.0 ? "rag-red" : (u.vakans > 0 ? "rag-green" : "");
+        return `
+          <tr>
+            <th scope="row">${u.name}</th>
+            <td>${u.sektor.replace(" og Utdanning", "").replace(" og Omsorg", "")}</td>
+            <td class="num-col">${u.ftePlan.toFixed(1).replace(".", ",")}</td>
+            <td class="num-col">${u.fteBesatt.toFixed(1).replace(".", ",")}</td>
+            <td class="num-col ${vakansClass}">${u.vakans.toFixed(1).replace(".", ",")}</td>
+            <td class="num-col col-budget">${fmtNum(u.snittLonn)}</td>
+            <td class="num-col col-regnskap">${fmtNum(u.ytdReg)}</td>
+            <td><span class="rag-badge ${u.statusClass}">${u.status}</span></td>
+          </tr>
+        `;
+      }).join("");
+
+      if (tfoot) {
+        tfoot.innerHTML = `
+          <tr style="font-weight:700;">
+            <th scope="row">Sum Kommunale Stillinger</th>
+            <td>${scopeLabel}</td>
+            <td class="num-col">${totPlan.toFixed(1).replace(".", ",")}</td>
+            <td class="num-col">${totBesatt.toFixed(1).replace(".", ",")}</td>
+            <td class="num-col rag-green">${totVakans.toFixed(1).replace(".", ",")}</td>
+            <td class="num-col col-budget">${fmtNum(avgSnitt)}</td>
+            <td class="num-col col-regnskap">${fmtNum(totReg)}</td>
+            <td><span class="rag-badge rag-amber">${totVakans.toFixed(1).replace(".", ",")} Vakanser</span></td>
+          </tr>
+        `;
+      }
+    }
+
     function updateSalaryBudgetSimulator() {
       const ksEl = document.getElementById("salary-sim-ks");
       const vikarEl = document.getElementById("salary-sim-vikar");
@@ -9748,6 +9784,9 @@ Rådgiver økonomistyring, Kristiansand kommune
     // Auto-init EDA, Framsikt og Årshjul modules on load
     if (typeof initEdaModule === 'function') {
       try { initEdaModule(); } catch(e) { console.warn("initEdaModule err:", e); }
+    }
+    if (typeof renderSalaryBudgetModule === 'function') {
+      try { renderSalaryBudgetModule(); } catch(e) { console.warn("renderSalaryBudgetModule err:", e); }
     }
     if (typeof initFramsiktModule === 'function') {
       try { initFramsiktModule(); } catch(e) { console.warn("initFramsiktModule err:", e); }
