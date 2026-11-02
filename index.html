@@ -5597,7 +5597,10 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         if (viewId === "view-recommender" && typeof renderRecommenderModule === "function") {
           renderRecommenderModule();
         }
-      }
+      }        if (viewId === "view-min-okonomi" && typeof refreshMonthlyReport === "function") {
+          refreshMonthlyReport();
+        }
+
       if (clickedBtn) {
         clickedBtn.setAttribute("aria-current", "page");
       }
@@ -6613,30 +6616,51 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       const caption = document.getElementById("min-favorable-caption");
       if (!container || !tbody) return;
 
-      const favRows = report.favorable_drivers || [];
+      const curFunksjon = document.getElementById("flt-funksjon")?.value || "ALL";
+      let favRows = report.favorable_drivers || [];
+      if (curFunksjon !== "ALL") {
+        const filtered = favRows.filter(r => r.funksjon_code && (r.funksjon_code === curFunksjon || r.funksjon_code.startsWith(curFunksjon)));
+        if (filtered.length > 0) {
+          favRows = filtered;
+        }
+      }
+
       const monthLabel = new Intl.DateTimeFormat("nb-NO", { month: "long", year: "numeric" })
         .format(new Date(`${report.data_as_of}T12:00:00`));
+
+      let scopeLabel = "Kristiansand Kommune";
+      if (report.responsibility !== "ALL") {
+        const uMeta = ANSVAR_UNITS[report.responsibility] || {};
+        scopeLabel = `${report.responsibility} — ${uMeta.name || report.responsibility_name || "Enhet"}`;
+      } else if (report.source_sector !== "ALL") {
+        scopeLabel = report.source_sector;
+      }
+      if (curFunksjon !== "ALL") {
+        const fnMeta = KOSTRA_FUNCTIONS.find(f => f.code === curFunksjon);
+        scopeLabel += ` (Fn. ${curFunksjon} ${fnMeta ? fnMeta.name : ""})`.trim();
+      }
+
       if (caption) {
-        caption.textContent = `Største mindreforbruk per ${monthLabel}`;
+        caption.textContent = `Største mindreforbruk — ${scopeLabel} per ${monthLabel}`;
       }
 
       if (!favRows.length) {
-        container.innerHTML = '<div style="color:var(--text-muted); font-size:0.74rem; padding:1rem; text-align:center;">Ingen kontoer har mindreforbruk i valgt utvalg.</div>';
-        tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted); text-align:center;">Ingen kontoer med mindreforbruk registrert.</td></tr>';
-        if (kpiEl) kpiEl.textContent = "";
+        container.innerHTML = `<div style="color:var(--text-muted); font-size:0.74rem; padding:1.2rem; text-align:center;">Ingen kontoer har mindreforbruk i ${escapeHtml(scopeLabel)}.</div>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--text-muted); text-align:center;">Ingen kontoer med mindreforbruk registrert for ${escapeHtml(scopeLabel)}.</td></tr>`;
+        if (kpiEl) kpiEl.textContent = "0 kr";
         return;
       }
 
       const sumMindreforbruk = favRows.reduce((acc, r) => acc + (r.eoy_variance_nok || 0), 0);
       if (kpiEl) {
-        kpiEl.textContent = `Samlet topp 5 mindreforbruk: ${fmtNOK(sumMindreforbruk, true)}`;
+        kpiEl.textContent = `Samlet topp ${favRows.length} mindreforbruk: ${fmtNOK(sumMindreforbruk, true)}`;
       }
 
       // 1. Populate table
       tbody.innerHTML = favRows.map(r => `
         <tr>
           <td style="font-weight:600; font-family:var(--font-mono, monospace); font-size:0.7rem;">${escapeHtml(r.konto_code)}</td>
-          <td title="${escapeHtml(r.funksjon_code)} – ${escapeHtml(r.funksjon_navn)}">${escapeHtml(r.kontonavn)}</td>
+          <td title="${escapeHtml(r.funksjon_code || '')} — ${escapeHtml(r.funksjon_navn || '')}">${escapeHtml(r.kontonavn || '')}</td>
           <td class="num-col">${fmtNOK(r.annual_budget_nok)}</td>
           <td class="num-col">${fmtNOK(r.eoy_forecast_nok)}</td>
           <td class="num-col rag-green" style="font-weight:700;">${fmtNOK(r.eoy_variance_nok, true)}</td>
@@ -6650,7 +6674,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       const svgHeight = favRows.length * rowHeight + 8;
 
       const svgLines = [
-        `<svg viewBox="0 0 520 ${svgHeight}" style="width:100%; height:auto;" preserveAspectRatio="xMinYMin meet" role="img" aria-label="TOP 5 konti med mindreforbruk">`
+        `<svg viewBox="0 0 520 ${svgHeight}" style="width:100%; height:auto;" preserveAspectRatio="xMinYMin meet" role="img" aria-label="TOP ${favRows.length} konti med mindreforbruk">`
       ];
 
       favRows.forEach((r, idx) => {
@@ -6963,18 +6987,26 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
     async function refreshMonthlyReport() {
       const requestId = ++monthlyReportRequestId;
-      const sector = document.getElementById("min-sector").value || "ALL";
-      const responsibility = document.getElementById("min-ansvar").value || "ALL";
+      const sector = document.getElementById("min-sector")?.value || document.getElementById("flt-sektor")?.value || "ALL";
+      const responsibility = document.getElementById("min-ansvar")?.value || document.getElementById("flt-ansvar")?.value || "ALL";
+      const curFunksjon = document.getElementById("flt-funksjon")?.value || "ALL";
       const status = document.getElementById("min-data-status");
       monthlyReportData = null;
-      document.getElementById("min-save-measure").disabled = true;
+      if (document.getElementById("min-save-measure")) {
+        document.getElementById("min-save-measure").disabled = true;
+      }
 
-      status.textContent = "Henter månedsrapport …";
-      status.className = "panel-subtitle";
+      if (status) {
+        status.textContent = "Henter månedsrapport …";
+        status.className = "panel-subtitle";
+      }
 
       const snapshotKey = `${sector}__${responsibility}`;
       const staticSnapshot = (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined")
-        ? DUCKDB_MONTHLY_REPORT_SNAPSHOTS[snapshotKey]
+        ? (DUCKDB_MONTHLY_REPORT_SNAPSHOTS[snapshotKey] ||
+           DUCKDB_MONTHLY_REPORT_SNAPSHOTS[`ALL__${responsibility}`] ||
+           DUCKDB_MONTHLY_REPORT_SNAPSHOTS[`${sector}__ALL`] ||
+           DUCKDB_MONTHLY_REPORT_SNAPSHOTS["ALL__ALL"])
         : null;
 
       // 1. Forsøk alltid lokal live FastAPI-tjeneste først hvis tilgjengelig:
@@ -6982,7 +7014,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       if (isLocalHost) {
         const apiBase = window.location.origin;
         try {
-          const params = new URLSearchParams({ sektor: sector, ansvar: responsibility });
+          const params = new URLSearchParams({ sektor: sector, ansvar: responsibility, funksjon: curFunksjon });
           const response = await fetch(
             `${apiBase}/api/v1/monthly-report?${params.toString()}`,
             { cache: "no-store" }
@@ -7337,6 +7369,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       if (typeof renderSalaryBudgetModule === "function") {
         renderSalaryBudgetModule(ctx);
       }
+      if (typeof refreshMonthlyReport === 'function') {
+        refreshMonthlyReport();
+      }
     }
 
     // =========================================================================
@@ -7472,12 +7507,25 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
         // Synkroniser også Modul 12 (Min Økonomi / Månedsrapport)
         const minSec = document.getElementById("min-sector");
-        if (minSec && minSec.value !== curSektor) {
-          minSec.value = curSektor;
+        if (minSec) {
+          if (curSektor !== "ALL" && !Array.from(minSec.options).some(o => o.value === curSektor)) {
+            const opt = document.createElement("option");
+            opt.value = curSektor;
+            opt.textContent = curSektor;
+            minSec.appendChild(opt);
+          }
+          if (minSec.value !== curSektor) minSec.value = curSektor;
         }
         const minAns = document.getElementById("min-ansvar");
-        if (minAns && minAns.value !== curAnsvar) {
-          minAns.value = curAnsvar;
+        if (minAns) {
+          if (curAnsvar !== "ALL" && !Array.from(minAns.options).some(o => o.value === curAnsvar)) {
+            const opt = document.createElement("option");
+            opt.value = curAnsvar;
+            const uMeta = ANSVAR_UNITS[curAnsvar] || {};
+            opt.textContent = `${curAnsvar} — ${uMeta.name || "Enhet"}`;
+            minAns.appendChild(opt);
+          }
+          if (minAns.value !== curAnsvar) minAns.value = curAnsvar;
         }
         refreshMonthlyReport();
         if (typeof renderSalaryBudgetModule === "function") {

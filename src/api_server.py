@@ -408,6 +408,7 @@ def get_summary(
 def get_monthly_report(
     sektor: str = Query(default="ALL"),
     ansvar: str = Query(default="ALL"),
+    funksjon: str = Query(default="ALL"),
 ):
     """Return a current-period budget follow-up report for the selected scope."""
     where_parts = ["1=1"]
@@ -418,6 +419,9 @@ def get_monthly_report(
     if ansvar != "ALL":
         where_parts.append("ansvar_code = ?")
         params.append(ansvar)
+    if funksjon != "ALL":
+        where_parts.append("(funksjon_code = ? OR funksjon_code LIKE ?)")
+        params.extend([funksjon, f"{funksjon}%"])
     where_sql = " AND ".join(where_parts)
 
     latest_rows = query_duckdb(

@@ -390,6 +390,23 @@ def run_all_tests():
                     fav_chart_info["hasSvg"] and fav_chart_info["rects"] == 5,
                     f"SVG: {fav_chart_info['hasSvg']}, Søyler: {fav_chart_info['rects']}")
         record_test("Mindreforbruk data-tabell har 5 rader", fav_chart_info["tableRows"] == 5, f"Rader: {fav_chart_info['tableRows']}")
+        # Test dynamisk respons i Mindreforbruksanalyse ved filterbytte til 25310
+        page.select_option("#flt-ansvar", "25310")
+        page.wait_for_timeout(150)
+        fav_25310_info = page.evaluate('''() => {
+            const caption = document.getElementById("min-favorable-caption")?.textContent || "";
+            const firstRowCode = document.querySelector("#min-favorable-tbody tr td")?.textContent || "";
+            const rects = document.querySelectorAll("#min-favorable-chart-wrap svg rect").length;
+            const kpiText = document.getElementById("min-favorable-kpi")?.textContent || "";
+            return { caption, firstRowCode, rects, kpiText };
+        }''')
+        record_test("Mindreforbruksanalyse oppdateres dynamisk ved valg av enhet 25310",
+                    "25310" in fav_25310_info["caption"] and fav_25310_info["firstRowCode"] == "101031",
+                    f"Caption: {fav_25310_info['caption']}, Toppkonto: {fav_25310_info['firstRowCode']}")
+
+        # Tilbakestill ansvar til ALL (beholder Helse og Omsorg sektor)
+        page.select_option("#flt-ansvar", "ALL")
+        page.wait_for_timeout(150)
 
         # Test fanevelger
         tabs = page.query_selector_all(".min-tab-btn")
