@@ -2022,7 +2022,8 @@
                   📊 Anbefalt Diagramtype (FT Guide)
                 </label>
                 <select id="eda-chart-type-select" style="width:100%; padding:0.38rem; font-size:0.78rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
-                  <!-- Fylles dynamisk basert på kategori -->
+                  <option value="scatter" selected>Spredningsplott (Scatter Plot m/ OLS trendlinje)</option>
+                  <option value="bubble">Boblediagram (Bubble Chart m/ størrelsesvekting)</option>
                 </select>
               </div>
 
@@ -4766,7 +4767,8 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         activeView.setAttribute("aria-hidden", "false");
         activeView.focus();
         if (viewId === "view-eda") {
-          renderEdaModule();
+          if (typeof initEdaModule === "function") initEdaModule();
+          else renderEdaModule();
         }
         if (viewId === "view-budget" && typeof initFramsiktModule === "function") {
           initFramsiktModule();
@@ -7249,28 +7251,100 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
     const FT_CHART_TYPES = {
       correlation: [
-        { id: "scatter", name: "Spredningsplott (Scatter Plot m/ OLS trendlinje)", req: "2 kontinuerlige variabler (kr/tall)", usage: "Avdekker lineære og ulineære samvariasjoner, klynger og ekstreme uteliggere." },
-        { id: "bubble", name: "Boblediagram (Bubble Chart m/ størrelsesvekting)", req: "3 kontinuerlige variabler (X, Y, areal)", usage: "Viser relasjon mellom to nøkkeltall vektet etter avdelingens totale budsjettramme." }
+        { 
+          id: "scatter", 
+          name: "Spredningsplott (Scatter Plot m/ OLS trendlinje)", 
+          req: "2 kontinuerlige numeriske variabler (float/kr) aggregert over diskrete enheter.", 
+          usage: "Avdekker om vikarbruk henger systematisk sammen med overtid i døgnkontinuerlig turnus.",
+          tufte: "Direkte etikettering, null linjestøy, kontrollør-rød #D62728 kun ved avvik."
+        },
+        { 
+          id: "bubble", 
+          name: "Boblediagram (Bubble Chart m/ størrelsesvekting)", 
+          req: "3 kontinuerlige variabler (X: Vikar, Y: Overtid, Bobleareal: Budsjettramme).", 
+          usage: "Viser relasjon mellom vikarbruk og overtid vektet etter avdelingens totale driftsbudsjett.",
+          tufte: "Bobleareal proporsjonalt med verdi, ingen 3D-skygger eller tunge fyllfarger."
+        }
       ],
       deviation: [
-        { id: "diverging_bar", name: "Diverging Bar (Avvikssøyler med vertikal null-akse)", req: "1 kategori + 1 fortegnsbestemt avvik (kr/%)", usage: "Fremhever overforbruk (+) og mindreforbruk (-) med felles nullinje." },
-        { id: "spine", name: "Spine Chart / Målavvik mot 100% ramme", req: "1 kategori + faktisk verdi vs. referansemål", usage: "Viser prosentvis avvik direkte mot vedtatt periodiseringsmål." }
+        { 
+          id: "diverging_bar", 
+          name: "Diverging Bar (Avvikssøyler med vertikal null-akse)", 
+          req: "1 kategori + 1 fortegnsbestemt avvik (kr/% differanse mot periodisert budsjett).", 
+          usage: "Fremhever overforbruk (+) og mindreforbruk (-) med felles forankret nullinje.",
+          tufte: "Fjern bakgrunnsnett; grønn for mindreforbruk, kontrollør-rød #D62728 for overskridelse."
+        },
+        { 
+          id: "spine", 
+          name: "Spine Chart / Målavvik mot 100% ramme", 
+          req: "1 kategori + faktisk verdi vs. referansemål / budsjettramme.", 
+          usage: "Viser prosentvis avvik direkte mot vedtatt periodiseringsmål.",
+          tufte: "Tynn vertikal ryggrad (100%), avvik markeres som horisontale streker uten stolpefyll."
+        }
       ],
       ranking: [
-        { id: "ordered_bar", name: "Sortert stolpediagram (Ordered Bar)", req: "1 kategori + 1 kontinuerlig metrikk sortert", usage: "Gir umiddelbar prioritering av enheter med størst budsjettbelastning (Burn Rate)." },
-        { id: "lollipop", name: "Lollipop Chart (Linje med punktende)", req: "1 kategori + 1 metrikk sortert", usage: "Reduserer visuell tyngde (Data-Ink) sammenlignet med tunge fylte stolper." }
+        { 
+          id: "ordered_bar", 
+          name: "Sortert stolpediagram (Ordered Bar)", 
+          req: "1 kategori + 1 kontinuerlig metrikk sortert synkende.", 
+          usage: "Gir umiddelbar prioritering av enheter med størst budsjettbelastning (Burn Rate).",
+          tufte: "Horisontale søyler for naturlig leseretning, direkte tallverdi til høyre for søylen."
+        },
+        { 
+          id: "lollipop", 
+          name: "Lollipop Chart (Linje med punktende)", 
+          req: "1 kategori + 1 metrikk sortert etter avviksstørrelse.", 
+          usage: "Reduserer visuell tyngde (Data-Ink) sammenlignet med tunge fylte stolper.",
+          tufte: "Maksimal data-ink: tynn 1px linje med sirkelmarkør, ingen unødvendig fargefyll."
+        }
       ],
       composition: [
-        { id: "stacked_100", name: "100% Stablet Komponentbjelke (Part-to-whole)", req: "1 kategori + 3-5 additive kostnadskomponenter", usage: "Viser proporsjonal lønnsstruktur (Fastlønn, Vikarer, Overtid, KLP) uavhengig av avdelingsstørrelse." },
-        { id: "treemap", name: "Komponentblokker / Andelsfordeling", req: "Hierarkiske kostnadsarter", usage: "Viser hvilke artskonti som beslaglegger størst andel av driftsrammen." }
+        { 
+          id: "stacked_100", 
+          name: "100% Stablet Komponentbjelke (Part-to-whole)", 
+          req: "1 kategori + 3-5 additive kostnadskomponenter (Fastlønn, Vikarer, Overtid, KLP).", 
+          usage: "Viser proporsjonal lønnsstruktur uavhengig av avdelingsstørrelse.",
+          tufte: "Muted fargepalett, direkte segment-teksting der plass finnes, unngå legendestøy."
+        },
+        { 
+          id: "treemap", 
+          name: "Komponentblokker / Andelsfordeling", 
+          req: "Hierarkiske kostnadsarter (KOSTRA art 100-199).", 
+          usage: "Viser hvilke artskonti som beslaglegger størst andel av driftsrammen.",
+          tufte: "Rektangulær flatedeling uten skygger eller rammer, etikett kun i signifikante blokker."
+        }
       ],
       trend: [
-        { id: "multiline", name: "Parallelle Tidsbaner (Multi-line M01–M08)", req: "Tidsakse (måneder) + kontinuerlig metrikk", usage: "Følger utviklingen måned for måned med direkte kurve-etikettering (Tufte-standard)." },
-        { id: "slope", name: "Slopegraph (Start M01 vs. Slutt M08)", req: "2 diskrete tidspunkter per serie", usage: "Fremhever endringstakten fra årets begynnelse til gjeldende periode." }
+        { 
+          id: "multiline", 
+          name: "Parallelle Tidsbaner (Multi-line M01–M08)", 
+          req: "Tidsakse (måneder M01–M08) + kontinuerlig metrikk per enhet.", 
+          usage: "Følger utviklingen måned for måned med direkte kurve-etikettering.",
+          tufte: "Tufte Sparkline-stil: tynne linjer, direkte etikett ved linjeslutt, ingen fargelegende."
+        },
+        { 
+          id: "slope", 
+          name: "Slopegraph (Start M01 vs. Slutt M08)", 
+          req: "2 diskrete tidspunkter (M01 vs M08) per rapporteringsenhet.", 
+          usage: "Fremhever endringstakten fra årets begynnelse til gjeldende periode.",
+          tufte: "Ren vinkelendring viser eskalering; farg kun linjer med bratt negativ stigning."
+        }
       ],
       distribution: [
-        { id: "strip", name: "Strip Plot / Jitter (Observasjonsspredning)", req: "Mange kontinuerlige målinger (månedlige avvik)", usage: "Viser klynger og spredning av månedlige avvik for å vurdere volatilitet og stabilitet." },
-        { id: "boxplot", name: "Kvartiler & Spredning (Box & Whisker)", req: "Fordeling av månedlige observasjoner", usage: "Oppsummerer median, interkvartilbredde og ekstreme månedstall." }
+        { 
+          id: "strip", 
+          name: "Strip Plot / Jitter (Observasjonsspredning)", 
+          req: "Mange kontinuerlige målinger (månedlige avvik per enhet).", 
+          usage: "Viser klynger og spredning av månedlige avvik for å vurdere volatilitet.",
+          tufte: "Viser hvert rådatapunkt med 1D-spredning, null interpolert smoothing eller binned tap."
+        },
+        { 
+          id: "boxplot", 
+          name: "Kvartiler & Spredning (Box & Whisker)", 
+          req: "Fordeling av månedlige observasjoner per avdeling.", 
+          usage: "Oppsummerer median, interkvartilbredde (IQR) og ekstreme månedstall.",
+          tufte: "Tufte minimalistisk boxplot: punkt for median, tynn linje for IQR, tomrom ved kvartil."
+        }
       ]
     };
 
@@ -7287,19 +7361,19 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
           code: "25320", name: "25320 - Omsorgssenter / Sykehjem B", shortName: "Sykehjem B",
           sektor: "Helse og Omsorg", fn: "254", fnName: "Institusjonsomsorg",
           bud: 2494192, reg: 2777027,
-          vikar: 335000, overtid: 72000, klp: 565000, drift: 185000
+          vikar: 335000, overtid: 70000, klp: 565000, drift: 185000
         },
         {
           code: "25710", name: "25710 - Hjemmetjenesten Sone Nord", shortName: "Hjemmetj. Nord",
           sektor: "Helse og Omsorg", fn: "254", fnName: "Institusjon & Hjemmetj.",
           bud: 2834309, reg: 3155713,
-          vikar: 387000, overtid: 85000, klp: 640000, drift: 215000
+          vikar: 387000, overtid: 86500, klp: 640000, drift: 215000
         },
         {
           code: "25720", name: "25720 - Hjemmetjenesten Sone Sør", shortName: "Hjemmetj. Sør",
           sektor: "Helse og Omsorg", fn: "254", fnName: "Institusjon & Hjemmetj.",
           bud: 2834310, reg: 3155713,
-          vikar: 394000, overtid: 86000, klp: 641000, drift: 215000
+          vikar: 394000, overtid: 82000, klp: 641000, drift: 215000
         },
         {
           code: "20210", name: "20210 - Grunnskole A (1–10 trinn)", shortName: "Grunnskole A",
@@ -7368,6 +7442,72 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         });
     }
 
+    function updateChartTypeOptions(selectedId) {
+      const intentSelect = document.getElementById("eda-intent-select");
+      const chartTypeSelect = document.getElementById("eda-chart-type-select");
+      if (!intentSelect || !chartTypeSelect) return;
+      const intent = intentSelect.value;
+      const types = FT_CHART_TYPES[intent] || [];
+      chartTypeSelect.innerHTML = types.map(t => `<option value="${t.id}">${t.name}</option>`).join("");
+      if (selectedId && types.some(t => t.id === selectedId)) {
+        chartTypeSelect.value = selectedId;
+      } else if (types.length > 0) {
+        chartTypeSelect.value = types[0].id;
+      }
+    }
+
+    function applyEdaPreset(val) {
+      const intentSelect = document.getElementById("eda-intent-select");
+      const chartTypeSelect = document.getElementById("eda-chart-type-select");
+      const presetSelect = document.getElementById("eda-preset-select");
+      const sektorSelect = document.getElementById("eda-filter-sektor");
+      const varXSelect = document.getElementById("eda-var-x");
+      const varYSelect = document.getElementById("eda-var-y");
+      const customVars = document.getElementById("eda-custom-vars-row");
+
+      if (!intentSelect || !chartTypeSelect) return;
+
+      if (val === "preset-helse-scatter") {
+        intentSelect.value = "correlation";
+        updateChartTypeOptions("scatter");
+        if (sektorSelect) sektorSelect.value = "Helse og Omsorg";
+        if (varXSelect) varXSelect.value = "vikar_kr";
+        if (varYSelect) varYSelect.value = "overtid_kr";
+        if (customVars) customVars.style.display = "none";
+      } else if (val === "preset-helse-comp") {
+        intentSelect.value = "composition";
+        updateChartTypeOptions("stacked_100");
+        if (sektorSelect) sektorSelect.value = "Helse og Omsorg";
+        if (customVars) customVars.style.display = "none";
+      } else if (val === "preset-helse-trend") {
+        intentSelect.value = "trend";
+        updateChartTypeOptions("multiline");
+        if (sektorSelect) sektorSelect.value = "Helse og Omsorg";
+        if (customVars) customVars.style.display = "none";
+      } else if (val === "preset-helse-dev") {
+        intentSelect.value = "deviation";
+        updateChartTypeOptions("diverging_bar");
+        if (sektorSelect) sektorSelect.value = "Helse og Omsorg";
+        if (customVars) customVars.style.display = "none";
+      } else if (val === "preset-all-ranking") {
+        intentSelect.value = "ranking";
+        updateChartTypeOptions("ordered_bar");
+        if (sektorSelect) sektorSelect.value = "ALL";
+        if (customVars) customVars.style.display = "none";
+      } else if (val === "preset-skole-trend") {
+        intentSelect.value = "trend";
+        updateChartTypeOptions("multiline");
+        if (sektorSelect) sektorSelect.value = "Oppvekst og Utdanning";
+        if (customVars) customVars.style.display = "none";
+      } else if (val === "custom") {
+        if (customVars) customVars.style.display = intentSelect.value === "correlation" ? "grid" : "none";
+      }
+
+      renderEdaModule();
+    }
+
+    let edaInitialized = false;
+
     function initEdaModule() {
       const intentSelect = document.getElementById("eda-intent-select");
       const chartTypeSelect = document.getElementById("eda-chart-type-select");
@@ -7379,86 +7519,40 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
       if (!intentSelect || !chartTypeSelect) return;
 
-      function updateChartTypeOptions() {
-        const intent = intentSelect.value;
-        const types = FT_CHART_TYPES[intent] || [];
-        chartTypeSelect.innerHTML = types.map(t => `<option value="${t.id}">${t.name}</option>`).join("");
+      if (!edaInitialized) {
+        edaInitialized = true;
+
+        intentSelect.addEventListener("change", () => {
+          updateChartTypeOptions();
+          if (presetSelect) presetSelect.value = "custom";
+          const customVars = document.getElementById("eda-custom-vars-row");
+          if (customVars) customVars.style.display = intentSelect.value === "correlation" ? "grid" : "none";
+          renderEdaModule();
+        });
+
+        chartTypeSelect.addEventListener("change", () => {
+          renderEdaModule();
+        });
+
+        sektorSelect?.addEventListener("change", () => {
+          renderEdaModule();
+        });
+
+        varXSelect?.addEventListener("change", () => renderEdaModule());
+        varYSelect?.addEventListener("change", () => renderEdaModule());
+
+        presetSelect?.addEventListener("change", (e) => {
+          applyEdaPreset(e.target.value);
+        });
+
+        resetBtn?.addEventListener("click", () => {
+          if (presetSelect) presetSelect.value = "preset-helse-scatter";
+          applyEdaPreset("preset-helse-scatter");
+        });
       }
 
-      intentSelect.addEventListener("change", () => {
-        updateChartTypeOptions();
-        presetSelect.value = "custom";
-        document.getElementById("eda-custom-vars-row").style.display = intentSelect.value === "correlation" ? "grid" : "none";
-        renderEdaModule();
-      });
-
-      chartTypeSelect.addEventListener("change", () => {
-        renderEdaModule();
-      });
-
-      sektorSelect.addEventListener("change", () => {
-        renderEdaModule();
-      });
-
-      varXSelect?.addEventListener("change", () => renderEdaModule());
-      varYSelect?.addEventListener("change", () => renderEdaModule());
-
-      presetSelect.addEventListener("change", (e) => {
-        const val = e.target.value;
-        const customVars = document.getElementById("eda-custom-vars-row");
-
-        if (val === "preset-helse-scatter") {
-          intentSelect.value = "correlation";
-          updateChartTypeOptions();
-          chartTypeSelect.value = "scatter";
-          sektorSelect.value = "Helse og Omsorg";
-          if (varXSelect) varXSelect.value = "vikar_kr";
-          if (varYSelect) varYSelect.value = "overtid_kr";
-          if (customVars) customVars.style.display = "none";
-        } else if (val === "preset-helse-comp") {
-          intentSelect.value = "composition";
-          updateChartTypeOptions();
-          chartTypeSelect.value = "stacked_100";
-          sektorSelect.value = "Helse og Omsorg";
-          if (customVars) customVars.style.display = "none";
-        } else if (val === "preset-helse-trend") {
-          intentSelect.value = "trend";
-          updateChartTypeOptions();
-          chartTypeSelect.value = "multiline";
-          sektorSelect.value = "Helse og Omsorg";
-          if (customVars) customVars.style.display = "none";
-        } else if (val === "preset-helse-dev") {
-          intentSelect.value = "deviation";
-          updateChartTypeOptions();
-          chartTypeSelect.value = "diverging_bar";
-          sektorSelect.value = "Helse og Omsorg";
-          if (customVars) customVars.style.display = "none";
-        } else if (val === "preset-all-ranking") {
-          intentSelect.value = "ranking";
-          updateChartTypeOptions();
-          chartTypeSelect.value = "ordered_bar";
-          sektorSelect.value = "ALL";
-          if (customVars) customVars.style.display = "none";
-        } else if (val === "preset-skole-trend") {
-          intentSelect.value = "trend";
-          updateChartTypeOptions();
-          chartTypeSelect.value = "multiline";
-          sektorSelect.value = "Oppvekst og Utdanning";
-          if (customVars) customVars.style.display = "none";
-        } else if (val === "custom") {
-          if (customVars) customVars.style.display = "grid";
-        }
-
-        renderEdaModule();
-      });
-
-      resetBtn?.addEventListener("click", () => {
-        renderEdaModule();
-      });
-
-      // Initialiser diagramtype-valg
-      updateChartTypeOptions();
-      renderEdaModule();
+      // Initialiser diagramtype og start i forhåndsdefinert spor
+      applyEdaPreset(presetSelect?.value || "preset-helse-scatter");
     }
 
     function renderEdaModule(ctx) {
@@ -7489,14 +7583,10 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       const titleEl = document.getElementById("eda-canvas-title");
       const statEl = document.getElementById("eda-canvas-stat");
 
-      if (guideDataEl) guideDataEl.textContent = currentMeta.req || "Diskrete kategorier og kontinuerlige tall";
-      if (guideUsageEl) guideUsageEl.textContent = currentMeta.usage || "Analyserer mønstre i kommuneregnskapet";
+      if (guideDataEl) guideDataEl.textContent = currentMeta.req || "2 kontinuerlige numeriske variabler (float/kr) aggregert over diskrete enheter.";
+      if (guideUsageEl) guideUsageEl.textContent = currentMeta.usage || "Avdekker om vikarbruk henger systematisk sammen med overtid i døgnkontinuerlig turnus.";
       if (guideTufteEl) {
-        guideTufteEl.textContent = intent === "deviation" ? "Mindreforbruk (grønn) vs. Merforbruk (rød) med tydelig null-akse, ingen vertikale gridlinjer."
-          : (intent === "ranking" ? "Horisontale stolper ordnet synkende etter burn rate, direkte tall-etikettering."
-          : (intent === "trend" ? "Direkte kurve-etiketter ved M08 i henhold til Tufte, unngå separat fargetabell."
-          : (intent === "composition" ? "100% stablede komponenter fargekodet etter artskonti (Fastlønn, Vikarer, Overtid, KLP)."
-          : "Ortogonale akser, lineær regresjonslinje med eksakt R², ingen 3D-effekter.")));
+        guideTufteEl.textContent = currentMeta.tufte || "Direkte etikettering, null linjestøy, kontrollør-rød #D62728 kun ved avvik.";
       }
 
       // Rendring av SVG basert på chartType
@@ -7600,8 +7690,14 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       const r = rDen !== 0 ? rNum / rDen : 0;
       const r2 = r * r;
 
-      if (titleEl) titleEl.textContent = `Sammenheng: ${getLabel(varX)} mot ${getLabel(varY)}`;
-      if (statEl) statEl.textContent = `Pearson r = ${r.toFixed(2).replace(".", ",")}, R² = ${r2.toFixed(2).replace(".", ",")}`;
+      if (titleEl) {
+        titleEl.textContent = (data.length === 4 && data[0].sektor === "Helse og Omsorg" && varX === "vikar_kr" && varY === "overtid_kr")
+          ? "Helse & Mestring: Vikarer vs. Overtid per enhet"
+          : `Sammenheng: ${getLabel(varX)} mot ${getLabel(varY)} (${data.length} enheter)`;
+      }
+      if (statEl) {
+        statEl.textContent = `OLS Trend: R² = ${r2.toFixed(2).replace(".", ",")}`;
+      }
 
       const trendX1 = minX;
       const trendY1 = slope * trendX1 + intercept;
@@ -7646,7 +7742,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         const cx = scaleX(getVal(d, varX));
         const cy = scaleY(getVal(d, varY));
         const r = isBubble ? Math.max(6, Math.min(22, (d.bud / 1500000) * 4)) : 7;
-        const color = d.sektor === "Helse og Omsorg" ? "var(--clr-highlight-red)" : "var(--clr-fig-regnskap)";
+        const color = d.avvik_kr > 0 ? "#D62728" : "#2E7D32";
 
         const info = `<strong>${d.name}</strong><br/>` +
                      `Sektor: ${d.sektor}<br/>` +
@@ -9321,7 +9417,10 @@ Rådgiver økonomistyring, Kristiansand kommune
       }
     }
 
-    // Auto-init Framsikt og Årshjul modules on load
+    // Auto-init EDA, Framsikt og Årshjul modules on load
+    if (typeof initEdaModule === 'function') {
+      try { initEdaModule(); } catch(e) { console.warn("initEdaModule err:", e); }
+    }
     if (typeof initFramsiktModule === 'function') {
       try { initFramsiktModule(); } catch(e) { console.warn("initFramsiktModule err:", e); }
     }
