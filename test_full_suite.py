@@ -367,6 +367,8 @@ def run_all_tests():
                     f"Badge: {sal_refund_info['hasArt1710Badge']}")
         record_test("Art 1710 er postet direkte under 102000 med motpost NAV refusjon", bool(sal_refund_info["hasArt1710Subrow"]))
         record_test("Netto fraværsbelastning etter Art 1710 er beregnet i tabellen", bool(sal_refund_info["hasNettoSubrow"]))
+        has_ytd_col = page.evaluate('() => (document.querySelector("#min-drivers-caption")?.closest("table")?.querySelector("thead")?.innerText || "").includes("Regnskap YTD")')
+        record_test("Kostnadsdriver-tabell inneholder kolonnen Regnskap YTD", bool(has_ytd_col))
 
         # Sjekk Mindreforbruksanalyse (Horisontal bar chart til høyre for TOP 5 konti med mindreforbruk)
         fav_chart_info = page.evaluate('''() => {
