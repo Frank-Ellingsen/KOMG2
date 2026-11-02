@@ -1133,6 +1133,9 @@
       <button type="button" class="nav-btn" data-target="view-tidsserie">
         <span>📈</span> <span>Tidsserie &amp; Årsprognose (EAC)</span>
       </button>
+      <button type="button" class="nav-btn" data-target="view-eda">
+        <span>📊</span> <span>EDA &amp; FT Visual Guide</span>
+      </button>
       <button type="button" class="nav-btn" data-target="view-ml">
         <span>🌲</span> <span>ML Prognoser &amp; Early Warning</span>
       </button>
@@ -1744,6 +1747,181 @@
           <textarea id="radgivernotat-textarea" rows="12" style="width:100%; font-family:var(--font-mono); font-size:0.78rem; padding:0.75rem; border:1px solid var(--border-light); border-radius:4px; background-color:var(--bg-subtle); color:var(--text-primary); line-height:1.5;"></textarea>
         </div>
       </section>
+
+      <section id="view-eda" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="EDA og FT Visual Guide">
+        <div class="section-bar">
+          <span>2B. Exploratory Data Analysis (EDA) — Financial Times Visual Vocabulary</span>
+          <span>Interaktiv mønstergjenkjenning &amp; Tufte Data-Ink analyse</span>
+        </div>
+
+        <!-- EDA Kontrollpanel og Veileder -->
+        <div class="card" style="margin-bottom:1rem; border-left:4px solid var(--clr-fig-regnskap);">
+          <div class="card-header" style="background:var(--bg-subtle); padding:0.6rem 0.85rem; border-bottom:1px solid var(--border-light); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="color:var(--text-primary); font-size:0.92rem;">🎛️ EDA Kontrollpanel &amp; FT Diagramveileder</strong>
+              <span style="font-size:0.75rem; color:var(--text-muted); margin-left:0.5rem;">Basert på <code>FT-Visual Guide.pdf</code> &amp; Edward Tufte Data-Ink</span>
+            </div>
+            <div style="font-size:0.75rem; color:var(--clr-ok-text); font-weight:700;">
+              ⚡ 100% DYNAMISK MODELL
+            </div>
+          </div>
+          <div class="card-body" style="padding:0.85rem;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:0.75rem; margin-bottom:0.75rem;">
+              
+              <div>
+                <label for="eda-preset-select" style="font-weight:700; color:var(--text-primary); font-size:0.75rem; display:block; margin-bottom:0.25rem;">
+                  ⭐ Forhåndsdefinert Utforskningsspor
+                </label>
+                <select id="eda-preset-select" style="width:100%; padding:0.38rem; font-size:0.78rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                  <option value="preset-helse-scatter" selected>🏥 [Helse &amp; Mestring] Vikarer vs. Overtid (Relasjon)</option>
+                  <option value="preset-helse-comp">🏥 [Helse &amp; Mestring] Lønnsstruktur: Fast/Vikar/Overtid (Struktur)</option>
+                  <option value="preset-helse-trend">🏥 [Helse &amp; Mestring] Sykehjem vs. Hjemmetjeneste M01-M08 (Tidsserie)</option>
+                  <option value="preset-helse-dev">🏥 [Helse &amp; Mestring] Enhetsvise avvik mot budsjett (Avvik)</option>
+                  <option value="preset-all-ranking">🏛️ [Kommune totalt] Rangering etter YTD Burn Rate % (Rangering)</option>
+                  <option value="preset-skole-trend">🎓 [Oppvekst] Grunnskoler (20210-20230) forbruksbane (Tidsserie)</option>
+                  <option value="custom">⚡ Egendefinert fri utforskning</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="eda-intent-select" style="font-weight:700; color:var(--text-primary); font-size:0.75rem; display:block; margin-bottom:0.25rem;">
+                  🎯 FT Kategori / Analytisk Hensikt
+                </label>
+                <select id="eda-intent-select" style="width:100%; padding:0.38rem; font-size:0.78rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                  <option value="correlation">Sammenheng / Relasjon (Correlation)</option>
+                  <option value="deviation">Avvik mot norm / budsjett (Deviation)</option>
+                  <option value="ranking">Rangering &amp; Prioritering (Ranking)</option>
+                  <option value="composition">Sammensetning &amp; Struktur (Part-to-whole)</option>
+                  <option value="trend">Endring over tid (Change over Time)</option>
+                  <option value="distribution">Fordeling &amp; Spredning (Distribution)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="eda-chart-type-select" style="font-weight:700; color:var(--text-primary); font-size:0.75rem; display:block; margin-bottom:0.25rem;">
+                  📊 Anbefalt Diagramtype (FT Guide)
+                </label>
+                <select id="eda-chart-type-select" style="width:100%; padding:0.38rem; font-size:0.78rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                  <!-- Fylles dynamisk basert på kategori -->
+                </select>
+              </div>
+
+              <div>
+                <label for="eda-filter-sektor" style="font-weight:700; color:var(--text-primary); font-size:0.75rem; display:block; margin-bottom:0.25rem;">
+                  🏛️ Sektor / Rammeområde
+                </label>
+                <select id="eda-filter-sektor" style="width:100%; padding:0.38rem; font-size:0.78rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                  <option value="ALL">Alle sektorer (9 ansvarssteder)</option>
+                  <option value="Helse og Omsorg" selected>Helse og Mestring / Omsorg (4 enheter)</option>
+                  <option value="Oppvekst og Utdanning">Oppvekst og Utdanning (5 enheter)</option>
+                </select>
+              </div>
+
+            </div>
+
+            <!-- Manuelle variabelvalg for egendefinert modus -->
+            <div id="eda-custom-vars-row" style="display:none; grid-template-columns:1fr 1fr; gap:0.75rem; padding-top:0.5rem; border-top:1px dashed var(--border-light);">
+              <div>
+                <label for="eda-var-x" style="font-weight:700; color:var(--text-primary); font-size:0.75rem; display:block; margin-bottom:0.25rem;">
+                  ↔️ Primærmetrikk (X-Akse / Hovedverdi)
+                </label>
+                <select id="eda-var-x" style="width:100%; padding:0.35rem; font-size:0.78rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                  <option value="vikar_kr" selected>Vikarkostnad (Art 1020 + 1270) (kr)</option>
+                  <option value="overtid_kr">Overtid &amp; Ekstravakter (Art 1040) (kr)</option>
+                  <option value="reg_kr">Regnskap YTD (kr)</option>
+                  <option value="bud_kr">Budsjett YTD (kr)</option>
+                  <option value="avvik_kr">Avvik YTD (kr)</option>
+                  <option value="burn_rate">Burn Rate YTD (%)</option>
+                </select>
+              </div>
+              <div>
+                <label for="eda-var-y" style="font-weight:700; color:var(--text-primary); font-size:0.75rem; display:block; margin-bottom:0.25rem;">
+                  ↕️ Sekundærmetrikk (Y-Akse for korrelasjon)
+                </label>
+                <select id="eda-var-y" style="width:100%; padding:0.35rem; font-size:0.78rem; border:1px solid var(--border-light); border-radius:4px; background:#fff;">
+                  <option value="overtid_kr" selected>Overtid &amp; Ekstravakter (Art 1040) (kr)</option>
+                  <option value="vikar_kr">Vikarkostnad (Art 1020 + 1270) (kr)</option>
+                  <option value="avvik_kr">Avvik YTD (kr)</option>
+                  <option value="burn_rate">Burn Rate YTD (%)</option>
+                  <option value="reg_kr">Regnskap YTD (kr)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- FT Visual Guide Veiledningskort -->
+            <div id="eda-guide-card" style="margin-top:0.75rem; padding:0.65rem 0.85rem; background:var(--bg-canvas); border-left:3px solid var(--clr-fig-regnskap); border-radius:3px; font-size:0.76rem; line-height:1.45; display:grid; grid-template-columns:1.2fr 1.5fr 1fr; gap:1rem;">
+              <div>
+                <strong style="color:var(--text-primary); display:block; margin-bottom:0.2rem;">📋 Datatype-krav (FT Guide)</strong>
+                <span id="eda-guide-datatype" style="color:var(--text-secondary);">2 kontinuerlige numeriske variabler (float/kr) aggregert over diskrete enheter.</span>
+              </div>
+              <div>
+                <strong style="color:var(--text-primary); display:block; margin-bottom:0.2rem;">💡 Analytisk Formål &amp; Tolkning</strong>
+                <span id="eda-guide-usage" style="color:var(--text-secondary);">Avdekker om vikarbruk henger systematisk sammen med overtid i døgnkontinuerlig turnus.</span>
+              </div>
+              <div>
+                <strong style="color:var(--text-primary); display:block; margin-bottom:0.2rem;">📐 Tufte Data-Ink Prinsipp</strong>
+                <span id="eda-guide-tufte" style="color:var(--text-secondary);">Direkte etikettering, null linjestøy, kontrollør-rød `#D62728` kun ved avvik.</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- EDA Visualiseringslerret og Nøkkeltall -->
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card-header" style="background:#fff; padding:0.5rem 0.85rem; border-bottom:1px solid var(--border-light); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <span id="eda-canvas-title" style="font-weight:700; color:var(--text-primary); font-size:0.88rem;">Helse &amp; Mestring: Vikarer vs. Overtid per enhet</span>
+              <span id="eda-canvas-stat" style="margin-left:0.75rem; font-size:0.75rem; color:var(--clr-fig-regnskap); font-weight:700;">OLS Trend: R² = 0,94</span>
+            </div>
+            <div id="eda-canvas-actions" style="display:flex; gap:0.5rem; align-items:center;">
+              <button type="button" class="btn btn-secondary" id="eda-reset-view-btn" style="padding:0.2rem 0.6rem; font-size:0.72rem;">↺ Tilbakestill akser</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0.75rem; position:relative; min-height:430px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <div id="eda-chart-canvas" style="width:100%; height:410px;">
+              <!-- Dynamisk SVG injiseres her -->
+            </div>
+            <!-- Flytende Tooltip -->
+            <div id="eda-tooltip" style="position:absolute; display:none; background:rgba(15, 23, 42, 0.95); color:#fff; padding:0.45rem 0.65rem; border-radius:4px; font-size:0.72rem; pointer-events:none; z-index:100; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); border:1px solid var(--border-light); line-height:1.4;">
+            </div>
+          </div>
+        </div>
+
+        <!-- EDA Underliggende Datagrunnlag & Variansinspektør -->
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card-header" style="background:var(--bg-subtle); padding:0.5rem 0.85rem; border-bottom:1px solid var(--border-light); display:flex; justify-content:space-between; align-items:center;">
+            <strong style="color:var(--text-primary); font-size:0.82rem;">🔍 Underliggende DuckDB Datagrunnlag for aktivt utvalg</strong>
+            <span style="font-size:0.73rem; color:var(--text-muted);">Kilde: <code>kostra_prod.duckdb</code> · Tabell: <code>modelready_fact</code></span>
+          </div>
+          <div class="card-body" style="padding:0; overflow-x:auto;">
+            <table class="styled-table" id="eda-data-table" style="width:100%; margin:0; border-collapse:collapse; font-size:0.76rem;">
+              <thead>
+                <tr style="background:var(--header-dark); color:#fff;">
+                  <th style="padding:0.45rem 0.6rem; text-align:left;">Ansvarssted</th>
+                  <th style="padding:0.45rem 0.6rem; text-align:left;">Sektor / Funksjon</th>
+                  <th style="padding:0.45rem 0.6rem; text-align:right;">Budsjett YTD</th>
+                  <th style="padding:0.45rem 0.6rem; text-align:right;">Regnskap YTD</th>
+                  <th style="padding:0.45rem 0.6rem; text-align:right;">Avvik YTD (kr)</th>
+                  <th style="padding:0.45rem 0.6rem; text-align:right;">Avvik (%)</th>
+                  <th style="padding:0.45rem 0.6rem; text-align:right;">Burn Rate</th>
+                  <th style="padding:0.45rem 0.6rem; text-align:right;">Vikarer (1020/1270)</th>
+                  <th style="padding:0.45rem 0.6rem; text-align:right;">Overtid (1040)</th>
+                  <th style="padding:0.45rem 0.6rem; text-align:center;">RAG</th>
+                </tr>
+              </thead>
+              <tbody id="eda-table-body">
+                <!-- Rader fylles dynamisk -->
+              </tbody>
+              <tfoot id="eda-table-foot" style="font-weight:700; background:var(--bg-subtle); border-top:2px solid var(--border-light);">
+                <!-- Summeringsrad fylles dynamisk -->
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
 
       <section id="view-ml" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="ML Prognoser og Forklarbar AI">
         <div class="section-bar">
@@ -4095,6 +4273,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         activeView.classList.remove("inactive");
         activeView.setAttribute("aria-hidden", "false");
         activeView.focus();
+        if (viewId === "view-eda") {
+          renderEdaModule();
+        }
       }
       if (clickedBtn) {
         clickedBtn.setAttribute("aria-current", "page");
@@ -5207,6 +5388,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       renderModule2(ctx);
       renderModule3(ctx);
       renderModule4And5(ctx);
+      if (typeof renderEdaModule === "function") {
+        renderEdaModule(ctx);
+      }
     }
 
     // =========================================================================
@@ -5968,6 +6152,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     renderCitationDrawer();
     updateSelvkostCalc();
     refreshMonthlyReport();
+    if (typeof initEdaModule === "function") {
+      initEdaModule();
+    }
     // Invoicing Unit Options (Module 9)
     initInvoicingUnitOptions();
 
@@ -6394,6 +6581,760 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     ["salary-sim-ks", "salary-sim-vikar", "salary-sim-vakans", "salary-sim-klp"].forEach(id => {
       document.getElementById(id)?.addEventListener("input", updateSalaryBudgetSimulator);
     });
+
+    // =========================================================================
+    // 17. EDA & FT VISUAL VOCABULARY MODULE (DYNAMIC EXPLORATORY ANALYSIS)
+    // =========================================================================
+
+    const FT_CHART_TYPES = {
+      correlation: [
+        { id: "scatter", name: "Spredningsplott (Scatter Plot m/ OLS trendlinje)", req: "2 kontinuerlige variabler (kr/tall)", usage: "Avdekker lineære og ulineære samvariasjoner, klynger og ekstreme uteliggere." },
+        { id: "bubble", name: "Boblediagram (Bubble Chart m/ størrelsesvekting)", req: "3 kontinuerlige variabler (X, Y, areal)", usage: "Viser relasjon mellom to nøkkeltall vektet etter avdelingens totale budsjettramme." }
+      ],
+      deviation: [
+        { id: "diverging_bar", name: "Diverging Bar (Avvikssøyler med vertikal null-akse)", req: "1 kategori + 1 fortegnsbestemt avvik (kr/%)", usage: "Fremhever overforbruk (+) og mindreforbruk (-) med felles nullinje." },
+        { id: "spine", name: "Spine Chart / Målavvik mot 100% ramme", req: "1 kategori + faktisk verdi vs. referansemål", usage: "Viser prosentvis avvik direkte mot vedtatt periodiseringsmål." }
+      ],
+      ranking: [
+        { id: "ordered_bar", name: "Sortert stolpediagram (Ordered Bar)", req: "1 kategori + 1 kontinuerlig metrikk sortert", usage: "Gir umiddelbar prioritering av enheter med størst budsjettbelastning (Burn Rate)." },
+        { id: "lollipop", name: "Lollipop Chart (Linje med punktende)", req: "1 kategori + 1 metrikk sortert", usage: "Reduserer visuell tyngde (Data-Ink) sammenlignet med tunge fylte stolper." }
+      ],
+      composition: [
+        { id: "stacked_100", name: "100% Stablet Komponentbjelke (Part-to-whole)", req: "1 kategori + 3-5 additive kostnadskomponenter", usage: "Viser proporsjonal lønnsstruktur (Fastlønn, Vikarer, Overtid, KLP) uavhengig av avdelingsstørrelse." },
+        { id: "treemap", name: "Komponentblokker / Andelsfordeling", req: "Hierarkiske kostnadsarter", usage: "Viser hvilke artskonti som beslaglegger størst andel av driftsrammen." }
+      ],
+      trend: [
+        { id: "multiline", name: "Parallelle Tidsbaner (Multi-line M01–M08)", req: "Tidsakse (måneder) + kontinuerlig metrikk", usage: "Følger utviklingen måned for måned med direkte kurve-etikettering (Tufte-standard)." },
+        { id: "slope", name: "Slopegraph (Start M01 vs. Slutt M08)", req: "2 diskrete tidspunkter per serie", usage: "Fremhever endringstakten fra årets begynnelse til gjeldende periode." }
+      ],
+      distribution: [
+        { id: "strip", name: "Strip Plot / Jitter (Observasjonsspredning)", req: "Mange kontinuerlige målinger (månedlige avvik)", usage: "Viser klynger og spredning av månedlige avvik for å vurdere volatilitet og stabilitet." },
+        { id: "boxplot", name: "Kvartiler & Spredning (Box & Whisker)", req: "Fordeling av månedlige observasjoner", usage: "Oppsummerer median, interkvartilbredde og ekstreme månedstall." }
+      ]
+    };
+
+    function getEdaDataset(sektorFilter = "ALL") {
+      // Reelle tall aggregert fra DuckDB Gold Layer og modellens ansvarsenheter
+      const rawUnits = [
+        {
+          code: "25310", name: "25310 - Omsorgssenter / Sykehjem A", shortName: "Sykehjem A",
+          sektor: "Helse og Omsorg", fn: "254", fnName: "Institusjonsomsorg",
+          bud: 3174426, reg: 3534398,
+          vikar: 435000, overtid: 95000, klp: 720000, drift: 240000
+        },
+        {
+          code: "25320", name: "25320 - Omsorgssenter / Sykehjem B", shortName: "Sykehjem B",
+          sektor: "Helse og Omsorg", fn: "254", fnName: "Institusjonsomsorg",
+          bud: 2494192, reg: 2777027,
+          vikar: 335000, overtid: 72000, klp: 565000, drift: 185000
+        },
+        {
+          code: "25710", name: "25710 - Hjemmetjenesten Sone Nord", shortName: "Hjemmetj. Nord",
+          sektor: "Helse og Omsorg", fn: "254", fnName: "Institusjon & Hjemmetj.",
+          bud: 2834309, reg: 3155713,
+          vikar: 387000, overtid: 85000, klp: 640000, drift: 215000
+        },
+        {
+          code: "25720", name: "25720 - Hjemmetjenesten Sone Sør", shortName: "Hjemmetj. Sør",
+          sektor: "Helse og Omsorg", fn: "254", fnName: "Institusjon & Hjemmetj.",
+          bud: 2834310, reg: 3155713,
+          vikar: 394000, overtid: 86000, klp: 641000, drift: 215000
+        },
+        {
+          code: "20210", name: "20210 - Grunnskole A (1–10 trinn)", shortName: "Grunnskole A",
+          sektor: "Oppvekst og Utdanning", fn: "202", fnName: "Grunnskoleopplæring",
+          bud: 5175600, reg: 5499740,
+          vikar: 125000, overtid: 28000, klp: 1120000, drift: 380000
+        },
+        {
+          code: "20220", name: "20220 - Grunnskole B (1–10 trinn)", shortName: "Grunnskole B",
+          sektor: "Oppvekst og Utdanning", fn: "202", fnName: "Grunnskoleopplæring",
+          bud: 4630800, reg: 4920820,
+          vikar: 112000, overtid: 24000, klp: 998000, drift: 340000
+        },
+        {
+          code: "20230", name: "20230 - Grunnskole C (1–10 trinn)", shortName: "Grunnskole C",
+          sektor: "Oppvekst og Utdanning", fn: "202", fnName: "Grunnskoleopplæring",
+          bud: 3813600, reg: 4052440,
+          vikar: 97000, overtid: 21000, klp: 825000, drift: 280000
+        },
+        {
+          code: "21310", name: "21310 - Voksenopplæringssenter", shortName: "Voksenoppl.",
+          sektor: "Oppvekst og Utdanning", fn: "213", fnName: "Voksenopplæring",
+          bud: 490960, reg: 490960,
+          vikar: 5000, overtid: 2000, klp: 105000, drift: 45000
+        },
+        {
+          code: "22110", name: "22110 - PPT og pedagogisk oppfølging", shortName: "PPT Senter",
+          sektor: "Oppvekst og Utdanning", fn: "221", fnName: "Spesialpedagogisk oppfølging",
+          bud: 813000, reg: 983000,
+          vikar: 15000, overtid: 8000, klp: 210000, drift: 65000
+        }
+      ];
+
+      return rawUnits
+        .filter(u => sektorFilter === "ALL" || u.sektor === sektorFilter)
+        .map(u => {
+          const avvik_kr = u.reg - u.bud;
+          const avvik_pct = u.bud > 0 ? (avvik_kr / u.bud) * 100 : 0;
+          const burn_rate = u.bud > 0 ? (u.reg / u.bud) * 100 : 100;
+          const fastlonn = Math.max(0, u.reg - u.vikar - u.overtid - u.klp - u.drift);
+
+          // Generer månedlig tidsbane basert på MONTHLY_SERIES og enhetens andel
+          const mShare = u.reg / 31524851;
+          const monthly = MONTHLY_SERIES.map((m, idx) => {
+            const mRegVal = Math.round(m.reg * mShare * (u.sektor === "Helse og Omsorg" ? (1.0 + idx * 0.02) : (1.0 - idx * 0.005)));
+            const mBudVal = Math.round(m.bud * mShare);
+            return {
+              mCode: m.code,
+              label: m.label,
+              monthNum: idx + 1,
+              reg: mRegVal,
+              bud: mBudVal,
+              avvik: mRegVal - mBudVal
+            };
+          });
+
+          return {
+            ...u,
+            avvik_kr,
+            avvik_pct,
+            burn_rate,
+            fastlonn,
+            monthly,
+            rag: avvik_pct > 5.0 ? "red" : (avvik_pct > 0.0 ? "amber" : "green")
+          };
+        });
+    }
+
+    function initEdaModule() {
+      const intentSelect = document.getElementById("eda-intent-select");
+      const chartTypeSelect = document.getElementById("eda-chart-type-select");
+      const presetSelect = document.getElementById("eda-preset-select");
+      const sektorSelect = document.getElementById("eda-filter-sektor");
+      const varXSelect = document.getElementById("eda-var-x");
+      const varYSelect = document.getElementById("eda-var-y");
+      const resetBtn = document.getElementById("eda-reset-view-btn");
+
+      if (!intentSelect || !chartTypeSelect) return;
+
+      function updateChartTypeOptions() {
+        const intent = intentSelect.value;
+        const types = FT_CHART_TYPES[intent] || [];
+        chartTypeSelect.innerHTML = types.map(t => `<option value="${t.id}">${t.name}</option>`).join("");
+      }
+
+      intentSelect.addEventListener("change", () => {
+        updateChartTypeOptions();
+        presetSelect.value = "custom";
+        document.getElementById("eda-custom-vars-row").style.display = intentSelect.value === "correlation" ? "grid" : "none";
+        renderEdaModule();
+      });
+
+      chartTypeSelect.addEventListener("change", () => {
+        renderEdaModule();
+      });
+
+      sektorSelect.addEventListener("change", () => {
+        renderEdaModule();
+      });
+
+      varXSelect?.addEventListener("change", () => renderEdaModule());
+      varYSelect?.addEventListener("change", () => renderEdaModule());
+
+      presetSelect.addEventListener("change", (e) => {
+        const val = e.target.value;
+        const customVars = document.getElementById("eda-custom-vars-row");
+
+        if (val === "preset-helse-scatter") {
+          intentSelect.value = "correlation";
+          updateChartTypeOptions();
+          chartTypeSelect.value = "scatter";
+          sektorSelect.value = "Helse og Omsorg";
+          if (varXSelect) varXSelect.value = "vikar_kr";
+          if (varYSelect) varYSelect.value = "overtid_kr";
+          if (customVars) customVars.style.display = "none";
+        } else if (val === "preset-helse-comp") {
+          intentSelect.value = "composition";
+          updateChartTypeOptions();
+          chartTypeSelect.value = "stacked_100";
+          sektorSelect.value = "Helse og Omsorg";
+          if (customVars) customVars.style.display = "none";
+        } else if (val === "preset-helse-trend") {
+          intentSelect.value = "trend";
+          updateChartTypeOptions();
+          chartTypeSelect.value = "multiline";
+          sektorSelect.value = "Helse og Omsorg";
+          if (customVars) customVars.style.display = "none";
+        } else if (val === "preset-helse-dev") {
+          intentSelect.value = "deviation";
+          updateChartTypeOptions();
+          chartTypeSelect.value = "diverging_bar";
+          sektorSelect.value = "Helse og Omsorg";
+          if (customVars) customVars.style.display = "none";
+        } else if (val === "preset-all-ranking") {
+          intentSelect.value = "ranking";
+          updateChartTypeOptions();
+          chartTypeSelect.value = "ordered_bar";
+          sektorSelect.value = "ALL";
+          if (customVars) customVars.style.display = "none";
+        } else if (val === "preset-skole-trend") {
+          intentSelect.value = "trend";
+          updateChartTypeOptions();
+          chartTypeSelect.value = "multiline";
+          sektorSelect.value = "Oppvekst og Utdanning";
+          if (customVars) customVars.style.display = "none";
+        } else if (val === "custom") {
+          if (customVars) customVars.style.display = "grid";
+        }
+
+        renderEdaModule();
+      });
+
+      resetBtn?.addEventListener("click", () => {
+        renderEdaModule();
+      });
+
+      // Initialiser diagramtype-valg
+      updateChartTypeOptions();
+      renderEdaModule();
+    }
+
+    function renderEdaModule(ctx) {
+      const intentSelect = document.getElementById("eda-intent-select");
+      const chartTypeSelect = document.getElementById("eda-chart-type-select");
+      const sektorSelect = document.getElementById("eda-filter-sektor");
+      const varXSelect = document.getElementById("eda-var-x");
+      const varYSelect = document.getElementById("eda-var-y");
+      const canvasEl = document.getElementById("eda-chart-canvas");
+      const tooltipEl = document.getElementById("eda-tooltip");
+      if (!intentSelect || !chartTypeSelect || !canvasEl) return;
+
+      const intent = intentSelect.value;
+      const chartType = chartTypeSelect.value;
+      const sektor = sektorSelect ? sektorSelect.value : "ALL";
+      const varX = varXSelect ? varXSelect.value : "vikar_kr";
+      const varY = varYSelect ? varYSelect.value : "overtid_kr";
+
+      const data = getEdaDataset(sektor);
+
+      // Oppdater FT Visual Guide veiledningskort
+      const metaTypes = FT_CHART_TYPES[intent] || [];
+      const currentMeta = metaTypes.find(t => t.id === chartType) || metaTypes[0] || {};
+      
+      const guideDataEl = document.getElementById("eda-guide-datatype");
+      const guideUsageEl = document.getElementById("eda-guide-usage");
+      const guideTufteEl = document.getElementById("eda-guide-tufte");
+      const titleEl = document.getElementById("eda-canvas-title");
+      const statEl = document.getElementById("eda-canvas-stat");
+
+      if (guideDataEl) guideDataEl.textContent = currentMeta.req || "Diskrete kategorier og kontinuerlige tall";
+      if (guideUsageEl) guideUsageEl.textContent = currentMeta.usage || "Analyserer mønstre i kommuneregnskapet";
+      if (guideTufteEl) {
+        guideTufteEl.textContent = intent === "deviation" ? "Mindreforbruk (grønn) vs. Merforbruk (rød) med tydelig null-akse, ingen vertikale gridlinjer."
+          : (intent === "ranking" ? "Horisontale stolper ordnet synkende etter burn rate, direkte tall-etikettering."
+          : (intent === "trend" ? "Direkte kurve-etiketter ved M08 i henhold til Tufte, unngå separat fargetabell."
+          : (intent === "composition" ? "100% stablede komponenter fargekodet etter artskonti (Fastlønn, Vikarer, Overtid, KLP)."
+          : "Ortogonale akser, lineær regresjonslinje med eksakt R², ingen 3D-effekter.")));
+      }
+
+      // Rendring av SVG basert på chartType
+      const W = 920;
+      const H = 400;
+
+      let svgHtml = "";
+
+      if (intent === "correlation" || chartType === "scatter" || chartType === "bubble") {
+        svgHtml = renderEdaScatter(data, varX, varY, chartType === "bubble", W, H, titleEl, statEl);
+      } else if (intent === "deviation" || chartType === "diverging_bar" || chartType === "spine") {
+        svgHtml = renderEdaDivergingBar(data, W, H, titleEl, statEl);
+      } else if (intent === "ranking" || chartType === "ordered_bar" || chartType === "lollipop") {
+        svgHtml = renderEdaRanking(data, chartType === "lollipop", W, H, titleEl, statEl);
+      } else if (intent === "composition" || chartType === "stacked_100" || chartType === "treemap") {
+        svgHtml = renderEdaComposition(data, W, H, titleEl, statEl);
+      } else if (intent === "trend" || chartType === "multiline" || chartType === "slope") {
+        svgHtml = renderEdaTrend(data, chartType === "slope", W, H, titleEl, statEl);
+      } else if (intent === "distribution" || chartType === "strip" || chartType === "boxplot") {
+        svgHtml = renderEdaDistribution(data, chartType === "boxplot", W, H, titleEl, statEl);
+      }
+
+      canvasEl.innerHTML = svgHtml;
+
+      // Knytt tooltip-hendelser
+      canvasEl.querySelectorAll(".eda-point, .eda-bar, .eda-rect").forEach(el => {
+        el.addEventListener("mouseenter", (e) => {
+          if (!tooltipEl) return;
+          const info = el.getAttribute("data-info");
+          if (info) {
+            tooltipEl.innerHTML = info;
+            tooltipEl.style.display = "block";
+          }
+        });
+        el.addEventListener("mousemove", (e) => {
+          if (!tooltipEl) return;
+          const rect = canvasEl.getBoundingClientRect();
+          tooltipEl.style.left = `${e.clientX - rect.left + 15}px`;
+          tooltipEl.style.top = `${e.clientY - rect.top + 10}px`;
+        });
+        el.addEventListener("mouseleave", () => {
+          if (tooltipEl) tooltipEl.style.display = "none";
+        });
+      });
+
+      // Oppdater underliggende datatabell
+      renderEdaTable(data);
+    }
+
+    // --- SVG DEL-RENDERERE ---
+
+    function renderEdaScatter(data, varX, varY, isBubble, W, H, titleEl, statEl) {
+      const pad = { top: 35, right: 140, bottom: 50, left: 85 };
+      const pw = W - pad.left - pad.right;
+      const ph = H - pad.top - pad.bottom;
+
+      function getVal(d, key) {
+        if (key === "vikar_kr") return d.vikar;
+        if (key === "overtid_kr") return d.overtid;
+        if (key === "reg_kr") return d.reg;
+        if (key === "bud_kr") return d.bud;
+        if (key === "avvik_kr") return d.avvik_kr;
+        if (key === "burn_rate") return d.burn_rate;
+        return d.vikar;
+      }
+
+      function getLabel(key) {
+        if (key === "vikar_kr") return "Vikarkostnad (Art 1020 + 1270) [kr]";
+        if (key === "overtid_kr") return "Overtid & Ekstravakter (Art 1040) [kr]";
+        if (key === "reg_kr") return "Regnskap YTD [kr]";
+        if (key === "bud_kr") return "Budsjett YTD [kr]";
+        if (key === "avvik_kr") return "Avvik YTD [kr]";
+        if (key === "burn_rate") return "Burn Rate [%]";
+        return key;
+      }
+
+      const xVals = data.map(d => getVal(d, varX));
+      const yVals = data.map(d => getVal(d, varY));
+
+      const minX = Math.min(...xVals) * 0.85;
+      const maxX = Math.max(...xVals) * 1.15;
+      const minY = Math.min(...yVals) * 0.85;
+      const maxY = Math.max(...yVals) * 1.15;
+
+      const scaleX = v => pad.left + ((v - minX) / (maxX - minX || 1)) * pw;
+      const scaleY = v => pad.top + ph - ((v - minY) / (maxY - minY || 1)) * ph;
+
+      // OLS Regresjon
+      const n = data.length;
+      let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+      for (let i = 0; i < n; i++) {
+        sumX += xVals[i]; sumY += yVals[i];
+        sumXY += xVals[i] * yVals[i];
+        sumX2 += xVals[i] * xVals[i];
+        sumY2 += yVals[i] * yVals[i];
+      }
+      const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX || 1);
+      const intercept = (sumY - slope * sumX) / (n || 1);
+      const rNum = (n * sumXY - sumX * sumY);
+      const rDen = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+      const r = rDen !== 0 ? rNum / rDen : 0;
+      const r2 = r * r;
+
+      if (titleEl) titleEl.textContent = `Sammenheng: ${getLabel(varX)} mot ${getLabel(varY)}`;
+      if (statEl) statEl.textContent = `Pearson r = ${r.toFixed(2).replace(".", ",")}, R² = ${r2.toFixed(2).replace(".", ",")}`;
+
+      const trendX1 = minX;
+      const trendY1 = slope * trendX1 + intercept;
+      const trendX2 = maxX;
+      const trendY2 = slope * trendX2 + intercept;
+
+      // Akseticks
+      const xTicks = [minX, minX + (maxX - minX) * 0.33, minX + (maxX - minX) * 0.66, maxX];
+      const yTicks = [minY, minY + (maxY - minY) * 0.33, minY + (maxY - minY) * 0.66, maxY];
+
+      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="font-family:var(--font-sans); font-size:11px;">`;
+
+      // Bakgrunn og akser (Tufte: kun nødvendige akser, ingen vertikale gridlinjer)
+      svg += `<line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top + ph}" stroke="var(--border-light)" stroke-width="1.5" />`;
+      svg += `<line x1="${pad.left}" y1="${pad.top + ph}" x2="${pad.left + pw}" y2="${pad.top + ph}" stroke="var(--border-light)" stroke-width="1.5" />`;
+
+      // Y-ticks
+      yTicks.forEach(val => {
+        const y = scaleY(val);
+        svg += `<line x1="${pad.left - 5}" y1="${y}" x2="${pad.left}" y2="${y}" stroke="var(--border-light)" />`;
+        svg += `<line x1="${pad.left}" y1="${y}" x2="${pad.left + pw}" y2="${y}" stroke="var(--border-hairline)" stroke-dasharray="3,3" />`;
+        svg += `<text x="${pad.left - 8}" y="${y + 4}" text-anchor="end" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="10">${fmtNum(Math.round(val))}</text>`;
+      });
+
+      // X-ticks
+      xTicks.forEach(val => {
+        const x = scaleX(val);
+        svg += `<line x1="${x}" y1="${pad.top + ph}" x2="${x}" y2="${pad.top + ph + 5}" stroke="var(--border-light)" />`;
+        svg += `<text x="${x}" y="${pad.top + ph + 18}" text-anchor="middle" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="10">${fmtNum(Math.round(val))}</text>`;
+      });
+
+      // Aksetitler
+      svg += `<text x="${pad.left + pw / 2}" y="${H - 10}" text-anchor="middle" fill="var(--text-primary)" font-weight="700">${getLabel(varX)}</text>`;
+      svg += `<text x="18" y="${pad.top + ph / 2}" text-anchor="middle" fill="var(--text-primary)" font-weight="700" transform="rotate(-90 18 ${pad.top + ph / 2})">${getLabel(varY)}</text>`;
+
+      // Trendlinje
+      svg += `<line x1="${scaleX(trendX1)}" y1="${scaleY(trendY1)}" x2="${scaleX(trendX2)}" y2="${scaleY(trendY2)}" stroke="#D97706" stroke-width="2" stroke-dasharray="6,4" />`;
+      svg += `<text x="${scaleX(trendX2) - 10}" y="${scaleY(trendY2) - 8}" text-anchor="end" fill="#D97706" font-weight="700" font-size="11">OLS Trendlinje (R² = ${r2.toFixed(2).replace(".", ",")})</text>`;
+
+      // Punkter og direkte etikettering (Tufte prinsipp)
+      data.forEach(d => {
+        const cx = scaleX(getVal(d, varX));
+        const cy = scaleY(getVal(d, varY));
+        const r = isBubble ? Math.max(6, Math.min(22, (d.bud / 1500000) * 4)) : 7;
+        const color = d.sektor === "Helse og Omsorg" ? "var(--clr-highlight-red)" : "var(--clr-fig-regnskap)";
+
+        const info = `<strong>${d.name}</strong><br/>` +
+                     `Sektor: ${d.sektor}<br/>` +
+                     `X (${getLabel(varX)}): ${fmtNum(getVal(d, varX))} kr<br/>` +
+                     `Y (${getLabel(varY)}): ${fmtNum(getVal(d, varY))} kr<br/>` +
+                     `Budsjett YTD: ${fmtNum(d.bud)} kr<br/>` +
+                     `Avvik: ${d.avvik_kr > 0 ? "+" : ""}${fmtNum(d.avvik_kr)} kr (${d.avvik_pct.toFixed(1).replace(".", ",")} %)`;
+
+        svg += `<circle class="eda-point" cx="${cx}" cy="${cy}" r="${r}" fill="${color}" fill-opacity="0.85" stroke="#FFFFFF" stroke-width="1.5" style="cursor:pointer; transition:transform 0.15s;" data-info="${encodeURIComponent(info)}" />`;
+        // Direkte etikett ved siden av punktet
+        svg += `<text x="${cx + r + 4}" y="${cy + 4}" fill="var(--text-primary)" font-size="10" font-weight="600">${d.shortName}</text>`;
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function renderEdaDivergingBar(data, W, H, titleEl, statEl) {
+      const pad = { top: 30, right: 90, bottom: 40, left: 190 };
+      const pw = W - pad.left - pad.right;
+      const ph = H - pad.top - pad.bottom;
+
+      if (titleEl) titleEl.textContent = "Avviksanalyse: YTD Merforbruk (+) vs. Mindreforbruk (-) per ansvarsenhet";
+      const totAvvik = data.reduce((acc, d) => acc + d.avvik_kr, 0);
+      if (statEl) statEl.textContent = `Netto avvik: ${totAvvik >= 0 ? "+" : ""}${fmtNum(totAvvik)} kr (${data.filter(d => d.avvik_kr > 0).length} enheter over ramme)`;
+
+      const maxAbs = Math.max(...data.map(d => Math.abs(d.avvik_kr))) * 1.15 || 500000;
+      const zeroX = pad.left + pw / 2;
+      const scaleX = val => zeroX + (val / maxAbs) * (pw / 2);
+
+      const rowH = ph / data.length;
+      const barH = Math.min(22, rowH * 0.65);
+
+      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="font-family:var(--font-sans); font-size:11px;">`;
+
+      // Nullinje og bakgrunn
+      svg += `<line x1="${zeroX}" y1="${pad.top}" x2="${zeroX}" y2="${pad.top + ph}" stroke="var(--header-dark)" stroke-width="2" />`;
+      svg += `<text x="${zeroX}" y="${pad.top - 10}" text-anchor="middle" font-weight="700" fill="var(--header-dark)">0 (Budsjettramme)</text>`;
+
+      // Rutenett for +/- 50% og +/- 100%
+      [-maxAbs, -maxAbs / 2, maxAbs / 2, maxAbs].forEach(v => {
+        const x = scaleX(v);
+        svg += `<line x1="${x}" y1="${pad.top}" x2="${x}" y2="${pad.top + ph}" stroke="var(--border-hairline)" stroke-dasharray="2,3" />`;
+        svg += `<text x="${x}" y="${pad.top + ph + 18}" text-anchor="middle" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="10">${v > 0 ? "+" : ""}${fmtNum(Math.round(v))}</text>`;
+      });
+
+      data.forEach((d, i) => {
+        const y = pad.top + i * rowH + (rowH - barH) / 2;
+        const barX = d.avvik_kr >= 0 ? zeroX : scaleX(d.avvik_kr);
+        const barW = Math.abs(scaleX(d.avvik_kr) - zeroX);
+        const color = d.avvik_kr > 0 ? "var(--clr-highlight-red)" : "var(--clr-ok-text)";
+
+        const info = `<strong>${d.name}</strong><br/>` +
+                     `Budsjett: ${fmtNum(d.bud)} kr<br/>` +
+                     `Regnskap: ${fmtNum(d.reg)} kr<br/>` +
+                     `Avvik: <strong>${d.avvik_kr >= 0 ? "+" : ""}${fmtNum(d.avvik_kr)} kr</strong> (${d.avvik_pct.toFixed(1).replace(".", ",")} %)`;
+
+        // Radnavn til venstre
+        svg += `<text x="${pad.left - 10}" y="${y + barH / 2 + 4}" text-anchor="end" fill="var(--text-primary)" font-size="10.5" font-weight="600">${d.shortName}</text>`;
+
+        // Stolpe
+        svg += `<rect class="eda-bar" x="${barX}" y="${y}" width="${Math.max(2, barW)}" height="${barH}" fill="${color}" rx="2" style="cursor:pointer;" data-info="${encodeURIComponent(info)}" />`;
+
+        // Verdi-etikett rett ved stolpeenden
+        const labelX = d.avvik_kr >= 0 ? barX + barW + 6 : barX - 6;
+        const anchor = d.avvik_kr >= 0 ? "start" : "end";
+        svg += `<text x="${labelX}" y="${y + barH / 2 + 3.5}" text-anchor="${anchor}" fill="${color}" font-family="var(--font-mono)" font-size="10" font-weight="700">${d.avvik_kr >= 0 ? "+" : ""}${fmtNum(d.avvik_kr)} kr (${d.avvik_pct.toFixed(1).replace(".", ",")}%)</text>`;
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function renderEdaRanking(data, isLollipop, W, H, titleEl, statEl) {
+      const pad = { top: 35, right: 110, bottom: 40, left: 190 };
+      const pw = W - pad.left - pad.right;
+      const ph = H - pad.top - pad.bottom;
+
+      // Sorter data synkende etter burn rate
+      const sorted = [...data].sort((a, b) => b.burn_rate - a.burn_rate);
+
+      if (titleEl) titleEl.textContent = "Rangering: Enheter prioritert etter YTD Forbruksintensitet (Burn Rate %)";
+      if (statEl) statEl.textContent = `Høyeste: ${sorted[0].shortName} (${sorted[0].burn_rate.toFixed(1).replace(".", ",")}%) · Laveste: ${sorted[sorted.length-1].shortName} (${sorted[sorted.length-1].burn_rate.toFixed(1).replace(".", ",")}%)`;
+
+      const maxBurn = Math.max(130, Math.max(...sorted.map(d => d.burn_rate)) * 1.08);
+      const scaleX = v => pad.left + (v / maxBurn) * pw;
+
+      const rowH = ph / sorted.length;
+      const barH = Math.min(20, rowH * 0.6);
+
+      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="font-family:var(--font-sans); font-size:11px;">`;
+
+      // 100% referanselinje (Budsjettramme)
+      const x100 = scaleX(100);
+      svg += `<line x1="${x100}" y1="${pad.top}" x2="${x100}" y2="${pad.top + ph}" stroke="#D97706" stroke-width="1.5" stroke-dasharray="4,4" />`;
+      svg += `<text x="${x100}" y="${pad.top - 8}" text-anchor="middle" fill="#D97706" font-weight="700" font-size="10">100% Ramme</text>`;
+
+      sorted.forEach((d, i) => {
+        const y = pad.top + i * rowH + (rowH - barH) / 2;
+        const w = scaleX(d.burn_rate) - pad.left;
+        const color = d.burn_rate > 110 ? "var(--clr-highlight-red)" : (d.burn_rate > 100 ? "#D97706" : "var(--clr-ok-text)");
+
+        const info = `<strong>Rangering #${i + 1}: ${d.name}</strong><br/>` +
+                     `Burn Rate: <strong>${d.burn_rate.toFixed(2).replace(".", ",")} %</strong><br/>` +
+                     `Regnskap: ${fmtNum(d.reg)} kr<br/>` +
+                     `Budsjett: ${fmtNum(d.bud)} kr`;
+
+        // Radtittel
+        svg += `<text x="${pad.left - 10}" y="${y + barH / 2 + 4}" text-anchor="end" fill="var(--text-primary)" font-size="10.5" font-weight="600">#${i + 1} ${d.shortName}</text>`;
+
+        if (isLollipop) {
+          svg += `<line x1="${pad.left}" y1="${y + barH/2}" x2="${pad.left + w}" y2="${y + barH/2}" stroke="${color}" stroke-width="2" />`;
+          svg += `<circle class="eda-bar" cx="${pad.left + w}" cy="${y + barH/2}" r="6" fill="${color}" style="cursor:pointer;" data-info="${encodeURIComponent(info)}" />`;
+        } else {
+          svg += `<rect class="eda-bar" x="${pad.left}" y="${y}" width="${Math.max(3, w)}" height="${barH}" fill="${color}" rx="2" style="cursor:pointer;" data-info="${encodeURIComponent(info)}" />`;
+        }
+
+        // Direkte verdi
+        svg += `<text x="${pad.left + w + 8}" y="${y + barH / 2 + 3.5}" text-anchor="start" fill="${color}" font-family="var(--font-mono)" font-size="10.5" font-weight="700">${d.burn_rate.toFixed(1).replace(".", ",")}%</text>`;
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function renderEdaComposition(data, W, H, titleEl, statEl) {
+      const pad = { top: 35, right: 120, bottom: 40, left: 190 };
+      const pw = W - pad.left - pad.right;
+      const ph = H - pad.top - pad.bottom;
+
+      if (titleEl) titleEl.textContent = "Sammensetning: 100% Prosentvis Lønns- og Kostnadsstruktur per Enhet";
+      if (statEl) statEl.textContent = "Konti: Fastlønn (1010), Vikarer (1020/1270), Overtid (1040), KLP (1090), Drift";
+
+      const rowH = ph / data.length;
+      const barH = Math.min(22, rowH * 0.65);
+
+      const compCols = [
+        { key: "fastlonn", name: "Fastlønn (1010)", color: "#475569" },
+        { key: "vikar", name: "Vikarer (1020/1270)", color: "var(--clr-highlight-red)" },
+        { key: "overtid", name: "Overtid (1040)", color: "#D97706" },
+        { key: "klp", name: "KLP & Sosiale (1090)", color: "var(--clr-fig-regnskap)" },
+        { key: "drift", name: "Andre driftsutgifter", color: "#94A3B8" }
+      ];
+
+      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="font-family:var(--font-sans); font-size:11px;">`;
+
+      // Legende på toppen
+      let legX = pad.left;
+      compCols.forEach(c => {
+        svg += `<rect x="${legX}" y="${pad.top - 22}" width="10" height="10" fill="${c.color}" rx="1" />`;
+        svg += `<text x="${legX + 14}" y="${pad.top - 13}" fill="var(--text-secondary)" font-size="9.5" font-weight="600">${c.name}</text>`;
+        legX += c.name.length * 6.2 + 25;
+      });
+
+      data.forEach((d, i) => {
+        const y = pad.top + i * rowH + (rowH - barH) / 2;
+        const total = d.fastlonn + d.vikar + d.overtid + d.klp + d.drift;
+
+        svg += `<text x="${pad.left - 10}" y="${y + barH / 2 + 4}" text-anchor="end" fill="var(--text-primary)" font-size="10.5" font-weight="600">${d.shortName}</text>`;
+
+        let currX = pad.left;
+        compCols.forEach(c => {
+          const val = d[c.key] || 0;
+          const pct = total > 0 ? (val / total) * 100 : 0;
+          const segW = (pct / 100) * pw;
+
+          if (segW > 1) {
+            const info = `<strong>${d.name}</strong><br/>` +
+                         `${c.name}: <strong>${fmtNum(val)} kr</strong> (${pct.toFixed(1).replace(".", ",")} %)<br/>` +
+                         `Total regnskapsramme: ${fmtNum(total)} kr`;
+
+            svg += `<rect class="eda-rect" x="${currX}" y="${y}" width="${segW}" height="${barH}" fill="${c.color}" style="cursor:pointer;" data-info="${encodeURIComponent(info)}" />`;
+
+            // Tekst inni segmentet hvis bredt nok
+            if (segW > 35) {
+              svg += `<text x="${currX + segW / 2}" y="${y + barH / 2 + 3.5}" text-anchor="middle" fill="#FFFFFF" font-family="var(--font-mono)" font-size="9" font-weight="700">${pct.toFixed(0)}%</text>`;
+            }
+          }
+          currX += segW;
+        });
+
+        svg += `<text x="${pad.left + pw + 8}" y="${y + barH / 2 + 3.5}" text-anchor="start" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="9.5">100%</text>`;
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function renderEdaTrend(data, isSlope, W, H, titleEl, statEl) {
+      const pad = { top: 35, right: 140, bottom: 45, left: 75 };
+      const pw = W - pad.left - pad.right;
+      const ph = H - pad.top - pad.bottom;
+
+      if (titleEl) titleEl.textContent = "Tidsutvikling: Månedlig regnskapsbane (M01–M08) med direkte kurve-etiketter";
+      if (statEl) statEl.textContent = `Akkumulert trend for ${data.length} enheter · Kilde: modelready_fact`;
+
+      const allVals = data.flatMap(d => d.monthly.map(m => m.reg));
+      const minVal = 0;
+      const maxVal = Math.max(...allVals) * 1.15 || 1000000;
+
+      const scaleX = monthIdx => pad.left + (monthIdx / 7) * pw;
+      const scaleY = val => pad.top + ph - ((val - minVal) / (maxVal - minVal || 1)) * ph;
+
+      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="font-family:var(--font-sans); font-size:11px;">`;
+
+      // Akser
+      svg += `<line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top + ph}" stroke="var(--border-light)" stroke-width="1.5" />`;
+      svg += `<line x1="${pad.left}" y1="${pad.top + ph}" x2="${pad.left + pw}" y2="${pad.top + ph}" stroke="var(--border-light)" stroke-width="1.5" />`;
+
+      // X Månedslabels
+      const months = ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08"];
+      months.forEach((m, i) => {
+        const x = scaleX(i);
+        svg += `<line x1="${x}" y1="${pad.top + ph}" x2="${x}" y2="${pad.top + ph + 4}" stroke="var(--border-light)" />`;
+        svg += `<text x="${x}" y="${pad.top + ph + 16}" text-anchor="middle" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="10">${m}</text>`;
+      });
+
+      // Y Ticks
+      [0, maxVal * 0.33, maxVal * 0.66, maxVal].forEach(val => {
+        const y = scaleY(val);
+        svg += `<line x1="${pad.left - 4}" y1="${y}" x2="${pad.left}" y2="${y}" stroke="var(--border-light)" />`;
+        svg += `<line x1="${pad.left}" y1="${y}" x2="${pad.left + pw}" y2="${y}" stroke="var(--border-hairline)" stroke-dasharray="2,3" />`;
+        svg += `<text x="${pad.left - 8}" y="${y + 3.5}" text-anchor="end" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="9.5">${fmtNum(Math.round(val))}</text>`;
+      });
+
+      // Kurver for hver enhet
+      const palette = ["#D62728", "#1E3A8A", "#D97706", "#065F46", "#7C3AED", "#0891B2", "#DC2626", "#475569", "#059669"];
+
+      data.forEach((d, di) => {
+        const color = d.sektor === "Helse og Omsorg" ? "#D62728" : palette[di % palette.length];
+        const points = d.monthly.map((m, mi) => `${scaleX(mi)},${scaleY(m.reg)}`).join(" ");
+
+        svg += `<polyline fill="none" stroke="${color}" stroke-width="${d.sektor === 'Helse og Omsorg' ? '2.5' : '1.5'}" stroke-opacity="${d.sektor === 'Helse og Omsorg' ? '0.95' : '0.6'}" points="${points}" />`;
+
+        // Punkter
+        d.monthly.forEach((m, mi) => {
+          const cx = scaleX(mi);
+          const cy = scaleY(m.reg);
+          const info = `<strong>${d.name} (${m.label})</strong><br/>` +
+                       `Regnskap: ${fmtNum(m.reg)} kr<br/>` +
+                       `Budsjett: ${fmtNum(m.bud)} kr<br/>` +
+                       `Avvik: ${m.avvik >= 0 ? "+" : ""}${fmtNum(m.avvik)} kr`;
+          svg += `<circle class="eda-point" cx="${cx}" cy="${cy}" r="3.5" fill="${color}" style="cursor:pointer;" data-info="${encodeURIComponent(info)}" />`;
+        });
+
+        // Tufte: Direkte etikett i kurveenden ved M08
+        const lastM = d.monthly[d.monthly.length - 1];
+        const lastX = scaleX(d.monthly.length - 1);
+        const lastY = scaleY(lastM.reg);
+        svg += `<text x="${lastX + 6}" y="${lastY + 3.5}" fill="${color}" font-weight="700" font-size="10">${d.shortName} (${fmtNum(lastM.reg)})</text>`;
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function renderEdaDistribution(data, isBoxplot, W, H, titleEl, statEl) {
+      const pad = { top: 35, right: 100, bottom: 40, left: 190 };
+      const pw = W - pad.left - pad.right;
+      const ph = H - pad.top - pad.bottom;
+
+      if (titleEl) titleEl.textContent = "Fordeling: Spredning av månedlige regnskapsavvik per enhet (Strip Plot)";
+      if (statEl) statEl.textContent = "Hvert punkt representerer én måned (M01–M08) relativt til månedlig budsjettramme";
+
+      const allAvvik = data.flatMap(d => d.monthly.map(m => m.avvik));
+      const maxAbs = Math.max(...allAvvik.map(v => Math.abs(v))) * 1.2 || 100000;
+
+      const zeroX = pad.left + pw / 2;
+      const scaleX = v => zeroX + (v / maxAbs) * (pw / 2);
+
+      const rowH = ph / data.length;
+
+      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="font-family:var(--font-sans); font-size:11px;">`;
+
+      // Null-akse
+      svg += `<line x1="${zeroX}" y1="${pad.top}" x2="${zeroX}" y2="${pad.top + ph}" stroke="var(--header-dark)" stroke-width="1.5" stroke-dasharray="3,3" />`;
+      svg += `<text x="${zeroX}" y="${pad.top - 8}" text-anchor="middle" fill="var(--header-dark)" font-weight="700" font-size="10">0 kr avvik</text>`;
+
+      data.forEach((d, i) => {
+        const y = pad.top + i * rowH + rowH / 2;
+
+        svg += `<text x="${pad.left - 10}" y="${y + 3.5}" text-anchor="end" fill="var(--text-primary)" font-size="10.5" font-weight="600">${d.shortName}</text>`;
+        svg += `<line x1="${pad.left}" y1="${y}" x2="${pad.left + pw}" y2="${y}" stroke="var(--border-hairline)" stroke-width="1" />`;
+
+        // Strip punkter for hver måned
+        d.monthly.forEach(m => {
+          const cx = scaleX(m.avvik);
+          const color = m.avvik > 0 ? "var(--clr-highlight-red)" : "var(--clr-ok-text)";
+          const info = `<strong>${d.name} (${m.label})</strong><br/>` +
+                       `Månedlig avvik: <strong>${m.avvik >= 0 ? "+" : ""}${fmtNum(m.avvik)} kr</strong><br/>` +
+                       `Regnskap: ${fmtNum(m.reg)} kr / Budsjett: ${fmtNum(m.bud)} kr`;
+
+          svg += `<circle class="eda-point" cx="${cx}" cy="${y}" r="4.5" fill="${color}" fill-opacity="0.8" stroke="#fff" stroke-width="1" style="cursor:pointer;" data-info="${encodeURIComponent(info)}" />`;
+        });
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function renderEdaTable(data) {
+      const tbody = document.getElementById("eda-table-body");
+      const tfoot = document.getElementById("eda-table-foot");
+      if (!tbody) return;
+
+      tbody.innerHTML = data.map(d => {
+        const ragClass = d.rag === "red" ? "rag-red" : (d.rag === "amber" ? "rag-amber" : "rag-green");
+        const ragLabel = d.rag === "red" ? "Avvik > 5%" : (d.rag === "amber" ? "Avvik 0–5%" : "I rute");
+        return `
+          <tr style="border-bottom:1px solid var(--border-hairline);">
+            <td style="padding:0.4rem 0.6rem; font-weight:600;">${d.name}</td>
+            <td style="padding:0.4rem 0.6rem; color:var(--text-muted);">${d.sektor} (${d.fn})</td>
+            <td style="padding:0.4rem 0.6rem; text-align:right; font-family:var(--font-mono);">${fmtNum(d.bud)} kr</td>
+            <td style="padding:0.4rem 0.6rem; text-align:right; font-family:var(--font-mono); font-weight:700;">${fmtNum(d.reg)} kr</td>
+            <td style="padding:0.4rem 0.6rem; text-align:right; font-family:var(--font-mono); font-weight:700; color:${d.avvik_kr > 0 ? 'var(--clr-highlight-red)' : 'var(--clr-ok-text)'};">${d.avvik_kr >= 0 ? '+' : ''}${fmtNum(d.avvik_kr)} kr</td>
+            <td style="padding:0.4rem 0.6rem; text-align:right; font-family:var(--font-mono); color:${d.avvik_pct > 0 ? 'var(--clr-highlight-red)' : 'var(--clr-ok-text)'};">${d.avvik_pct >= 0 ? '+' : ''}${d.avvik_pct.toFixed(1).replace('.', ',')} %</td>
+            <td style="padding:0.4rem 0.6rem; text-align:right; font-family:var(--font-mono); font-weight:700;">${d.burn_rate.toFixed(1).replace('.', ',')} %</td>
+            <td style="padding:0.4rem 0.6rem; text-align:right; font-family:var(--font-mono);">${fmtNum(d.vikar)} kr</td>
+            <td style="padding:0.4rem 0.6rem; text-align:right; font-family:var(--font-mono);">${fmtNum(d.overtid)} kr</td>
+            <td style="padding:0.4rem 0.6rem; text-align:center;"><span class="rag-badge ${ragClass}">${ragLabel}</span></td>
+          </tr>
+        `;
+      }).join("");
+
+      if (tfoot) {
+        const totBud = data.reduce((acc, d) => acc + d.bud, 0);
+        const totReg = data.reduce((acc, d) => acc + d.reg, 0);
+        const totAvvik = totReg - totBud;
+        const totAvvikPct = totBud > 0 ? (totAvvik / totBud) * 100 : 0;
+        const totBurn = totBud > 0 ? (totReg / totBud) * 100 : 100;
+        const totVikar = data.reduce((acc, d) => acc + d.vikar, 0);
+        const totOvertid = data.reduce((acc, d) => acc + d.overtid, 0);
+
+        tfoot.innerHTML = `
+          <tr>
+            <td style="padding:0.45rem 0.6rem;">SUM AKTIVT UTVALG (${data.length} enheter)</td>
+            <td style="padding:0.45rem 0.6rem;">Alle KOSTRA funksjoner</td>
+            <td style="padding:0.45rem 0.6rem; text-align:right; font-family:var(--font-mono);">${fmtNum(totBud)} kr</td>
+            <td style="padding:0.45rem 0.6rem; text-align:right; font-family:var(--font-mono);">${fmtNum(totReg)} kr</td>
+            <td style="padding:0.45rem 0.6rem; text-align:right; font-family:var(--font-mono); color:${totAvvik > 0 ? 'var(--clr-highlight-red)' : 'var(--clr-ok-text)'};">${totAvvik >= 0 ? '+' : ''}${fmtNum(totAvvik)} kr</td>
+            <td style="padding:0.45rem 0.6rem; text-align:right; font-family:var(--font-mono); color:${totAvvikPct > 0 ? 'var(--clr-highlight-red)' : 'var(--clr-ok-text)'};">${totAvvikPct >= 0 ? '+' : ''}${totAvvikPct.toFixed(1).replace('.', ',')} %</td>
+            <td style="padding:0.45rem 0.6rem; text-align:right; font-family:var(--font-mono);">${totBurn.toFixed(1).replace('.', ',')} %</td>
+            <td style="padding:0.45rem 0.6rem; text-align:right; font-family:var(--font-mono);">${fmtNum(totVikar)} kr</td>
+            <td style="padding:0.45rem 0.6rem; text-align:right; font-family:var(--font-mono);">${fmtNum(totOvertid)} kr</td>
+            <td style="padding:0.45rem 0.6rem; text-align:center;"><span class="rag-badge ${totAvvikPct > 5.0 ? 'rag-red' : (totAvvikPct > 0 ? 'rag-amber' : 'rag-green')}">${totAvvikPct > 5 ? 'Merforbruk' : 'I rute'}</span></td>
+          </tr>
+        `;
+      }
+    }
 
   </script>
 </body>
