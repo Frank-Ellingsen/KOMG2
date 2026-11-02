@@ -354,12 +354,21 @@ Tjenester som starter:
 
 ## 🧪 Verifikasjon & Tester
 
-Kjør den automatiserte testsuiten for å verifisere at samtlige 10 REST-endepunkter fungerer:
+### 1. Full E2E Nettlesertest (Playwright E2E Testsuite)
+Kjør den fullstendige, automatiserte nettlesertesten som verifiserer samtlige moduler, dynamisk filterkaskadering, EDA FT Visuals, lønnsbudsjett (KOSTRA arter & årsverk), Recommender, Årshjul og feilfri konsoll:
+```powershell
+python test_full_suite.py
+```
+*Forventet resultat: `41 av 41 tester bestått (100.0 %) — Null console.error, null JavaScript runtime exceptions`.*
+
+### 2. FastAPI Backend REST Testsuite
+Kjør den automatiserte enhetstesten for å verifisere at samtlige 10 REST-endepunkter fungerer:
 ```powershell
 python -m src.test_api_endpoints
 ```
 *Forventet resultat: `Ran 10 tests in 0.45s - OK (10/10 PASS)`.*
 
+### 3. DuckDB Medallion Databaseavstemming (06_CHECKS)
 For å verifisere databaseavstemmingen og `06_CHECKS`:
 ```powershell
 python -c "import duckdb; con = duckdb.connect('data/database/kostra_prod.duckdb'); print(con.execute('SELECT COUNT(*) FROM modelready_fact').fetchone())"
