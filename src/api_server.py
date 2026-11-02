@@ -487,6 +487,127 @@ def get_monthly_report(
         """,
         latest_params,
     )
+    personnel_rows = query_duckdb(
+        f"""
+        SELECT
+            konto_code,
+            kontonavn,
+            COALESCE(SUM(cum_budsjett_ytd_nok), 0) AS ytd_budget_nok,
+            COALESCE(SUM(cum_regnskap_ytd_nok), 0) AS ytd_actual_nok,
+            COALESCE(SUM(annual_budget_eoy_nok), 0) AS annual_budget_nok,
+            COALESCE(SUM(eoy_forecast_unadjusted_nok), 0) AS eoy_forecast_nok,
+            COALESCE(SUM(eoy_variance_projected_nok), 0) AS eoy_variance_nok
+        FROM modelready_fact
+        WHERE {where_sql} AND accounting_period = ?
+          AND (konto_code LIKE '10%' OR konto_code = '127040' OR konto_code IN ('171000', '171005'))
+        GROUP BY konto_code, kontonavn
+        ORDER BY konto_code
+        """,
+        latest_params,
+    )
+    brutto_actual = 0.0
+    brutto_budget = 0.0
+    brutto_annual = 0.0
+    brutto_eoy_fc = 0.0
+    brutto_eoy_var = 0.0
+
+    nav_syke_actual = 0.0
+    nav_syke_budget = 0.0
+    nav_syke_annual = 0.0
+    nav_syke_eoy_fc = 0.0
+    nav_syke_eoy_var = 0.0
+
+    nav_foreldre_actual = 0.0
+    nav_foreldre_budget = 0.0
+    nav_foreldre_annual = 0.0
+    nav_foreldre_eoy_fc = 0.0
+    nav_foreldre_eoy_var = 0.0
+
+    vikar_syk_actual = 0.0
+    vikar_syk_budget = 0.0
+    vikar_byra_actual = 0.0
+    vikar_byra_budget = 0.0
+
+    for pr in personnel_rows:
+        p_code = str(pr["konto_code"])
+        p_act = float(pr["ytd_actual_nok"] or 0.0)
+        p_bud = float(pr["ytd_budget_nok"] or 0.0)
+        p_ann = float(pr["annual_budget_nok"] or 0.0)
+        p_fc = float(pr["eoy_forecast_nok"] or 0.0)
+        p_var = float(pr["eoy_variance_nok"] or 0.0)
+
+        if p_code == "171000":
+            nav_syke_actual += p_act
+            nav_syke_budget += p_bud
+            nav_syke_annual += p_ann
+            nav_syke_eoy_fc += p_fc
+            nav_syke_eoy_var += p_var
+        elif p_code == "171005":
+            nav_foreldre_actual += p_act
+            nav_foreldre_budget += p_bud
+            nav_foreldre_annual += p_ann
+            nav_foreldre_eoy_fc += p_fc
+            nav_foreldre_eoy_var += p_var
+        else:
+            brutto_actual += p_act
+            brutto_budget += p_bud
+            brutto_annual += p_ann
+            brutto_eoy_fc += p_fc
+            brutto_eoy_var += p_var
+            if p_code == "102000":
+                vikar_syk_actual += p_act
+                vikar_syk_budget += p_bud
+            elif p_code == "127040":
+                vikar_byra_actual += p_act
+                vikar_byra_budget += p_bud
+
+    nav_tot_actual = nav_syke_actual + nav_foreldre_actual
+    nav_tot_budget = nav_syke_budget + nav_foreldre_budget
+    nav_tot_annual = nav_syke_annual + nav_foreldre_annual
+    nav_tot_eoy_fc = nav_syke_eoy_fc + nav_foreldre_eoy_fc
+    nav_tot_eoy_var = nav_syke_eoy_var + nav_foreldre_eoy_var
+
+    netto_actual = brutto_actual + nav_tot_actual
+    netto_budget = brutto_budget + nav_tot_budget
+    netto_annual = brutto_annual + nav_tot_annual
+    netto_eoy_fc = brutto_eoy_fc + nav_tot_eoy_fc
+    netto_eoy_var = brutto_eoy_var + nav_tot_eoy_var
+    fravarsvikar_tot = vikar_syk_actual + vikar_byra_actual
+    dekningsgrad = round(abs(nav_syke_actual) / fravarsvikar_tot * 100.0, 1) if fravarsvikar_tot > 0 else 0.0
+
+    personnel_profile = {
+        "brutto_actual_nok": round(brutto_actual, 2),
+        "brutto_budget_nok": round(brutto_budget, 2),
+        "brutto_variance_nok": round(brutto_actual - brutto_budget, 2),
+        "brutto_annual_budget_nok": round(brutto_annual, 2),
+        "brutto_eoy_forecast_nok": round(brutto_eoy_fc, 2),
+        "brutto_eoy_variance_nok": round(brutto_eoy_var, 2),
+        "nav_sickness_actual_nok": round(nav_syke_actual, 2),
+        "nav_sickness_budget_nok": round(nav_syke_budget, 2),
+        "nav_sickness_variance_nok": round(nav_syke_actual - nav_syke_budget, 2),
+        "nav_sickness_annual_budget_nok": round(nav_syke_annual, 2),
+        "nav_sickness_eoy_forecast_nok": round(nav_syke_eoy_fc, 2),
+        "nav_sickness_eoy_variance_nok": round(nav_syke_eoy_var, 2),
+        "nav_parental_actual_nok": round(nav_foreldre_actual, 2),
+        "nav_parental_budget_nok": round(nav_foreldre_budget, 2),
+        "nav_parental_variance_nok": round(nav_foreldre_actual - nav_foreldre_budget, 2),
+        "nav_total_refund_actual_nok": round(nav_tot_actual, 2),
+        "nav_total_refund_budget_nok": round(nav_tot_budget, 2),
+        "nav_total_refund_variance_nok": round(nav_tot_actual - nav_tot_budget, 2),
+        "nav_total_refund_annual_budget_nok": round(nav_tot_annual, 2),
+        "nav_total_refund_eoy_forecast_nok": round(nav_tot_eoy_fc, 2),
+        "nav_total_refund_eoy_variance_nok": round(nav_tot_eoy_var, 2),
+        "netto_actual_nok": round(netto_actual, 2),
+        "netto_budget_nok": round(netto_budget, 2),
+        "netto_variance_nok": round(netto_actual - netto_budget, 2),
+        "netto_annual_budget_nok": round(netto_annual, 2),
+        "netto_eoy_forecast_nok": round(netto_eoy_fc, 2),
+        "netto_eoy_variance_nok": round(netto_eoy_var, 2),
+        "vikar_sykefravaer_actual_nok": round(vikar_syk_actual, 2),
+        "vikarbyra_actual_nok": round(vikar_byra_actual, 2),
+        "fravarsvikar_tot_nok": round(fravarsvikar_tot, 2),
+        "sykedekningsgrad_pct": dekningsgrad,
+    }
     option_parts = ["accounting_period = ?"]
     option_params: List[Any] = [latest_period]
     if sektor != "ALL":
@@ -608,6 +729,7 @@ def get_monthly_report(
             }
             for row in driver_rows
         ],
+        "personnel_profile": personnel_profile,
     }
 
 

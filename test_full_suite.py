@@ -328,6 +328,40 @@ def run_all_tests():
         record_test("Kolonnetittel til høyre for MoM er 'Avvikssøyle'", bool(sparkline_info["hasAvvikHeader"]))
         record_test("Fjernet overflødig 'kr kr' i MoM trend-kolonne", not sparkline_info["hasDoubleKr"])
 
+        # Sjekk Lønns- og Refusjonsprofil (Brutto vs. Netto & NAV sykelønnsrefusjon)
+        sal_refund_info = page.evaluate('''() => {
+            const panel = document.getElementById("min-salary-refund-panel");
+            const brutto = document.getElementById("min-sal-brutto-reg")?.textContent || "";
+            const sykelonn = document.getElementById("min-sal-syke-reg")?.textContent || "";
+            const foreldre = document.getElementById("min-sal-foreldre-reg")?.textContent || "";
+            const netto = document.getElementById("min-sal-netto-reg")?.textContent || "";
+            const fravarsvikar = document.getElementById("min-sal-fravarsvikar-nok")?.textContent || "";
+            const dekningsgrad = document.getElementById("min-sal-dekningsgrad-pct")?.textContent || "";
+            const driversText = document.getElementById("min-drivers-body")?.innerText || "";
+            const hasArt1710Badge = document.querySelector("#min-drivers-body .badge") !== null;
+            return {
+                panelVisible: panel && getComputedStyle(panel).display !== "none",
+                brutto,
+                sykelonn,
+                foreldre,
+                netto,
+                fravarsvikar,
+                dekningsgrad,
+                hasArt1710Badge,
+                driversText
+            };
+        }''')
+        record_test("Lønns- og Refusjonsprofil-panel er synlig", bool(sal_refund_info["panelVisible"]))
+        record_test("Brutto og Netto personalkostnad er beregnet", 
+                    sal_refund_info["brutto"] != "—" and sal_refund_info["netto"] != "—",
+                    f"Brutto: {sal_refund_info['brutto']}, Netto: {sal_refund_info['netto']}")
+        record_test("NAV Sykelønnsrefusjon (art 1710) vises i lønnsprofilen",
+                    sal_refund_info["sykelonn"] != "—",
+                    f"Sykelønnsrefusjon: {sal_refund_info['sykelonn']}, Dekningsgrad: {sal_refund_info['dekningsgrad']}")
+        record_test("Kostnadsdriver-tabell har merknad eller badge for motregning mot art 1710",
+                    sal_refund_info["hasArt1710Badge"] or "102000" in sal_refund_info["driversText"],
+                    f"Badge: {sal_refund_info['hasArt1710Badge']}")
+
         # Test fanevelger
         tabs = page.query_selector_all(".min-tab-btn")
         record_test("Predefinerte rapporter har 3 visningsfaner", len(tabs) == 3, f"Faner: {len(tabs)}")
