@@ -2728,23 +2728,110 @@
             Automatisk krysssjekk mellom bokførte leverandørfakturaer (art 110–130) og Kristiansand kommunes godkjente rammeavtaler i KAS.
           </p>
           <table class="tufte-table" style="font-size:0.77rem;">
-              <thead>
-                <tr>
-                  <th>Lønnsart / Kontogruppe</th>
-                  <th>KOSTRA Art</th>
-                  <th class="num-col col-budget">Budsjett 2024</th>
-                  <th class="num-col col-regnskap">Regnskap YTD (M08)</th>
-                  <th class="num-col">Fullårs EAC</th>
-                  <th class="num-col">Avvik År (NOK)</th>
-                  <th class="num-col">Avvik %</th>
-                  <th>Status &amp; Driver</th>
-                </tr>
-              </thead>
-              <tbody id="salary-art-table-body"></tbody>
-              <tfoot id="salary-art-table-foot"></tfoot>
-            </table>
+            <thead>
+              <tr>
+                <th>Bilagsnummer</th>
+                <th>Ansvar</th>
+                <th>Leverandør</th>
+                <th>Art / Beskrivelse</th>
+                <th class="num-col">Beløp (NOK)</th>
+                <th>Avtalestatus</th>
+                <th>Handlingsanbefaling</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>BIL-2024-8841</code></td>
+                <td>25310</td>
+                <td>Bemanningspartner Sør AS</td>
+                <td>127000 Konsulent &amp; vikarbyrå</td>
+                <td class="num-col rag-red">248 500,00</td>
+                <td><span class="rag-badge rag-red">🔴 Maverick Spend</span></td>
+                <td>Avviksbehandles: Innkjøp skal rettes mot rammeavtale RAM-2023-04 (Adecco/Randstad)</td>
+              </tr>
+              <tr>
+                <td><code>BIL-2024-9102</code></td>
+                <td>20210</td>
+                <td>Kontor &amp; Skolemateriell Direkte</td>
+                <td>115000 Undervisningsmateriell</td>
+                <td class="num-col rag-amber">42 100,00</td>
+                <td><span class="rag-badge rag-amber">🟡 Enkeltkjøp (&lt;500k)</span></td>
+                <td>Sjekk fellesavtale for skolemateriell før neste bestilling</td>
+              </tr>
+              <tr>
+                <td><code>BIL-2024-9330</code></td>
+                <td>25710</td>
+                <td>Atea Norge AS</td>
+                <td>119500 IT-utstyr &amp; lisenser</td>
+                <td class="num-col rag-green">189 000,00</td>
+                <td><span class="rag-badge rag-green">🟢 Godkjent Avtale</span></td>
+                <td>I henhold til felles KommIT-avtale</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 9: FAKTURA, INTERNE TJENESTER & SELVKOST
+           =================================================================== -->
+      <section id="view-invoicing" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Utgående Faktura og Selvkost">
+        <div class="section-bar">
+          <span>9. Utgående Faktura, Interne Tjenester &amp; Selvkost (GKRS &amp; KOSTRA)</span>
+          <span>Konsolidering • Eliminering Art 380/780 • Selvkostkalkulator</span>
         </div>
 
+        <!-- KOSTRA Konsolidering & Eliminering -->
+        <div class="panel" style="margin-bottom:1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+            <h3 style="font-size:0.9rem; font-weight:700; color:var(--text-primary);">
+              ⚖️ KOSTRA Konsolidering &amp; Interne Tjenesteelimineringer (Art 780 vs. Art 380)
+            </h3>
+            <span class="rag-badge rag-green" id="elim-reconciled-badge">🟢 Avstemt: Netto Diff = 0,00 kr</span>
+          </div>
+          <p style="font-size:0.79rem; color:var(--text-secondary); margin-bottom:0.6rem;">
+            Interne viderefaktureringer mellom kommunale produksjonsenheter (Byggservice, Felleskjøkken, IT) elimineres automatisk slik at kommunens bruttotall ikke blåses opp i KOSTRA-rapporteringen til SSB jf. GKRS 11.4.
+          </p>
+          <table class="tufte-table" style="font-size:0.77rem;">
+            <thead>
+              <tr>
+                <th>Intern Tjenesteleveranse</th>
+                <th>Selger (Art 780/750)</th>
+                <th>Kjøper (Art 380/350)</th>
+                <th>Funksjon Selger &rarr; Kjøper</th>
+                <th class="num-col">Beløp (NOK)</th>
+                <th>Konsolideringsstatus</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Byggservice &amp; Teknisk Drift</td>
+                <td>Art 780000 Intern salgsinntekt</td>
+                <td>Art 380000 Intern kjøpsutgift</td>
+                <td>120 &rarr; 254</td>
+                <td class="num-col">850 000,00</td>
+                <td><span class="rag-badge rag-green">🟢 Eliminert</span></td>
+              </tr>
+              <tr>
+                <td>Felleskjøkken Institusjon</td>
+                <td>Art 780000 Intern salgsinntekt</td>
+                <td>Art 380000 Intern kjøpsutgift</td>
+                <td>254 &rarr; 254</td>
+                <td class="num-col">1 420 000,00</td>
+                <td><span class="rag-badge rag-green">🟢 Eliminert</span></td>
+              </tr>
+              <tr>
+                <td>Intern IT-drift &amp; Lisenser</td>
+                <td>Art 780000 Intern salgsinntekt</td>
+                <td>Art 380000 Intern kjøpsutgift</td>
+                <td>120 &rarr; 202</td>
+                <td class="num-col">340 000,00</td>
+                <td><span class="rag-badge rag-green">🟢 Eliminert</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
         <!-- Interaktiv Selvkostkalkulator -->
         <div class="panel">
           <h3 style="font-size:0.92rem; font-weight:700; color:var(--text-primary); margin-bottom:0.4rem;">
@@ -3086,7 +3173,7 @@
                   <th>Status &amp; Driver</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="salary-art-table-body">
                 <tr>
                   <th scope="row">Fastlønn ordinære stillinger</th>
                   <td>Art 1010</td>
@@ -3178,7 +3265,7 @@
                   <td><span class="rag-badge rag-green">Høyere innbetaling fra NAV enn budsjettert</span></td>
                 </tr>
               </tbody>
-              <tfoot>
+              <tfoot id="salary-art-table-foot">
                 <tr style="border-top:2px solid var(--border-light); font-weight:700;">
                   <th scope="row" colspan="2">Netto Lønns- og Personalkostnader (Inkl. Refusjoner)</th>
                   <td class="num-col col-budget">315 738 884</td>
@@ -4363,6 +4450,557 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       { period: "2024_05", pCode: "M05", sektor: "Helse og Omsorg", fnCode: "254", fn: "2540 - Helse- og omsorgstjenester i institusjon", konto: "102000 - Innleie vikarbyrå sykehjem", reg: 318400, avg3m: 192000, z: 2.64, cluster: "Klynge 1: Høyvolatil / Vikar", status: "🟡 ADVARSEL" },
       { period: "2024_04", pCode: "M04", sektor: "Helse og Omsorg", fnCode: "254", fn: "2540 - Helse- og omsorgstjenester i institusjon", konto: "115000 - Medisinsk forbruksmateriell", reg: 512900, avg3m: 289000, z: 3.12, cluster: "Klynge 3: Ekstraordinære Avvik", status: "🔴 KRITISK AVVIK" }
     ];
+
+    // =========================================================================
+    // SECTION 1 (CONT.): EXTENDED ENTERPRISE & GOVERNANCE DATA STRUCTURES
+    // =========================================================================
+
+// =========================================================================
+
+    const FT_CHART_TYPES = {
+      correlation: [
+        { 
+          id: "scatter", 
+          name: "Spredningsplott (Scatter Plot m/ OLS trendlinje)", 
+          req: "2 kontinuerlige numeriske variabler (float/kr) aggregert over diskrete enheter.", 
+          usage: "Avdekker om vikarbruk henger systematisk sammen med overtid i døgnkontinuerlig turnus.",
+          tufte: "Direkte etikettering, null linjestøy, kontrollør-rød #D62728 kun ved avvik."
+        },
+        { 
+          id: "bubble", 
+          name: "Boblediagram (Bubble Chart m/ størrelsesvekting)", 
+          req: "3 kontinuerlige variabler (X: Vikar, Y: Overtid, Bobleareal: Budsjettramme).", 
+          usage: "Viser relasjon mellom vikarbruk og overtid vektet etter avdelingens totale driftsbudsjett.",
+          tufte: "Bobleareal proporsjonalt med verdi, ingen 3D-skygger eller tunge fyllfarger."
+        }
+      ],
+      deviation: [
+        { 
+          id: "diverging_bar", 
+          name: "Diverging Bar (Avvikssøyler med vertikal null-akse)", 
+          req: "1 kategori + 1 fortegnsbestemt avvik (kr/% differanse mot periodisert budsjett).", 
+          usage: "Fremhever overforbruk (+) og mindreforbruk (-) med felles forankret nullinje.",
+          tufte: "Fjern bakgrunnsnett; grønn for mindreforbruk, kontrollør-rød #D62728 for overskridelse."
+        },
+        { 
+          id: "spine", 
+          name: "Spine Chart / Målavvik mot 100% ramme", 
+          req: "1 kategori + faktisk verdi vs. referansemål / budsjettramme.", 
+          usage: "Viser prosentvis avvik direkte mot vedtatt periodiseringsmål.",
+          tufte: "Tynn vertikal ryggrad (100%), avvik markeres som horisontale streker uten stolpefyll."
+        }
+      ],
+      ranking: [
+        { 
+          id: "ordered_bar", 
+          name: "Sortert stolpediagram (Ordered Bar)", 
+          req: "1 kategori + 1 kontinuerlig metrikk sortert synkende.", 
+          usage: "Gir umiddelbar prioritering av enheter med størst budsjettbelastning (Burn Rate).",
+          tufte: "Horisontale søyler for naturlig leseretning, direkte tallverdi til høyre for søylen."
+        },
+        { 
+          id: "lollipop", 
+          name: "Lollipop Chart (Linje med punktende)", 
+          req: "1 kategori + 1 metrikk sortert etter avviksstørrelse.", 
+          usage: "Reduserer visuell tyngde (Data-Ink) sammenlignet med tunge fylte stolper.",
+          tufte: "Maksimal data-ink: tynn 1px linje med sirkelmarkør, ingen unødvendig fargefyll."
+        }
+      ],
+      composition: [
+        { 
+          id: "stacked_100", 
+          name: "100% Stablet Komponentbjelke (Part-to-whole)", 
+          req: "1 kategori + 3-5 additive kostnadskomponenter (Fastlønn, Vikarer, Overtid, KLP).", 
+          usage: "Viser proporsjonal lønnsstruktur uavhengig av avdelingsstørrelse.",
+          tufte: "Muted fargepalett, direkte segment-teksting der plass finnes, unngå legendestøy."
+        },
+        { 
+          id: "treemap", 
+          name: "Komponentblokker / Andelsfordeling", 
+          req: "Hierarkiske kostnadsarter (KOSTRA art 100-199).", 
+          usage: "Viser hvilke artskonti som beslaglegger størst andel av driftsrammen.",
+          tufte: "Rektangulær flatedeling uten skygger eller rammer, etikett kun i signifikante blokker."
+        }
+      ],
+      trend: [
+        { 
+          id: "multiline", 
+          name: "Parallelle Tidsbaner (Multi-line M01–M08)", 
+          req: "Tidsakse (måneder M01–M08) + kontinuerlig metrikk per enhet.", 
+          usage: "Følger utviklingen måned for måned med direkte kurve-etikettering.",
+          tufte: "Tufte Sparkline-stil: tynne linjer, direkte etikett ved linjeslutt, ingen fargelegende."
+        },
+        { 
+          id: "slope", 
+          name: "Slopegraph (Start M01 vs. Slutt M08)", 
+          req: "2 diskrete tidspunkter (M01 vs M08) per rapporteringsenhet.", 
+          usage: "Fremhever endringstakten fra årets begynnelse til gjeldende periode.",
+          tufte: "Ren vinkelendring viser eskalering; farg kun linjer med bratt negativ stigning."
+        }
+      ],
+      distribution: [
+        { 
+          id: "strip", 
+          name: "Strip Plot / Jitter (Observasjonsspredning)", 
+          req: "Mange kontinuerlige målinger (månedlige avvik per enhet).", 
+          usage: "Viser klynger og spredning av månedlige avvik for å vurdere volatilitet.",
+          tufte: "Viser hvert rådatapunkt med 1D-spredning, null interpolert smoothing eller binned tap."
+        },
+        { 
+          id: "boxplot", 
+          name: "Kvartiler & Spredning (Box & Whisker)", 
+          req: "Fordeling av månedlige observasjoner per avdeling.", 
+          usage: "Oppsummerer median, interkvartilbredde (IQR) og ekstreme månedstall.",
+          tufte: "Tufte minimalistisk boxplot: punkt for median, tynn linje for IQR, tomrom ved kvartil."
+        }
+      ]
+    };
+
+// =========================================================================
+    const RECOMMENDER_DATA = [
+      {
+        id: "TLT-01",
+        horisont: "Kortsiktig EOY (M9-M12)",
+        kategori: "Administrative EOY",
+        catKey: "admin",
+        omraadeCode: "Område 3 / Område 2",
+        sektor: "Helse og Omsorg",
+        ansvar: ["25310", "25320", "25710", "25720"],
+        fn: "254",
+        navn: "Ansettelses- og vikarstopp",
+        beskrivelse: "Midlertidig inndragning av vakanser og stram vurdering av vikarbehov på tvers av omsorgssentre og hjemmetjeneste.",
+        hjemmel: "Administrativt (Kommuneloven § 13-1 - Kommunedirektør)",
+        sparingEoy: -770000,
+        fullaar2027: -2310000,
+        gjennomforing: "Høy",
+        risiko: "Middels",
+        risikoDetalj: "Middels - Krever prioritering av kjerneoppgaver i pleie og turnus (AML § 10-8).",
+        status: "🔴 ANBEFALT UTLØST STRAKS"
+      },
+      {
+        id: "TLT-02",
+        horisont: "Kortsiktig EOY (M9-M12)",
+        kategori: "Administrative EOY",
+        catKey: "admin",
+        omraadeCode: "Område 3",
+        sektor: "Helse og Omsorg",
+        ansvar: ["25310", "25320", "25710", "25720"],
+        fn: "254",
+        navn: "Overtids- og merarbeidsstopp",
+        beskrivelse: "Streng forhåndsgodkjenning av overtid (art 1040) og omfordeling av helgevakter via Optur Plus.",
+        hjemmel: "Administrativt (Kommuneloven § 13-1 - Enhetsleder)",
+        sparingEoy: -430000,
+        fullaar2027: -1290000,
+        gjennomforing: "Høy",
+        risiko: "Lav",
+        risikoDetalj: "Lav - Forhindrer slitasje på fast ansatte og overskridelse av hviletidsbestemmelser.",
+        status: "🔴 ANBEFALT UTLØST STRAKS"
+      },
+      {
+        id: "TLT-03",
+        horisont: "Kortsiktig EOY (M9-M12)",
+        kategori: "Administrative EOY",
+        catKey: "admin",
+        omraadeCode: "Område 11",
+        sektor: "ALL",
+        ansvar: ["ALL"],
+        fn: "ALL",
+        navn: "Frys i konsulentbruk",
+        beskrivelse: "Stopp i nye konsulentavtaler og innskrenkning av pågående ekstern bistand (art 1270) innen IT og organisasjon.",
+        hjemmel: "Administrativt (Kommuneloven § 13-1 - Kommunedirektør)",
+        sparingEoy: -500000,
+        fullaar2027: -1500000,
+        gjennomforing: "Høy",
+        risiko: "Lav",
+        risikoDetalj: "Lav - Interne ressurser overtar prosjektledelse og utredninger.",
+        status: "🔴 ANBEFALT UTLØST STRAKS"
+      },
+      {
+        id: "TLT-04",
+        horisont: "Kortsiktig EOY (M9-M12)",
+        kategori: "Administrative EOY",
+        catKey: "admin",
+        omraadeCode: "Område 5",
+        sektor: "ALL",
+        ansvar: ["ALL"],
+        fn: "ALL",
+        navn: "Innkjøps- og vedlikeholdsstopp",
+        beskrivelse: "Utsettelse av ikke-kritiske nyinnkjøp, inventar og vedlikehold (art 1199/1200) i kommunale bygg.",
+        hjemmel: "Administrativt (Kommuneloven § 13-1 - Enhetsleder)",
+        sparingEoy: -150000,
+        fullaar2027: -450000,
+        gjennomforing: "Høy",
+        risiko: "Lav",
+        risikoDetalj: "Lav - Ingen direkte innvirkning på lovpålagte innbyggertjenester.",
+        status: "🟢 ANBEFALT UTLØST"
+      },
+      {
+        id: "TLT-05",
+        horisont: "Kortsiktig EOY (M12)",
+        kategori: "Politisk Vedtak EOY",
+        catKey: "politisk",
+        omraadeCode: "Område 9",
+        sektor: "Helse og Omsorg",
+        ansvar: ["ALL", "25310", "25320", "25710", "25720"],
+        fn: "254",
+        navn: "Fondsinndragning (Disposisjonsfond)",
+        beskrivelse: "Omdisponering fra ubundne disposisjonsfond for å dekke uunngåelig demografidrevet merforbruk i helse og omsorg.",
+        hjemmel: "Politisk vedtak i Bystyret (Kommuneloven § 14-6)",
+        sparingEoy: -800000,
+        fullaar2027: 0,
+        gjennomforing: "Middels (Krever flertall)",
+        risiko: "Middels",
+        risikoDetalj: "Middels - Reduserer kommunens finansielle buffer for 2027.",
+        status: "🟡 KREVER BYSTYREVEDTAK"
+      },
+      {
+        id: "TLT-06",
+        horisont: "Kortsiktig EOY (M12)",
+        kategori: "Politisk Vedtak EOY",
+        catKey: "politisk",
+        omraadeCode: "Område 9",
+        sektor: "Helse og Omsorg",
+        ansvar: ["ALL", "25310", "25320", "25710", "25720"],
+        fn: "254",
+        navn: "Rammeoverføring mellom sektorer",
+        beskrivelse: "Bystyrevedtak om å omdisponere ubrukte midler fra sentral reserve til Helse og mestring for budsjettbalanse.",
+        hjemmel: "Politisk vedtak i Bystyret (Kommuneloven § 14-10)",
+        sparingEoy: 0,
+        fullaar2027: 0,
+        gjennomforing: "Middels",
+        risiko: "Lav",
+        risikoDetalj: "Lav - Nøytraliserer merforbruk innenfor samlet ramme (§ 14-2).",
+        status: "🟡 KREVER BYSTYREVEDTAK"
+      },
+      {
+        id: "TLT-07",
+        horisont: "Neste Års Budsjett (2027)",
+        kategori: "Langsiktig 2027+",
+        catKey: "lang",
+        omraadeCode: "Område 2",
+        sektor: "Oppvekst og Utdanning",
+        ansvar: ["20210", "20220", "20230", "21310", "22110"],
+        fn: "202",
+        navn: "Strukturell Stillingsomstilling",
+        beskrivelse: "Bemanningsreduksjon ved naturlig avgang uten nyrekruttering i grunnskole og pedagogisk administrasjon.",
+        hjemmel: "Politisk behandling (Økonomiplan / Kommuneloven § 14-3)",
+        sparingEoy: 0,
+        fullaar2027: -2700000,
+        gjennomforing: "Middels (Langsiktig)",
+        risiko: "Middels",
+        risikoDetalj: "Lav/Middels - Tilpasser organisasjonen til demografiendring og elevtallsutvikling.",
+        status: "🔵 INNGÅR I BUDSJETT 2027"
+      },
+      {
+        id: "TLT-08",
+        horisont: "Neste Års Budsjett (2027)",
+        kategori: "Langsiktig 2027+",
+        catKey: "lang",
+        omraadeCode: "Område 12 / Område 11",
+        sektor: "ALL",
+        ansvar: ["ALL"],
+        fn: "ALL",
+        navn: "Gevinstuttak KI-satsing",
+        beskrivelse: "Realisere 2,0 mill. kr i innsparingskrav via automatisert saksbehandling, fakturakontroll og RAG-støtte.",
+        hjemmel: "Politisk vedtak i Bystyret (Satsing Teknologiløft)",
+        sparingEoy: 0,
+        fullaar2027: -2000000,
+        gjennomforing: "Høy",
+        risiko: "Lav",
+        risikoDetalj: "Lav - Frigjør saksbehandlerkapasitet uten kutt i velferdstilbud.",
+        status: "🔵 INNGÅR I BUDSJETT 2027"
+      },
+      {
+        id: "TLT-09",
+        horisont: "Langsiktig Økonomiplan (2027-2030)",
+        kategori: "Langsiktig 2027+",
+        catKey: "lang",
+        omraadeCode: "Område 2",
+        sektor: "Oppvekst og Utdanning",
+        ansvar: ["20210", "20220", "20230"],
+        fn: "202",
+        navn: "Tjenestestruktur & Skolekretser",
+        beskrivelse: "Strukturell tilpasning av barnehage- og skolekapasitet i tråd med oppvekstsektorens behovsplan.",
+        hjemmel: "Politisk vedtak i Bystyret (Kommuneloven § 14-3)",
+        sparingEoy: 0,
+        fullaar2027: -5000000,
+        gjennomforing: "Lav/Middels",
+        risiko: "Høy",
+        risikoDetalj: "Høy - Politisk krevende prosess, berører nærmiljø og krever høringsrunder.",
+        status: "🟣 LANGSIKTIG UTREDNING"
+      }
+    ];
+
+    const REC_OMRAADER = [
+      { code: "Område 2", name: "Oppvekst (Skole & Barnehage)", sektor: "Oppvekst og Utdanning", defaultAdmin: -530000, defaultPol: 0, default2027: -2790000, tiltak: "Vikar-/overtidsstopp EOY + Stillingsomstilling 2027" },
+      { code: "Område 3", name: "Helse og mestring", sektor: "Helse og Omsorg", defaultAdmin: -670000, defaultPol: 800000, default2027: -3510000, tiltak: "Optur Plus kvelds/helgejustering + Rammetilførsel EOY" },
+      { code: "Område 5", name: "By- og stedsutvikling", sektor: "Teknisk", defaultAdmin: -150000, defaultPol: 0, default2027: -450000, tiltak: "Utsettelse av ikke-kritiske vedlikeholdsinnkjøp" },
+      { code: "Område 11", name: "Organisasjon og teknologi", sektor: "Felles", defaultAdmin: -500000, defaultPol: 0, default2027: -1500000, tiltak: "Konsulentfrys på IT og organisasjonsprosjekter" },
+      { code: "Område 12", name: "Økonomi og virksomhetsstyring", sektor: "Felles", defaultAdmin: 0, defaultPol: 0, default2027: -800000, tiltak: "KI-gevinstuttak på saksbehandling og analyse" },
+      { code: "Område 9", name: "Finans, skatt og rammetilskudd", sektor: "Finans", defaultAdmin: 0, defaultPol: -800000, default2027: 0, tiltak: "Inndragning fra disposisjonsfond (Bystyrevedtak)" }
+    ];
+
+// =========================================================================
+    const SALARY_UNITS_DATA = [
+      { code: "20210", name: "20210 - Grunnskole A", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 54.0, fteBesatt: 52.5, vakans: 1.5, snittLonn: 642000, ytdReg: 5499740, status: "🟡 Vikarpress", statusClass: "rag-amber" },
+      { code: "20220", name: "20220 - Grunnskole B", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 48.0, fteBesatt: 47.0, vakans: 1.0, snittLonn: 638000, ytdReg: 4920820, status: "🟡 Vikarpress", statusClass: "rag-amber" },
+      { code: "20230", name: "20230 - Grunnskole C", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 38.0, fteBesatt: 37.0, vakans: 1.0, snittLonn: 635000, ytdReg: 4052440, status: "🟢 I rute", statusClass: "rag-green" },
+      { code: "21310", name: "21310 - Voksenopplæring", sektor: "Oppvekst og Utdanning", fn: "213", ftePlan: 8.0, fteBesatt: 8.0, vakans: 0.0, snittLonn: 613700, ytdReg: 490960, status: "🟢 I rute", statusClass: "rag-green" },
+      { code: "22110", name: "22110 - PPT og veiledning", sektor: "Oppvekst og Utdanning", fn: "221", ftePlan: 12.0, fteBesatt: 11.0, vakans: 1.0, snittLonn: 677500, ytdReg: 983000, status: "🟡 Merforbruk", statusClass: "rag-amber" },
+      { code: "25310", name: "25310 - Omsorgssenter A", sektor: "Helse og Omsorg", fn: "254", ftePlan: 48.0, fteBesatt: 46.0, vakans: 2.0, snittLonn: 595000, ytdReg: 3534398, status: "🔴 Overtid/vikar", statusClass: "rag-red" },
+      { code: "25320", name: "25320 - Omsorgssenter B", sektor: "Helse og Omsorg", fn: "254", ftePlan: 36.0, fteBesatt: 35.0, vakans: 1.0, snittLonn: 592000, ytdReg: 2777027, status: "🔴 Vikarbruk", statusClass: "rag-red" },
+      { code: "25710", name: "25710 - Hjemmetjeneste Nord", sektor: "Helse og Omsorg", fn: "254", ftePlan: 42.0, fteBesatt: 41.5, vakans: 0.5, snittLonn: 588000, ytdReg: 3155713, status: "🔴 Overtid", statusClass: "rag-red" },
+      { code: "25720", name: "25720 - Hjemmetjeneste Sør", sektor: "Helse og Omsorg", fn: "254", ftePlan: 42.0, fteBesatt: 41.5, vakans: 0.5, snittLonn: 588000, ytdReg: 3155713, status: "🔴 Overtid", statusClass: "rag-red" }
+    ];
+
+    const BASE_KOSTRA_ARTS = [
+      { name: "Fastlønn ordinære stillinger", art: "Art 1010", baseBud: 233062968, baseReg: 95087904, baseEac: 252800011, driverHelse: "KS-oppgjør 5,2 % + ansiennitet", driverOppvekst: "KS-oppgjør 5,2 %" },
+      { name: "Vikarlønn ved fravær & sykdom", art: "Art 1020", baseBud: 11491584, baseReg: 8430708, baseEac: 21396331, driverHelse: "Høyt sykefravær pleie/turnus", driverOppvekst: "Korttidsfravær lærere" },
+      { name: "Overtidslønn & ekstravakter (Gat)", art: "Art 1040", baseBud: 906048, baseReg: 2406818, baseEac: 6382121, driverHelse: "AML-bruddrisiko & Gat-vakter", driverOppvekst: "Tilsyn og eksamensavvikling" },
+      { name: "Ekstrahjelp & midlertidig ansatte", art: "Art 1030", baseBud: 480000, baseReg: 1572649, baseEac: 3921059, driverHelse: "Sommer- og ferieavlastning", driverOppvekst: "SFO-ekstrahjelp" },
+      { name: "Variable turnustillegg (helg/natt/helligdag)", art: "Art 1050", baseBud: 167904, baseReg: 456999, baseEac: 1023954, driverHelse: "Turnusavtaler jf. HTA kap. 1 § 5", driverOppvekst: "Kveldsarrangementer" },
+      { name: "Kjøp av vikarbyråtjenester (innleie)", art: "Art 1270", baseBud: 0, baseReg: 512136, baseEac: 795950, driverHelse: "Sykepleiermangel natt (Omsorg A)", driverOppvekst: "Spesialpedagogisk innleie" },
+      { name: "Pensjonspremie KLP fellesordning", art: "Art 1090", baseBud: 43621188, baseReg: 17105485, baseEac: 42650943, driverHelse: "Reguleringspremie KLP", driverOppvekst: "KLP / SPK Pensjon" },
+      { name: "Arbeidsgiveravgift (Sone 1, 14,1 %)", art: "Art 1099", baseBud: 34665804, baseReg: 14399520, baseEac: 37804681, driverHelse: "Følger lønnsmasseøkning", driverOppvekst: "14,1 % AGA" },
+      { name: "Refusjoner for sykepenger & foreldrepenger", art: "Art 1710", baseBud: -8596620, baseReg: -10341130, baseEac: -26390140, driverHelse: "Høy innbetaling fra NAV", driverOppvekst: "NAV sykelønnsrefusjon" }
+    ];
+
+// =========================================================================
+
+    const AARSHJUL_CALENDAR_DATA = [
+      {
+        id: "m01",
+        monthNum: 1,
+        name: "Januar",
+        short: "Jan",
+        quarter: "Q1",
+        isCurrent: false,
+        status: "completed",
+        title: "Årsavslutning foregående år & Periodelåsing",
+        deadlines: [
+          { day: "15. jan", desc: "Siste bilagsføring for M12 i Agresso", tag: "agresso" },
+          { day: "25. jan", desc: "Avsetninger til bundne og ubundne fond", tag: "lov" },
+          { day: "31. jan", desc: "Bitemporal avstemming mot DuckDB Gold Layer", tag: "agresso" }
+        ],
+        summary: "Avstemming av balansekontoer, periodisering av påløpte kostnader og overføring av ubrukte prosjektmidler.",
+        defaultTemplate: "aarsavslutning_sjekkliste",
+        tags: ["lov", "agresso"]
+      },
+      {
+        id: "m02",
+        monthNum: 2,
+        name: "Februar",
+        short: "Feb",
+        quarter: "Q1",
+        isCurrent: false,
+        status: "completed",
+        title: "Årsregnskap til Revisjon & Lønnsoppgjør",
+        deadlines: [
+          { day: "15. feb", desc: "LOVPÅLAGT: Foreløpig årsregnskap oversendes Agder Kommunerevisjon (Kommuneloven § 14-8)", tag: "lov" },
+          { day: "20. feb", desc: "Innhenting av tariff- og deflatorforutsetninger for nytt år", tag: "agresso" }
+        ],
+        summary: "Regnskapsavleggelse til revisjon. Første analyse av lønnsvekst og pensjonspremieavvik mot budsjettreserve.",
+        defaultTemplate: "aarsavslutning_sjekkliste",
+        tags: ["lov"]
+      },
+      {
+        id: "m03",
+        monthNum: 3,
+        name: "Mars",
+        short: "Mar",
+        quarter: "Q1",
+        isCurrent: false,
+        status: "completed",
+        title: "Politisk Behandling av Årsregnskap",
+        deadlines: [
+          { day: "10. mar", desc: "Revisjonsberetning mottas fra Agder Kommunerevisjon", tag: "lov" },
+          { day: "18. mar", desc: "Formannskapet behandler årsregnskap og årsrapport", tag: "politisk" },
+          { day: "26. mar", desc: "Bystyret vedtar årsregnskap og fondsavsetninger", tag: "politisk" }
+        ],
+        summary: "Formell politisk sluttbehandling av foregående års regnskap og disponering av eventuelt netto driftsresultat.",
+        defaultTemplate: "direktor_flash",
+        tags: ["politisk", "lov"]
+      },
+      {
+        id: "m04",
+        monthNum: 4,
+        name: "April",
+        short: "Apr",
+        quarter: "Q2",
+        isCurrent: false,
+        status: "completed",
+        title: "1. Tertial (T1) Datagrunnlag & Enhetsoppfølging",
+        deadlines: [
+          { day: "20. apr", desc: "Månedsavslutning M03 fullført i Agresso", tag: "agresso" },
+          { day: "30. apr", desc: "Regnskap per 30.04 fryses som grunnlag for 1. tertial", tag: "agresso" },
+          { day: "30. apr", desc: "Enhetsledere starter oppdatering av EAC i Framsikt", tag: "tertial" }
+        ],
+        summary: "Månedsavslutning M04. Enhetsledere identifiserer tidlige avvik på vikarbruk, overtid og sykefravær.",
+        defaultTemplate: "enhetsleder_avvik",
+        tags: ["tertial", "agresso"]
+      },
+      {
+        id: "m05",
+        monthNum: 5,
+        name: "Mai",
+        short: "Mai",
+        quarter: "Q2",
+        isCurrent: false,
+        status: "completed",
+        title: "1. Tertialrapport & Budsjettreguleringer",
+        deadlines: [
+          { day: "12. mai", desc: "Enhetslederes frist for EAC og tiltaksrapportering", tag: "tertial" },
+          { day: "20. mai", desc: "Rådgiver ferdigstiller T1-analyse og budsjettreguleringer", tag: "lov" },
+          { day: "28. mai", desc: "Kommunedirektørens ledergruppe behandler T1-utkast", tag: "politisk" }
+        ],
+        summary: "Konsolidering av 1. tertialrapport. Vurdering av administrative omdisponeringer (§ 13-1) vs Bystyresak (§ 14-6).",
+        defaultTemplate: "saksfremlegg_t2",
+        tags: ["tertial", "politisk", "lov"]
+      },
+      {
+        id: "m06",
+        monthNum: 6,
+        name: "Juni",
+        short: "Jun",
+        quarter: "Q2",
+        isCurrent: false,
+        status: "completed",
+        title: "Bystyresak 1. Tertial & Rammeskriv HØP",
+        deadlines: [
+          { day: "10. jun", desc: "Bystyret behandler 1. tertial og vedtar budsjettendringer", tag: "politisk" },
+          { day: "15. jun", desc: "Utsendelse av rammeskriv og retningslinjer for HØP 2027–2030", tag: "agresso" },
+          { day: "22. jun", desc: "Kontroll av sommervikarkontrakter og bemanningsplaner", tag: "agresso" }
+        ],
+        summary: "Bystyret vedtar tertial 1. Kommunedirektøren sender ut økonomiske rammer og innsparingskrav til sektorene.",
+        defaultTemplate: "rammebrev_hop",
+        tags: ["tertial", "politisk"]
+      },
+      {
+        id: "m07",
+        monthNum: 7,
+        name: "Juli",
+        short: "Jul",
+        quarter: "Q3",
+        isCurrent: false,
+        status: "completed",
+        title: "Halvårsavstemming & Sommervikarkontroll",
+        deadlines: [
+          { day: "15. jul", desc: "Halvårsavslutning M06 avstemt", tag: "agresso" },
+          { day: "31. jul", desc: "Ukentlig monitorering av vikarutgifter i helse/mestring", tag: "agresso" }
+        ],
+        summary: "Lav administrativ aktivitet, men kritisk overvåking av helgedoble vakter, overtid og timebaserte vikarer under fellesferien.",
+        defaultTemplate: "direktor_flash",
+        tags: ["agresso"]
+      },
+      {
+        id: "m08",
+        monthNum: 8,
+        name: "August",
+        short: "Aug",
+        quarter: "Q3",
+        isCurrent: true,
+        status: "current",
+        title: "2. Tertial (T2) Status & Månedsavslutning",
+        deadlines: [
+          { day: "20. aug", desc: "Lønnskjøring M08 avstemt mot Visma Gat", tag: "agresso" },
+          { day: "31. aug", desc: "Datagrunnlag per 31.08 fryses for 2. tertial i Agresso", tag: "tertial" },
+          { day: "31. aug", desc: "Utsendelse av krav om avviksforklaring og EAC til enhetslederne", tag: "tertial" }
+        ],
+        summary: "AKTIV FASE: Månedsavslutning M08. Bitemporal avstemming, analyse av sommervikaravvik, og innhenting av bindende EAC.",
+        defaultTemplate: "enhetsleder_avvik",
+        tags: ["tertial", "agresso", "lov"]
+      },
+      {
+        id: "m09",
+        monthNum: 9,
+        name: "September",
+        short: "Sep",
+        quarter: "Q3",
+        isCurrent: false,
+        status: "upcoming",
+        title: "2. Tertialrapport & Faginnspill til HØP",
+        deadlines: [
+          { day: "08. sep", desc: "Enhetslederes frist for innlegging av EAC og tiltak i Framsikt", tag: "tertial" },
+          { day: "15. sep", desc: "LOVPÅLAGT: 2. Tertialrapport oversendes Kommunedirektøren", tag: "lov" },
+          { day: "25. sep", desc: "Sektorenes innspill til nye drifts- og investeringstiltak i Framsikt", tag: "agresso" }
+        ],
+        summary: "Konsolidering av 2. tertial. Prognostisering av skatteinngang og rammetilskudd etter revidert nasjonalbudsjett.",
+        defaultTemplate: "saksfremlegg_t2",
+        tags: ["tertial", "lov", "agresso"]
+      },
+      {
+        id: "m10",
+        monthNum: 10,
+        name: "Oktober",
+        short: "Okt",
+        quarter: "Q4",
+        isCurrent: false,
+        status: "upcoming",
+        title: "Bystyresak T2 & Kommunedirektørens HØP",
+        deadlines: [
+          { day: "15. okt", desc: "Skatteanslag oppdateres etter Statsbudsjettfremleggelsen", tag: "lov" },
+          { day: "22. okt", desc: "Bystyret behandler 2. tertial og vedtar reguleringer", tag: "politisk" },
+          { day: "30. okt", desc: "Kommunedirektøren legger frem forslag til HØP og Årsbudsjett", tag: "politisk" }
+        ],
+        summary: "Bystyret vedtar 2. tertial. Kommunedirektørens forslag til 4-årig Handlings- og økonomiplan publiseres i Framsikt.",
+        defaultTemplate: "rammebrev_hop",
+        tags: ["tertial", "politisk", "lov"]
+      },
+      {
+        id: "m11",
+        monthNum: 11,
+        name: "November",
+        short: "Nov",
+        quarter: "Q4",
+        isCurrent: false,
+        status: "upcoming",
+        title: "Formannskapsinnstilling & Offentlig Høring",
+        deadlines: [
+          { day: "12. nov", desc: "Formannskapet avgir innstilling til HØP og Årsbudsjett", tag: "politisk" },
+          { day: "15. nov", desc: "LOVPÅLAGT: 3 ukers offentlig høring starter (Kommuneloven § 14-3)", tag: "lov" },
+          { day: "25. nov", desc: "M10 månedsavslutning og risikovurdering for årsslutt", tag: "agresso" }
+        ],
+        summary: "Politisk debatt, høringsuttalelser fra partiene og innbyggere. Avklaring av salderinger og fondsbruk.",
+        defaultTemplate: "direktor_flash",
+        tags: ["politisk", "lov"]
+      },
+      {
+        id: "m12",
+        monthNum: 12,
+        name: "Desember",
+        short: "Des",
+        quarter: "Q4",
+        isCurrent: false,
+        status: "upcoming",
+        title: "Bystyrevedtak HØP & Siste Budsjettregulering",
+        deadlines: [
+          { day: "10. des", desc: "LOVPÅLAGT: Bystyret vedtar HØP og Årsbudsjett før nyttår (§ 14-3)", tag: "politisk" },
+          { day: "15. des", desc: "Siste administrative budsjettregulering for inneværende år", tag: "agresso" },
+          { day: "31. des", desc: "Regnskapsåret 2026 avsluttes. Forberedelse til årsregnskap", tag: "agresso" }
+        ],
+        summary: "Bystyret fatter endelig vedtak om neste års skattesatser, gebyrer, drifts- og investeringsbudsjett.",
+        defaultTemplate: "saksfremlegg_t2",
+        tags: ["politisk", "lov", "agresso"]
+      }
+    ];
+
+    const AARSHJUL_CHECKLIST_DEFAULT = [
+      { id: "c1", label: "Lønnskjøring M08 avstemt mot Visma Gat og Agresso (art 1010-1090)", done: true, phase: "Lønn" },
+      { id: "c2", label: "NAV sykelønns- og foreldrepengerefusjon periodisert (art 1710/1690)", done: true, phase: "Refusjon" },
+      { id: "c3", label: "Interne faktureringer og selvkosttjenester avstemt", done: true, phase: "Balanse" },
+      { id: "c4", label: "Investeringsregnskap og anleggsbidrag avstemt mot prosjektmodul", done: true, phase: "Investering" },
+      { id: "c5", label: "Enhetsledere har bekreftet EAC og lagt inn avviksforklaringer i Framsikt", done: false, phase: "Prognose" },
+      { id: "c6", label: "DuckDB Gold Layer Snapshot låst med bitemporal tidsstempling (Diff 0,00 kr)", done: true, phase: "Kvalitet" },
+      { id: "c7", label: "Avviksvurdering og LOY-omdisponeringsbehov identifisert jf. § 13-1", done: true, phase: "Budsjett" },
+      { id: "c8", label: "Balansert Framsikt 12-kolonners importfil generert og godkjent", done: false, phase: "Framsikt" }
+    ];
+
+    let currentAarshjulFilter = "all";
+    let currentSelectedMonthId = "m08";
+    let currentDocViewMode = "preview"; // 'preview' or 'raw'
+    let currentDocRawText = "";
+
+
 
     // =========================================================================
     // 2. FORMATTING & RAG HELPERS
@@ -5817,9 +6455,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         : null;
 
       // 1. Forsøk alltid lokal live FastAPI-tjeneste først hvis tilgjengelig:
-      const isLocalHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-      if (isLocalHost || window.location.protocol === "file:") {
-        const apiBase = window.location.protocol === "file:" ? "http://127.0.0.1:8000" : window.location.origin;
+      const isLocalHost = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") && window.location.protocol !== "file:";
+      if (isLocalHost) {
+        const apiBase = window.location.origin;
         try {
           const params = new URLSearchParams({ sektor: sector, ansvar: responsibility });
           const response = await fetch(
@@ -6486,191 +7124,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     // =========================================================================
     // =========================================================================
     // RECOMMENDER TILTAKSMATRISE ENGINE (100% DYNAMISK & TUFTE DATA-INK)
-    // =========================================================================
-    const RECOMMENDER_DATA = [
-      {
-        id: "TLT-01",
-        horisont: "Kortsiktig EOY (M9-M12)",
-        kategori: "Administrative EOY",
-        catKey: "admin",
-        omraadeCode: "Område 3 / Område 2",
-        sektor: "Helse og Omsorg",
-        ansvar: ["25310", "25320", "25710", "25720"],
-        fn: "254",
-        navn: "Ansettelses- og vikarstopp",
-        beskrivelse: "Midlertidig inndragning av vakanser og stram vurdering av vikarbehov på tvers av omsorgssentre og hjemmetjeneste.",
-        hjemmel: "Administrativt (Kommuneloven § 13-1 - Kommunedirektør)",
-        sparingEoy: -770000,
-        fullaar2027: -2310000,
-        gjennomforing: "Høy",
-        risiko: "Middels",
-        risikoDetalj: "Middels - Krever prioritering av kjerneoppgaver i pleie og turnus (AML § 10-8).",
-        status: "🔴 ANBEFALT UTLØST STRAKS"
-      },
-      {
-        id: "TLT-02",
-        horisont: "Kortsiktig EOY (M9-M12)",
-        kategori: "Administrative EOY",
-        catKey: "admin",
-        omraadeCode: "Område 3",
-        sektor: "Helse og Omsorg",
-        ansvar: ["25310", "25320", "25710", "25720"],
-        fn: "254",
-        navn: "Overtids- og merarbeidsstopp",
-        beskrivelse: "Streng forhåndsgodkjenning av overtid (art 1040) og omfordeling av helgevakter via Optur Plus.",
-        hjemmel: "Administrativt (Kommuneloven § 13-1 - Enhetsleder)",
-        sparingEoy: -430000,
-        fullaar2027: -1290000,
-        gjennomforing: "Høy",
-        risiko: "Lav",
-        risikoDetalj: "Lav - Forhindrer slitasje på fast ansatte og overskridelse av hviletidsbestemmelser.",
-        status: "🔴 ANBEFALT UTLØST STRAKS"
-      },
-      {
-        id: "TLT-03",
-        horisont: "Kortsiktig EOY (M9-M12)",
-        kategori: "Administrative EOY",
-        catKey: "admin",
-        omraadeCode: "Område 11",
-        sektor: "ALL",
-        ansvar: ["ALL"],
-        fn: "ALL",
-        navn: "Frys i konsulentbruk",
-        beskrivelse: "Stopp i nye konsulentavtaler og innskrenkning av pågående ekstern bistand (art 1270) innen IT og organisasjon.",
-        hjemmel: "Administrativt (Kommuneloven § 13-1 - Kommunedirektør)",
-        sparingEoy: -500000,
-        fullaar2027: -1500000,
-        gjennomforing: "Høy",
-        risiko: "Lav",
-        risikoDetalj: "Lav - Interne ressurser overtar prosjektledelse og utredninger.",
-        status: "🔴 ANBEFALT UTLØST STRAKS"
-      },
-      {
-        id: "TLT-04",
-        horisont: "Kortsiktig EOY (M9-M12)",
-        kategori: "Administrative EOY",
-        catKey: "admin",
-        omraadeCode: "Område 5",
-        sektor: "ALL",
-        ansvar: ["ALL"],
-        fn: "ALL",
-        navn: "Innkjøps- og vedlikeholdsstopp",
-        beskrivelse: "Utsettelse av ikke-kritiske nyinnkjøp, inventar og vedlikehold (art 1199/1200) i kommunale bygg.",
-        hjemmel: "Administrativt (Kommuneloven § 13-1 - Enhetsleder)",
-        sparingEoy: -150000,
-        fullaar2027: -450000,
-        gjennomforing: "Høy",
-        risiko: "Lav",
-        risikoDetalj: "Lav - Ingen direkte innvirkning på lovpålagte innbyggertjenester.",
-        status: "🟢 ANBEFALT UTLØST"
-      },
-      {
-        id: "TLT-05",
-        horisont: "Kortsiktig EOY (M12)",
-        kategori: "Politisk Vedtak EOY",
-        catKey: "politisk",
-        omraadeCode: "Område 9",
-        sektor: "Helse og Omsorg",
-        ansvar: ["ALL", "25310", "25320", "25710", "25720"],
-        fn: "254",
-        navn: "Fondsinndragning (Disposisjonsfond)",
-        beskrivelse: "Omdisponering fra ubundne disposisjonsfond for å dekke uunngåelig demografidrevet merforbruk i helse og omsorg.",
-        hjemmel: "Politisk vedtak i Bystyret (Kommuneloven § 14-6)",
-        sparingEoy: -800000,
-        fullaar2027: 0,
-        gjennomforing: "Middels (Krever flertall)",
-        risiko: "Middels",
-        risikoDetalj: "Middels - Reduserer kommunens finansielle buffer for 2027.",
-        status: "🟡 KREVER BYSTYREVEDTAK"
-      },
-      {
-        id: "TLT-06",
-        horisont: "Kortsiktig EOY (M12)",
-        kategori: "Politisk Vedtak EOY",
-        catKey: "politisk",
-        omraadeCode: "Område 9",
-        sektor: "Helse og Omsorg",
-        ansvar: ["ALL", "25310", "25320", "25710", "25720"],
-        fn: "254",
-        navn: "Rammeoverføring mellom sektorer",
-        beskrivelse: "Bystyrevedtak om å omdisponere ubrukte midler fra sentral reserve til Helse og mestring for budsjettbalanse.",
-        hjemmel: "Politisk vedtak i Bystyret (Kommuneloven § 14-10)",
-        sparingEoy: 0,
-        fullaar2027: 0,
-        gjennomforing: "Middels",
-        risiko: "Lav",
-        risikoDetalj: "Lav - Nøytraliserer merforbruk innenfor samlet ramme (§ 14-2).",
-        status: "🟡 KREVER BYSTYREVEDTAK"
-      },
-      {
-        id: "TLT-07",
-        horisont: "Neste Års Budsjett (2027)",
-        kategori: "Langsiktig 2027+",
-        catKey: "lang",
-        omraadeCode: "Område 2",
-        sektor: "Oppvekst og Utdanning",
-        ansvar: ["20210", "20220", "20230", "21310", "22110"],
-        fn: "202",
-        navn: "Strukturell Stillingsomstilling",
-        beskrivelse: "Bemanningsreduksjon ved naturlig avgang uten nyrekruttering i grunnskole og pedagogisk administrasjon.",
-        hjemmel: "Politisk behandling (Økonomiplan / Kommuneloven § 14-3)",
-        sparingEoy: 0,
-        fullaar2027: -2700000,
-        gjennomforing: "Middels (Langsiktig)",
-        risiko: "Middels",
-        risikoDetalj: "Lav/Middels - Tilpasser organisasjonen til demografiendring og elevtallsutvikling.",
-        status: "🔵 INNGÅR I BUDSJETT 2027"
-      },
-      {
-        id: "TLT-08",
-        horisont: "Neste Års Budsjett (2027)",
-        kategori: "Langsiktig 2027+",
-        catKey: "lang",
-        omraadeCode: "Område 12 / Område 11",
-        sektor: "ALL",
-        ansvar: ["ALL"],
-        fn: "ALL",
-        navn: "Gevinstuttak KI-satsing",
-        beskrivelse: "Realisere 2,0 mill. kr i innsparingskrav via automatisert saksbehandling, fakturakontroll og RAG-støtte.",
-        hjemmel: "Politisk vedtak i Bystyret (Satsing Teknologiløft)",
-        sparingEoy: 0,
-        fullaar2027: -2000000,
-        gjennomforing: "Høy",
-        risiko: "Lav",
-        risikoDetalj: "Lav - Frigjør saksbehandlerkapasitet uten kutt i velferdstilbud.",
-        status: "🔵 INNGÅR I BUDSJETT 2027"
-      },
-      {
-        id: "TLT-09",
-        horisont: "Langsiktig Økonomiplan (2027-2030)",
-        kategori: "Langsiktig 2027+",
-        catKey: "lang",
-        omraadeCode: "Område 2",
-        sektor: "Oppvekst og Utdanning",
-        ansvar: ["20210", "20220", "20230"],
-        fn: "202",
-        navn: "Tjenestestruktur & Skolekretser",
-        beskrivelse: "Strukturell tilpasning av barnehage- og skolekapasitet i tråd med oppvekstsektorens behovsplan.",
-        hjemmel: "Politisk vedtak i Bystyret (Kommuneloven § 14-3)",
-        sparingEoy: 0,
-        fullaar2027: -5000000,
-        gjennomforing: "Lav/Middels",
-        risiko: "Høy",
-        risikoDetalj: "Høy - Politisk krevende prosess, berører nærmiljø og krever høringsrunder.",
-        status: "🟣 LANGSIKTIG UTREDNING"
-      }
-    ];
+        // [RECOMMENDER_DATA & REC_OMRAADER defined in Section 1 Data Constants]
 
-    const REC_OMRAADER = [
-      { code: "Område 2", name: "Oppvekst (Skole & Barnehage)", sektor: "Oppvekst og Utdanning", defaultAdmin: -530000, defaultPol: 0, default2027: -2790000, tiltak: "Vikar-/overtidsstopp EOY + Stillingsomstilling 2027" },
-      { code: "Område 3", name: "Helse og mestring", sektor: "Helse og Omsorg", defaultAdmin: -670000, defaultPol: 800000, default2027: -3510000, tiltak: "Optur Plus kvelds/helgejustering + Rammetilførsel EOY" },
-      { code: "Område 5", name: "By- og stedsutvikling", sektor: "Teknisk", defaultAdmin: -150000, defaultPol: 0, default2027: -450000, tiltak: "Utsettelse av ikke-kritiske vedlikeholdsinnkjøp" },
-      { code: "Område 11", name: "Organisasjon og teknologi", sektor: "Felles", defaultAdmin: -500000, defaultPol: 0, default2027: -1500000, tiltak: "Konsulentfrys på IT og organisasjonsprosjekter" },
-      { code: "Område 12", name: "Økonomi og virksomhetsstyring", sektor: "Felles", defaultAdmin: 0, defaultPol: 0, default2027: -800000, tiltak: "KI-gevinstuttak på saksbehandling og analyse" },
-      { code: "Område 9", name: "Finans, skatt og rammetilskudd", sektor: "Finans", defaultAdmin: 0, defaultPol: -800000, default2027: 0, tiltak: "Inndragning fra disposisjonsfond (Bystyrevedtak)" }
-    ];
-
-    function renderRecommenderModule(ctx) {
+function renderRecommenderModule(ctx) {
       if (!ctx) ctx = getFilteredContext();
       const { period, pMeta, sektor, ansvar, funksjon } = ctx;
 
@@ -6927,23 +7383,8 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       renderRecommenderModule();
     }
 
-    initRecommenderModule();
+    // (Initial render orchestrated in unified bootApplication at end of script)
 
-    // Initial render
-    populateAnsvarOptions("ALL", "ALL");
-    populateFunksjonOptions("ALL", "ALL");
-    renderAllDynamicReports();
-    renderCitationDrawer();
-    updateSelvkostCalc();
-    refreshMonthlyReport();
-    if (typeof initEdaModule === "function") {
-      initEdaModule();
-    }
-    if (typeof initPredefinedReportsShowcase === "function") {
-      initPredefinedReportsShowcase();
-    }
-    // Invoicing Unit Options (Module 9)
-    initInvoicingUnitOptions();
 
     // =========================================================================
     // 14. MODULE 9: INVOICE OPTIONS & REGLER PER ENHET (12 ANSVARSSTEDER)
@@ -7327,32 +7768,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     
     // =========================================================================
     // DYNAMISK LØNNS- OG BEMANNINGSBUDSJETTMODUL (KOSTRA ART 1010-1099, 1270, 1710)
-    // =========================================================================
-    const SALARY_UNITS_DATA = [
-      { code: "20210", name: "20210 - Grunnskole A", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 54.0, fteBesatt: 52.5, vakans: 1.5, snittLonn: 642000, ytdReg: 5499740, status: "🟡 Vikarpress", statusClass: "rag-amber" },
-      { code: "20220", name: "20220 - Grunnskole B", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 48.0, fteBesatt: 47.0, vakans: 1.0, snittLonn: 638000, ytdReg: 4920820, status: "🟡 Vikarpress", statusClass: "rag-amber" },
-      { code: "20230", name: "20230 - Grunnskole C", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 38.0, fteBesatt: 37.0, vakans: 1.0, snittLonn: 635000, ytdReg: 4052440, status: "🟢 I rute", statusClass: "rag-green" },
-      { code: "21310", name: "21310 - Voksenopplæring", sektor: "Oppvekst og Utdanning", fn: "213", ftePlan: 8.0, fteBesatt: 8.0, vakans: 0.0, snittLonn: 613700, ytdReg: 490960, status: "🟢 I rute", statusClass: "rag-green" },
-      { code: "22110", name: "22110 - PPT og veiledning", sektor: "Oppvekst og Utdanning", fn: "221", ftePlan: 12.0, fteBesatt: 11.0, vakans: 1.0, snittLonn: 677500, ytdReg: 983000, status: "🟡 Merforbruk", statusClass: "rag-amber" },
-      { code: "25310", name: "25310 - Omsorgssenter A", sektor: "Helse og Omsorg", fn: "254", ftePlan: 48.0, fteBesatt: 46.0, vakans: 2.0, snittLonn: 595000, ytdReg: 3534398, status: "🔴 Overtid/vikar", statusClass: "rag-red" },
-      { code: "25320", name: "25320 - Omsorgssenter B", sektor: "Helse og Omsorg", fn: "254", ftePlan: 36.0, fteBesatt: 35.0, vakans: 1.0, snittLonn: 592000, ytdReg: 2777027, status: "🔴 Vikarbruk", statusClass: "rag-red" },
-      { code: "25710", name: "25710 - Hjemmetjeneste Nord", sektor: "Helse og Omsorg", fn: "254", ftePlan: 42.0, fteBesatt: 41.5, vakans: 0.5, snittLonn: 588000, ytdReg: 3155713, status: "🔴 Overtid", statusClass: "rag-red" },
-      { code: "25720", name: "25720 - Hjemmetjeneste Sør", sektor: "Helse og Omsorg", fn: "254", ftePlan: 42.0, fteBesatt: 41.5, vakans: 0.5, snittLonn: 588000, ytdReg: 3155713, status: "🔴 Overtid", statusClass: "rag-red" }
-    ];
+        // [SALARY_UNITS_DATA & BASE_KOSTRA_ARTS defined in Section 1 Data Constants]
 
-    const BASE_KOSTRA_ARTS = [
-      { name: "Fastlønn ordinære stillinger", art: "Art 1010", baseBud: 233062968, baseReg: 95087904, baseEac: 252800011, driverHelse: "KS-oppgjør 5,2 % + ansiennitet", driverOppvekst: "KS-oppgjør 5,2 %" },
-      { name: "Vikarlønn ved fravær & sykdom", art: "Art 1020", baseBud: 11491584, baseReg: 8430708, baseEac: 21396331, driverHelse: "Høyt sykefravær pleie/turnus", driverOppvekst: "Korttidsfravær lærere" },
-      { name: "Overtidslønn & ekstravakter (Gat)", art: "Art 1040", baseBud: 906048, baseReg: 2406818, baseEac: 6382121, driverHelse: "AML-bruddrisiko & Gat-vakter", driverOppvekst: "Tilsyn og eksamensavvikling" },
-      { name: "Ekstrahjelp & midlertidig ansatte", art: "Art 1030", baseBud: 480000, baseReg: 1572649, baseEac: 3921059, driverHelse: "Sommer- og ferieavlastning", driverOppvekst: "SFO-ekstrahjelp" },
-      { name: "Variable turnustillegg (helg/natt/helligdag)", art: "Art 1050", baseBud: 167904, baseReg: 456999, baseEac: 1023954, driverHelse: "Turnusavtaler jf. HTA kap. 1 § 5", driverOppvekst: "Kveldsarrangementer" },
-      { name: "Kjøp av vikarbyråtjenester (innleie)", art: "Art 1270", baseBud: 0, baseReg: 512136, baseEac: 795950, driverHelse: "Sykepleiermangel natt (Omsorg A)", driverOppvekst: "Spesialpedagogisk innleie" },
-      { name: "Pensjonspremie KLP fellesordning", art: "Art 1090", baseBud: 43621188, baseReg: 17105485, baseEac: 42650943, driverHelse: "Reguleringspremie KLP", driverOppvekst: "KLP / SPK Pensjon" },
-      { name: "Arbeidsgiveravgift (Sone 1, 14,1 %)", art: "Art 1099", baseBud: 34665804, baseReg: 14399520, baseEac: 37804681, driverHelse: "Følger lønnsmasseøkning", driverOppvekst: "14,1 % AGA" },
-      { name: "Refusjoner for sykepenger & foreldrepenger", art: "Art 1710", baseBud: -8596620, baseReg: -10341130, baseEac: -26390140, driverHelse: "Høy innbetaling fra NAV", driverOppvekst: "NAV sykelønnsrefusjon" }
-    ];
-
-    function renderSalaryBudgetModule(ctx) {
+function renderSalaryBudgetModule(ctx) {
       if (!ctx) ctx = getFilteredContext();
       const { period, pMeta, sektor, ansvar, funksjon } = ctx;
 
@@ -7701,108 +8119,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
     // =========================================================================
     // 17. EDA & FT VISUAL VOCABULARY MODULE (DYNAMIC EXPLORATORY ANALYSIS)
-    // =========================================================================
+        // [FT_CHART_TYPES defined in Section 1 Data Constants]
 
-    const FT_CHART_TYPES = {
-      correlation: [
-        { 
-          id: "scatter", 
-          name: "Spredningsplott (Scatter Plot m/ OLS trendlinje)", 
-          req: "2 kontinuerlige numeriske variabler (float/kr) aggregert over diskrete enheter.", 
-          usage: "Avdekker om vikarbruk henger systematisk sammen med overtid i døgnkontinuerlig turnus.",
-          tufte: "Direkte etikettering, null linjestøy, kontrollør-rød #D62728 kun ved avvik."
-        },
-        { 
-          id: "bubble", 
-          name: "Boblediagram (Bubble Chart m/ størrelsesvekting)", 
-          req: "3 kontinuerlige variabler (X: Vikar, Y: Overtid, Bobleareal: Budsjettramme).", 
-          usage: "Viser relasjon mellom vikarbruk og overtid vektet etter avdelingens totale driftsbudsjett.",
-          tufte: "Bobleareal proporsjonalt med verdi, ingen 3D-skygger eller tunge fyllfarger."
-        }
-      ],
-      deviation: [
-        { 
-          id: "diverging_bar", 
-          name: "Diverging Bar (Avvikssøyler med vertikal null-akse)", 
-          req: "1 kategori + 1 fortegnsbestemt avvik (kr/% differanse mot periodisert budsjett).", 
-          usage: "Fremhever overforbruk (+) og mindreforbruk (-) med felles forankret nullinje.",
-          tufte: "Fjern bakgrunnsnett; grønn for mindreforbruk, kontrollør-rød #D62728 for overskridelse."
-        },
-        { 
-          id: "spine", 
-          name: "Spine Chart / Målavvik mot 100% ramme", 
-          req: "1 kategori + faktisk verdi vs. referansemål / budsjettramme.", 
-          usage: "Viser prosentvis avvik direkte mot vedtatt periodiseringsmål.",
-          tufte: "Tynn vertikal ryggrad (100%), avvik markeres som horisontale streker uten stolpefyll."
-        }
-      ],
-      ranking: [
-        { 
-          id: "ordered_bar", 
-          name: "Sortert stolpediagram (Ordered Bar)", 
-          req: "1 kategori + 1 kontinuerlig metrikk sortert synkende.", 
-          usage: "Gir umiddelbar prioritering av enheter med størst budsjettbelastning (Burn Rate).",
-          tufte: "Horisontale søyler for naturlig leseretning, direkte tallverdi til høyre for søylen."
-        },
-        { 
-          id: "lollipop", 
-          name: "Lollipop Chart (Linje med punktende)", 
-          req: "1 kategori + 1 metrikk sortert etter avviksstørrelse.", 
-          usage: "Reduserer visuell tyngde (Data-Ink) sammenlignet med tunge fylte stolper.",
-          tufte: "Maksimal data-ink: tynn 1px linje med sirkelmarkør, ingen unødvendig fargefyll."
-        }
-      ],
-      composition: [
-        { 
-          id: "stacked_100", 
-          name: "100% Stablet Komponentbjelke (Part-to-whole)", 
-          req: "1 kategori + 3-5 additive kostnadskomponenter (Fastlønn, Vikarer, Overtid, KLP).", 
-          usage: "Viser proporsjonal lønnsstruktur uavhengig av avdelingsstørrelse.",
-          tufte: "Muted fargepalett, direkte segment-teksting der plass finnes, unngå legendestøy."
-        },
-        { 
-          id: "treemap", 
-          name: "Komponentblokker / Andelsfordeling", 
-          req: "Hierarkiske kostnadsarter (KOSTRA art 100-199).", 
-          usage: "Viser hvilke artskonti som beslaglegger størst andel av driftsrammen.",
-          tufte: "Rektangulær flatedeling uten skygger eller rammer, etikett kun i signifikante blokker."
-        }
-      ],
-      trend: [
-        { 
-          id: "multiline", 
-          name: "Parallelle Tidsbaner (Multi-line M01–M08)", 
-          req: "Tidsakse (måneder M01–M08) + kontinuerlig metrikk per enhet.", 
-          usage: "Følger utviklingen måned for måned med direkte kurve-etikettering.",
-          tufte: "Tufte Sparkline-stil: tynne linjer, direkte etikett ved linjeslutt, ingen fargelegende."
-        },
-        { 
-          id: "slope", 
-          name: "Slopegraph (Start M01 vs. Slutt M08)", 
-          req: "2 diskrete tidspunkter (M01 vs M08) per rapporteringsenhet.", 
-          usage: "Fremhever endringstakten fra årets begynnelse til gjeldende periode.",
-          tufte: "Ren vinkelendring viser eskalering; farg kun linjer med bratt negativ stigning."
-        }
-      ],
-      distribution: [
-        { 
-          id: "strip", 
-          name: "Strip Plot / Jitter (Observasjonsspredning)", 
-          req: "Mange kontinuerlige målinger (månedlige avvik per enhet).", 
-          usage: "Viser klynger og spredning av månedlige avvik for å vurdere volatilitet.",
-          tufte: "Viser hvert rådatapunkt med 1D-spredning, null interpolert smoothing eller binned tap."
-        },
-        { 
-          id: "boxplot", 
-          name: "Kvartiler & Spredning (Box & Whisker)", 
-          req: "Fordeling av månedlige observasjoner per avdeling.", 
-          usage: "Oppsummerer median, interkvartilbredde (IQR) og ekstreme månedstall.",
-          tufte: "Tufte minimalistisk boxplot: punkt for median, tynn linje for IQR, tomrom ved kvartil."
-        }
-      ]
-    };
-
-    function getEdaDataset(sektorFilter = "ALL") {
+function getEdaDataset(sektorFilter = "ALL") {
       // Reelle tall aggregert fra DuckDB Gold Layer og modellens ansvarsenheter
       const rawUnits = [
         {
@@ -8857,242 +9176,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
 // =========================================================================
     // ÅRSHJUL, FRISTER & DOKUMENTGENERATOR MODUL
-    // =========================================================================
+        // [AARSHJUL_CALENDAR_DATA defined in Section 1 Data Constants]
 
-    const AARSHJUL_CALENDAR_DATA = [
-      {
-        id: "m01",
-        monthNum: 1,
-        name: "Januar",
-        short: "Jan",
-        quarter: "Q1",
-        isCurrent: false,
-        status: "completed",
-        title: "Årsavslutning foregående år & Periodelåsing",
-        deadlines: [
-          { day: "15. jan", desc: "Siste bilagsføring for M12 i Agresso", tag: "agresso" },
-          { day: "25. jan", desc: "Avsetninger til bundne og ubundne fond", tag: "lov" },
-          { day: "31. jan", desc: "Bitemporal avstemming mot DuckDB Gold Layer", tag: "agresso" }
-        ],
-        summary: "Avstemming av balansekontoer, periodisering av påløpte kostnader og overføring av ubrukte prosjektmidler.",
-        defaultTemplate: "aarsavslutning_sjekkliste",
-        tags: ["lov", "agresso"]
-      },
-      {
-        id: "m02",
-        monthNum: 2,
-        name: "Februar",
-        short: "Feb",
-        quarter: "Q1",
-        isCurrent: false,
-        status: "completed",
-        title: "Årsregnskap til Revisjon & Lønnsoppgjør",
-        deadlines: [
-          { day: "15. feb", desc: "LOVPÅLAGT: Foreløpig årsregnskap oversendes Agder Kommunerevisjon (Kommuneloven § 14-8)", tag: "lov" },
-          { day: "20. feb", desc: "Innhenting av tariff- og deflatorforutsetninger for nytt år", tag: "agresso" }
-        ],
-        summary: "Regnskapsavleggelse til revisjon. Første analyse av lønnsvekst og pensjonspremieavvik mot budsjettreserve.",
-        defaultTemplate: "aarsavslutning_sjekkliste",
-        tags: ["lov"]
-      },
-      {
-        id: "m03",
-        monthNum: 3,
-        name: "Mars",
-        short: "Mar",
-        quarter: "Q1",
-        isCurrent: false,
-        status: "completed",
-        title: "Politisk Behandling av Årsregnskap",
-        deadlines: [
-          { day: "10. mar", desc: "Revisjonsberetning mottas fra Agder Kommunerevisjon", tag: "lov" },
-          { day: "18. mar", desc: "Formannskapet behandler årsregnskap og årsrapport", tag: "politisk" },
-          { day: "26. mar", desc: "Bystyret vedtar årsregnskap og fondsavsetninger", tag: "politisk" }
-        ],
-        summary: "Formell politisk sluttbehandling av foregående års regnskap og disponering av eventuelt netto driftsresultat.",
-        defaultTemplate: "direktor_flash",
-        tags: ["politisk", "lov"]
-      },
-      {
-        id: "m04",
-        monthNum: 4,
-        name: "April",
-        short: "Apr",
-        quarter: "Q2",
-        isCurrent: false,
-        status: "completed",
-        title: "1. Tertial (T1) Datagrunnlag & Enhetsoppfølging",
-        deadlines: [
-          { day: "20. apr", desc: "Månedsavslutning M03 fullført i Agresso", tag: "agresso" },
-          { day: "30. apr", desc: "Regnskap per 30.04 fryses som grunnlag for 1. tertial", tag: "agresso" },
-          { day: "30. apr", desc: "Enhetsledere starter oppdatering av EAC i Framsikt", tag: "tertial" }
-        ],
-        summary: "Månedsavslutning M04. Enhetsledere identifiserer tidlige avvik på vikarbruk, overtid og sykefravær.",
-        defaultTemplate: "enhetsleder_avvik",
-        tags: ["tertial", "agresso"]
-      },
-      {
-        id: "m05",
-        monthNum: 5,
-        name: "Mai",
-        short: "Mai",
-        quarter: "Q2",
-        isCurrent: false,
-        status: "completed",
-        title: "1. Tertialrapport & Budsjettreguleringer",
-        deadlines: [
-          { day: "12. mai", desc: "Enhetslederes frist for EAC og tiltaksrapportering", tag: "tertial" },
-          { day: "20. mai", desc: "Rådgiver ferdigstiller T1-analyse og budsjettreguleringer", tag: "lov" },
-          { day: "28. mai", desc: "Kommunedirektørens ledergruppe behandler T1-utkast", tag: "politisk" }
-        ],
-        summary: "Konsolidering av 1. tertialrapport. Vurdering av administrative omdisponeringer (§ 13-1) vs Bystyresak (§ 14-6).",
-        defaultTemplate: "saksfremlegg_t2",
-        tags: ["tertial", "politisk", "lov"]
-      },
-      {
-        id: "m06",
-        monthNum: 6,
-        name: "Juni",
-        short: "Jun",
-        quarter: "Q2",
-        isCurrent: false,
-        status: "completed",
-        title: "Bystyresak 1. Tertial & Rammeskriv HØP",
-        deadlines: [
-          { day: "10. jun", desc: "Bystyret behandler 1. tertial og vedtar budsjettendringer", tag: "politisk" },
-          { day: "15. jun", desc: "Utsendelse av rammeskriv og retningslinjer for HØP 2027–2030", tag: "agresso" },
-          { day: "22. jun", desc: "Kontroll av sommervikarkontrakter og bemanningsplaner", tag: "agresso" }
-        ],
-        summary: "Bystyret vedtar tertial 1. Kommunedirektøren sender ut økonomiske rammer og innsparingskrav til sektorene.",
-        defaultTemplate: "rammebrev_hop",
-        tags: ["tertial", "politisk"]
-      },
-      {
-        id: "m07",
-        monthNum: 7,
-        name: "Juli",
-        short: "Jul",
-        quarter: "Q3",
-        isCurrent: false,
-        status: "completed",
-        title: "Halvårsavstemming & Sommervikarkontroll",
-        deadlines: [
-          { day: "15. jul", desc: "Halvårsavslutning M06 avstemt", tag: "agresso" },
-          { day: "31. jul", desc: "Ukentlig monitorering av vikarutgifter i helse/mestring", tag: "agresso" }
-        ],
-        summary: "Lav administrativ aktivitet, men kritisk overvåking av helgedoble vakter, overtid og timebaserte vikarer under fellesferien.",
-        defaultTemplate: "direktor_flash",
-        tags: ["agresso"]
-      },
-      {
-        id: "m08",
-        monthNum: 8,
-        name: "August",
-        short: "Aug",
-        quarter: "Q3",
-        isCurrent: true,
-        status: "current",
-        title: "2. Tertial (T2) Status & Månedsavslutning",
-        deadlines: [
-          { day: "20. aug", desc: "Lønnskjøring M08 avstemt mot Visma Gat", tag: "agresso" },
-          { day: "31. aug", desc: "Datagrunnlag per 31.08 fryses for 2. tertial i Agresso", tag: "tertial" },
-          { day: "31. aug", desc: "Utsendelse av krav om avviksforklaring og EAC til enhetslederne", tag: "tertial" }
-        ],
-        summary: "AKTIV FASE: Månedsavslutning M08. Bitemporal avstemming, analyse av sommervikaravvik, og innhenting av bindende EAC.",
-        defaultTemplate: "enhetsleder_avvik",
-        tags: ["tertial", "agresso", "lov"]
-      },
-      {
-        id: "m09",
-        monthNum: 9,
-        name: "September",
-        short: "Sep",
-        quarter: "Q3",
-        isCurrent: false,
-        status: "upcoming",
-        title: "2. Tertialrapport & Faginnspill til HØP",
-        deadlines: [
-          { day: "08. sep", desc: "Enhetslederes frist for innlegging av EAC og tiltak i Framsikt", tag: "tertial" },
-          { day: "15. sep", desc: "LOVPÅLAGT: 2. Tertialrapport oversendes Kommunedirektøren", tag: "lov" },
-          { day: "25. sep", desc: "Sektorenes innspill til nye drifts- og investeringstiltak i Framsikt", tag: "agresso" }
-        ],
-        summary: "Konsolidering av 2. tertial. Prognostisering av skatteinngang og rammetilskudd etter revidert nasjonalbudsjett.",
-        defaultTemplate: "saksfremlegg_t2",
-        tags: ["tertial", "lov", "agresso"]
-      },
-      {
-        id: "m10",
-        monthNum: 10,
-        name: "Oktober",
-        short: "Okt",
-        quarter: "Q4",
-        isCurrent: false,
-        status: "upcoming",
-        title: "Bystyresak T2 & Kommunedirektørens HØP",
-        deadlines: [
-          { day: "15. okt", desc: "Skatteanslag oppdateres etter Statsbudsjettfremleggelsen", tag: "lov" },
-          { day: "22. okt", desc: "Bystyret behandler 2. tertial og vedtar reguleringer", tag: "politisk" },
-          { day: "30. okt", desc: "Kommunedirektøren legger frem forslag til HØP og Årsbudsjett", tag: "politisk" }
-        ],
-        summary: "Bystyret vedtar 2. tertial. Kommunedirektørens forslag til 4-årig Handlings- og økonomiplan publiseres i Framsikt.",
-        defaultTemplate: "rammebrev_hop",
-        tags: ["tertial", "politisk", "lov"]
-      },
-      {
-        id: "m11",
-        monthNum: 11,
-        name: "November",
-        short: "Nov",
-        quarter: "Q4",
-        isCurrent: false,
-        status: "upcoming",
-        title: "Formannskapsinnstilling & Offentlig Høring",
-        deadlines: [
-          { day: "12. nov", desc: "Formannskapet avgir innstilling til HØP og Årsbudsjett", tag: "politisk" },
-          { day: "15. nov", desc: "LOVPÅLAGT: 3 ukers offentlig høring starter (Kommuneloven § 14-3)", tag: "lov" },
-          { day: "25. nov", desc: "M10 månedsavslutning og risikovurdering for årsslutt", tag: "agresso" }
-        ],
-        summary: "Politisk debatt, høringsuttalelser fra partiene og innbyggere. Avklaring av salderinger og fondsbruk.",
-        defaultTemplate: "direktor_flash",
-        tags: ["politisk", "lov"]
-      },
-      {
-        id: "m12",
-        monthNum: 12,
-        name: "Desember",
-        short: "Des",
-        quarter: "Q4",
-        isCurrent: false,
-        status: "upcoming",
-        title: "Bystyrevedtak HØP & Siste Budsjettregulering",
-        deadlines: [
-          { day: "10. des", desc: "LOVPÅLAGT: Bystyret vedtar HØP og Årsbudsjett før nyttår (§ 14-3)", tag: "politisk" },
-          { day: "15. des", desc: "Siste administrative budsjettregulering for inneværende år", tag: "agresso" },
-          { day: "31. des", desc: "Regnskapsåret 2026 avsluttes. Forberedelse til årsregnskap", tag: "agresso" }
-        ],
-        summary: "Bystyret fatter endelig vedtak om neste års skattesatser, gebyrer, drifts- og investeringsbudsjett.",
-        defaultTemplate: "saksfremlegg_t2",
-        tags: ["politisk", "lov", "agresso"]
-      }
-    ];
-
-    const AARSHJUL_CHECKLIST_DEFAULT = [
-      { id: "c1", label: "Lønnskjøring M08 avstemt mot Visma Gat og Agresso (art 1010-1090)", done: true, phase: "Lønn" },
-      { id: "c2", label: "NAV sykelønns- og foreldrepengerefusjon periodisert (art 1710/1690)", done: true, phase: "Refusjon" },
-      { id: "c3", label: "Interne faktureringer og selvkosttjenester avstemt", done: true, phase: "Balanse" },
-      { id: "c4", label: "Investeringsregnskap og anleggsbidrag avstemt mot prosjektmodul", done: true, phase: "Investering" },
-      { id: "c5", label: "Enhetsledere har bekreftet EAC og lagt inn avviksforklaringer i Framsikt", done: false, phase: "Prognose" },
-      { id: "c6", label: "DuckDB Gold Layer Snapshot låst med bitemporal tidsstempling (Diff 0,00 kr)", done: true, phase: "Kvalitet" },
-      { id: "c7", label: "Avviksvurdering og LOY-omdisponeringsbehov identifisert jf. § 13-1", done: true, phase: "Budsjett" },
-      { id: "c8", label: "Balansert Framsikt 12-kolonners importfil generert og godkjent", done: false, phase: "Framsikt" }
-    ];
-
-    let currentAarshjulFilter = "all";
-    let currentSelectedMonthId = "m08";
-    let currentDocViewMode = "preview"; // 'preview' or 'raw'
-    let currentDocRawText = "";
-
-    function initAarshjulModule() {
+function initAarshjulModule() {
       renderAarshjulGrid();
       initAarshjulChecklist();
       setupAarshjulFilterControls();
@@ -9928,23 +10014,29 @@ Rådgiver økonomistyring, Kristiansand kommune
       }
     }
 
-    // Auto-init EDA, Framsikt og Årshjul modules on load
-    if (typeof initEdaModule === 'function') {
-      try { initEdaModule(); } catch(e) { console.warn("initEdaModule err:", e); }
-    }
-    if (typeof renderSalaryBudgetModule === 'function') {
-      try { renderSalaryBudgetModule(); } catch(e) { console.warn("renderSalaryBudgetModule err:", e); }
-    }
-    if (typeof initFramsiktModule === 'function') {
-      try { initFramsiktModule(); } catch(e) { console.warn("initFramsiktModule err:", e); }
-    }
-    if (typeof initAarshjulModule === 'function') {
-      try { initAarshjulModule(); } catch(e) { console.warn("initAarshjulModule err:", e); }
+    // =========================================================================
+    // UNIFIED APPLICATION BOOTSTRAP (100% ORDER GUARANTEED)
+    // =========================================================================
+    function bootApplication() {
+      try { populateAnsvarOptions("ALL", "ALL"); } catch(e) { console.warn("populateAnsvarOptions:", e); }
+      try { populateFunksjonOptions("ALL", "ALL"); } catch(e) { console.warn("populateFunksjonOptions:", e); }
+      try { if (typeof initEdaModule === 'function') initEdaModule(); } catch(e) { console.warn("initEdaModule:", e); }
+      try { if (typeof initRecommenderModule === 'function') initRecommenderModule(); } catch(e) { console.warn("initRecommenderModule:", e); }
+      try { if (typeof initAarshjulModule === 'function') initAarshjulModule(); } catch(e) { console.warn("initAarshjulModule:", e); }
+      try { if (typeof initFramsiktModule === 'function') initFramsiktModule(); } catch(e) { console.warn("initFramsiktModule:", e); }
+      try { if (typeof initPredefinedReportsShowcase === 'function') initPredefinedReportsShowcase(); } catch(e) { console.warn("initPredefinedReportsShowcase:", e); }
+      try { if (typeof initInvoicingUnitOptions === 'function') initInvoicingUnitOptions(); } catch(e) { console.warn("initInvoicingUnitOptions:", e); }
+      try { renderAllDynamicReports(); } catch(e) { console.warn("renderAllDynamicReports:", e); }
+      try { renderCitationDrawer(); } catch(e) { console.warn("renderCitationDrawer:", e); }
+      try { updateSelvkostCalc(); } catch(e) { console.warn("updateSelvkostCalc:", e); }
+      try { refreshMonthlyReport(); } catch(e) { console.warn("refreshMonthlyReport:", e); }
     }
 
-
-
-
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bootApplication);
+    } else {
+      bootApplication();
+    }
   </script>
 </body>
 </html>
