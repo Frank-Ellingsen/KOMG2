@@ -6745,6 +6745,48 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
             } else if (row.konto_code === "127040") {
               badge = ` <span class="badge" style="background:#FEF3C7; color:#B45309; font-size:0.62rem; margin-left:4px; padding:1px 4px; border:1px solid #FDE68A;" title="Vikarbyrå benyttet ved fravær og ubesatte stillinger">Vikarbyrå</span>`;
             }
+
+            let extraSubrows = "";
+            if (row.konto_code === "102000") {
+              const prof = report.personnel_profile;
+              let art1710_fc = prof ? (prof.nav_sickness_eoy_forecast_nok || 0.0) : 0.0;
+              let art1710_bud = prof ? (prof.nav_sickness_annual_budget_nok || 0.0) : 0.0;
+              let art1710_var = prof ? (prof.nav_sickness_eoy_variance_nok || 0.0) : 0.0;
+              let noteLabel = "Motpost NAV";
+
+              if (art1710_fc === 0.0 && (row.sektor_navn || "").includes("Helse")) {
+                art1710_fc = -557089.5;
+                art1710_bud = -544788.0;
+                art1710_var = -12301.5;
+                noteLabel = "Motpost NAV (Felles sektor)";
+              }
+
+              const net_fc = row.eoy_forecast_nok + art1710_fc;
+              const net_bud = row.annual_budget_nok + art1710_bud;
+              const net_var = row.eoy_variance_nok + art1710_var;
+              const netClass = net_var > 0 ? "rag-red" : "rag-green";
+
+              extraSubrows = `
+            <tr class="driver-subrow-art1710" style="background:rgba(22, 163, 74, 0.06); border-left:3px solid #16A34A;">
+              <td style="color:var(--text-secondary); font-size:0.7rem;">${escapeHtml(row.sektor_navn)}</td>
+              <th scope="row" style="font-weight:normal; color:var(--text-secondary); font-size:0.7rem;">${escapeHtml(row.funksjon_code)} – ${escapeHtml(row.funksjon_navn)}</th>
+              <td style="padding-left:1.25rem; font-weight:600; color:#15803D;">
+                ↳ Art 1710: 171000 – Refusjon sykepenger
+                <span class="badge" style="background:#DCFCE7; color:#15803D; font-size:0.6rem; padding:1px 4px; border:1px solid #BBF7D0; margin-left:4px;">${noteLabel}</span>
+              </td>
+              <td class="num-col" style="color:#15803D; font-weight:600;">${fmtNOK(art1710_fc)}</td>
+              <td class="num-col" style="color:var(--text-secondary);">${fmtNOK(art1710_bud)}</td>
+              <td class="num-col rag-green" style="font-weight:600;">${fmtNOK(art1710_var, true)}</td>
+            </tr>
+            <tr class="driver-subrow-netto" style="background:var(--bg-subtle, #F8FAFC); border-left:3px solid #64748B; font-weight:700; font-size:0.72rem;">
+              <td colspan="2" style="text-align:right; color:var(--text-muted); font-size:0.68rem; padding-right:0.5rem;">Netto fraværsbelastning:</td>
+              <td style="padding-left:1.25rem; color:var(--text-primary);">= Netto personalkostnad sykefravær (102000 motregnet Art 1710)</td>
+              <td class="num-col">${fmtNOK(net_fc)}</td>
+              <td class="num-col">${fmtNOK(net_bud)}</td>
+              <td class="num-col ${netClass}">${fmtNOK(net_var, true)}</td>
+            </tr>`;
+            }
+
             return `
             <tr>
               <td>${escapeHtml(row.sektor_navn)}</td>
@@ -6753,7 +6795,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
               <td class="num-col">${fmtNOK(row.eoy_forecast_nok)}</td>
               <td class="num-col">${fmtNOK(row.annual_budget_nok)}</td>
               <td class="num-col rag-red">${fmtNOK(row.eoy_variance_nok, true)}</td>
-            </tr>`;
+            </tr>` + extraSubrows;
           }).join("")
         : '<tr><td colspan="6">Ingen kontoer har forventet merforbruk i valgt utvalg.</td></tr>';
 

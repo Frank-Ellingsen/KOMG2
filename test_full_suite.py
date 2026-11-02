@@ -339,6 +339,8 @@ def run_all_tests():
             const dekningsgrad = document.getElementById("min-sal-dekningsgrad-pct")?.textContent || "";
             const driversText = document.getElementById("min-drivers-body")?.innerText || "";
             const hasArt1710Badge = document.querySelector("#min-drivers-body .badge") !== null;
+            const hasArt1710Subrow = document.querySelector("#min-drivers-body tr.driver-subrow-art1710") !== null;
+            const hasNettoSubrow = document.querySelector("#min-drivers-body tr.driver-subrow-netto") !== null;
             return {
                 panelVisible: panel && getComputedStyle(panel).display !== "none",
                 brutto,
@@ -348,6 +350,8 @@ def run_all_tests():
                 fravarsvikar,
                 dekningsgrad,
                 hasArt1710Badge,
+                hasArt1710Subrow,
+                hasNettoSubrow,
                 driversText
             };
         }''')
@@ -361,6 +365,8 @@ def run_all_tests():
         record_test("Kostnadsdriver-tabell har merknad eller badge for motregning mot art 1710",
                     sal_refund_info["hasArt1710Badge"] or "102000" in sal_refund_info["driversText"],
                     f"Badge: {sal_refund_info['hasArt1710Badge']}")
+        record_test("Art 1710 er postet direkte under 102000 med motpost NAV refusjon", bool(sal_refund_info["hasArt1710Subrow"]))
+        record_test("Netto fraværsbelastning etter Art 1710 er beregnet i tabellen", bool(sal_refund_info["hasNettoSubrow"]))
 
         # Test fanevelger
         tabs = page.query_selector_all(".min-tab-btn")
