@@ -1154,6 +1154,9 @@
       <button type="button" class="nav-btn" data-target="view-grants">
         <span>🏛️</span> <span>Søknader &amp; Tilskudd</span>
       </button>
+      <button type="button" class="nav-btn" data-target="view-budget">
+        <span>💼</span> <span>Budsjettmodul (Lønn &amp; Rammer)</span>
+      </button>
       <button type="button" class="nav-btn" data-target="view-guide">
         <span>📖</span> <span>Brukerveiledning &amp; Metodikk</span>
       </button>
@@ -2667,6 +2670,403 @@
           <p style="font-size:0.79rem; color:var(--text-secondary); line-height:1.45;">
             Ubrukte øremerkede tilskudd overføres obligatorisk til <strong>bundne driftsfond (art 930 / funksjon 840)</strong> ved årsoppgjør. Dette forhindrer at flerårige tilskudd forvrenger kommunens <em>korrigerte netto driftsresultat</em> (hovedindikator for sunn økonomistyring). Samlet bundet driftsfondsavsetning for 2024 er estimert til <strong>2 470 000 kr</strong>.
           </p>
+        </div>
+      </section>
+
+      <section id="view-budget" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="Budsjettmodul for Lønn og Stillinger">
+        <div class="section-bar">
+          <span>11. Budsjettmodul for Personalkostnader &amp; Lønn (KOSTRA Art 1010–1099, 1270, 1710)</span>
+          <span>Fastlønn • Fraværsdekning • Lønnsoppgjør KS (5,2 %) • Årsverk (FTE) • Sosiale Kostnader (KLP &amp; AGA)</span>
+        </div>
+
+        <!-- 6 KPI-kort for Lønn & Bemanning -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Vedtatt Lønnsramme (År 2024)</span>
+            <span class="kpi-value col-budget">315 738 884 kr</span>
+            <span class="kpi-sub">Brutto personalkostnader før NAV-refusjon</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Bokført Lønn YTD (M01–M08)</span>
+            <span class="kpi-value col-regnskap">140 074 468 kr</span>
+            <span class="kpi-sub">Ordinær fastlønn, vikarer, overtid og tillegg</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Forventet Årsavvik Lønn (EAC)</span>
+            <span class="kpi-value" style="color:var(--clr-err-text);">+24 374 815 kr</span>
+            <span class="kpi-sub">Forventet brutto merforbruk før refusjoner</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Bemanningsramme (Årsverk / FTE)</span>
+            <span class="kpi-value">328,0 planlagt</span>
+            <span class="kpi-sub">319,5 besatte årsverk • 8,5 vakanser (2,6 %)</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Sosiale Kostnader (KLP &amp; AGA)</span>
+            <span class="kpi-value">78 286 992 kr</span>
+            <span class="kpi-sub">KLP Pensjon 14,8 % + Arbeidsgiveravgift 14,1 %</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">NAV Sykelønnsrefusjoner (Art 1710)</span>
+            <span class="kpi-value" style="color:var(--clr-ok-text);">-10 341 130 kr</span>
+            <span class="kpi-sub">Bokført YTD mot periodisert -3 223 731 kr</span>
+          </div>
+        </div>
+
+        <!-- Detaljert Lønns- og Stillingsbudsjett per Art / Gruppe -->
+        <div class="panel" style="margin-bottom:1rem;">
+          <div class="panel-title">
+            <h3 style="font-size:0.92rem; font-weight:700; color:var(--text-primary);">
+              📋 Lønnsbudsjett per KOSTRA-art &amp; Avviksanalyse (Tall i hele NOK)
+            </h3>
+            <span class="panel-subtitle">Hoveddrivere: Vikarbruk ved sykefravær, overtid og lønnsoppgjøret KS 2024</span>
+          </div>
+          <div class="table-wrapper">
+            <table class="tufte-table" style="font-size:0.77rem;">
+              <thead>
+                <tr>
+                  <th>Lønnsart / Kontogruppe</th>
+                  <th>KOSTRA Art</th>
+                  <th class="num-col col-budget">Budsjett 2024</th>
+                  <th class="num-col col-regnskap">Regnskap YTD (M08)</th>
+                  <th class="num-col">Fullårs EAC</th>
+                  <th class="num-col">Avvik År (NOK)</th>
+                  <th class="num-col">Avvik %</th>
+                  <th>Status &amp; Driver</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Fastlønn ordinære stillinger</th>
+                  <td>Art 1010</td>
+                  <td class="num-col col-budget">233 062 968</td>
+                  <td class="num-col col-regnskap">95 087 904</td>
+                  <td class="num-col">252 800 011</td>
+                  <td class="num-col rag-red">+19 737 043</td>
+                  <td class="num-col rag-red">+8,5 %</td>
+                  <td><span class="rag-badge rag-red">KS-oppgjør 5,2 % + ansiennitet</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">Vikarlønn ved fravær &amp; sykdom</th>
+                  <td>Art 1020</td>
+                  <td class="num-col col-budget">11 491 584</td>
+                  <td class="num-col col-regnskap">8 430 708</td>
+                  <td class="num-col">21 396 331</td>
+                  <td class="num-col rag-red">+9 904 747</td>
+                  <td class="num-col rag-red">+86,2 %</td>
+                  <td><span class="rag-badge rag-red">Høyt sykefravær i pleie &amp; skole</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">Overtidslønn &amp; ekstravakter (Gat)</th>
+                  <td>Art 1040</td>
+                  <td class="num-col col-budget">906 048</td>
+                  <td class="num-col col-regnskap">2 406 818</td>
+                  <td class="num-col">6 382 121</td>
+                  <td class="num-col rag-red">+5 476 073</td>
+                  <td class="num-col rag-red">+604,4 %</td>
+                  <td><span class="rag-badge rag-red">AML-bruddrisiko &amp; vakansdekning</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">Ekstrahjelp &amp; midlertidig ansatte</th>
+                  <td>Art 1030</td>
+                  <td class="num-col col-budget">480 000</td>
+                  <td class="num-col col-regnskap">1 572 649</td>
+                  <td class="num-col">3 921 059</td>
+                  <td class="num-col rag-red">+3 441 059</td>
+                  <td class="num-col rag-red">+716,9 %</td>
+                  <td><span class="rag-badge rag-red">Sommer- og ferieavlastning</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">Variable turnustillegg (helg/natt/helligdag)</th>
+                  <td>Art 1050</td>
+                  <td class="num-col col-budget">167 904</td>
+                  <td class="num-col col-regnskap">456 999</td>
+                  <td class="num-col">1 023 954</td>
+                  <td class="num-col rag-amber">+856 050</td>
+                  <td class="num-col rag-amber">+509,8 %</td>
+                  <td><span class="rag-badge rag-amber">Turnusavtaler jf. HTA kap. 1 § 5</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">Kjøp av vikarbyråtjenester (innleie)</th>
+                  <td>Art 1270</td>
+                  <td class="num-col col-budget">0</td>
+                  <td class="num-col col-regnskap">512 136</td>
+                  <td class="num-col">795 950</td>
+                  <td class="num-col rag-red">+795 950</td>
+                  <td class="num-col rag-red">—</td>
+                  <td><span class="rag-badge rag-red">Sykepleiermangel natt (Omsorg A)</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">Pensjonspremie KLP fellesordning</th>
+                  <td>Art 1090</td>
+                  <td class="num-col col-budget">43 621 188</td>
+                  <td class="num-col col-regnskap">17 105 485</td>
+                  <td class="num-col">42 650 943</td>
+                  <td class="num-col rag-green">-970 245</td>
+                  <td class="num-col rag-green">-2,2 %</td>
+                  <td><span class="rag-badge rag-green">Reguleringspremie lavere enn anslått</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">Arbeidsgiveravgift (Sone 1, 14,1 %)</th>
+                  <td>Art 1099</td>
+                  <td class="num-col col-budget">34 665 804</td>
+                  <td class="num-col col-regnskap">14 399 520</td>
+                  <td class="num-col">37 804 681</td>
+                  <td class="num-col rag-red">+3 138 877</td>
+                  <td class="num-col rag-red">+9,1 %</td>
+                  <td><span class="rag-badge rag-red">Følger lønnsmasseøkning</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">Refusjoner for sykepenger &amp; foreldrepenger</th>
+                  <td>Art 1710</td>
+                  <td class="num-col col-budget" style="color:var(--clr-ok-text);">-8 596 620</td>
+                  <td class="num-col col-regnskap" style="color:var(--clr-ok-text);">-10 341 130</td>
+                  <td class="num-col" style="color:var(--clr-ok-text);">-26 390 140</td>
+                  <td class="num-col rag-green">-17 793 520</td>
+                  <td class="num-col rag-green">-207,0 %</td>
+                  <td><span class="rag-badge rag-green">Høyere innbetaling fra NAV enn budsjettert</span></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr style="border-top:2px solid var(--border-light); font-weight:700;">
+                  <th scope="row" colspan="2">Netto Lønns- og Personalkostnader (Inkl. Refusjoner)</th>
+                  <td class="num-col col-budget">315 738 884</td>
+                  <td class="num-col col-regnskap">129 733 338</td>
+                  <td class="num-col">322 321 000</td>
+                  <td class="num-col rag-amber">+6 582 116</td>
+                  <td class="num-col rag-amber">+2,1 %</td>
+                  <td><span class="rag-badge rag-amber">🟡 Netto Merforbruk 6,58 MNOK</span></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2-kolonner: Bemanningsrammer & Stillingskontroll + Interaktiv Simulator -->
+        <div class="two-col" style="grid-template-columns: 1.15fr 0.85fr; margin-bottom:1rem;">
+          <!-- Stillingskontroll per Ansvarssted -->
+          <div class="panel">
+            <h3 style="font-size:0.9rem; font-weight:700; color:var(--text-primary); margin-bottom:0.4rem;">
+              👥 Bemanningsrammer &amp; Årsverkskontroll (9 Ansvarsenheter)
+            </h3>
+            <p style="font-size:0.77rem; color:var(--text-secondary); margin-bottom:0.5rem;">
+              Oversikt over vedtatte stillingshjemler vs. besatte årsverk og gjennomsnittlig lønnsnivå.
+            </p>
+            <div class="table-wrapper">
+              <table class="tufte-table" style="font-size:0.75rem;">
+                <thead>
+                  <tr>
+                    <th>Ansvarssted</th>
+                    <th>Sektor</th>
+                    <th class="num-col">Vedtatt FTE</th>
+                    <th class="num-col">Besatt FTE</th>
+                    <th class="num-col">Vakans FTE</th>
+                    <th class="num-col col-budget">Snittlønn FTE</th>
+                    <th class="num-col col-regnskap">Lønn YTD</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="salary-fte-table-body">
+                  <tr>
+                    <th scope="row">20210 - Grunnskole A</th>
+                    <td>Oppvekst</td>
+                    <td class="num-col">54,0</td>
+                    <td class="num-col">52,5</td>
+                    <td class="num-col rag-green">1,5</td>
+                    <td class="num-col col-budget">642 000</td>
+                    <td class="num-col col-regnskap">5 499 740</td>
+                    <td><span class="rag-badge rag-amber">🟡 Vikarpress</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">20220 - Grunnskole B</th>
+                    <td>Oppvekst</td>
+                    <td class="num-col">48,0</td>
+                    <td class="num-col">47,0</td>
+                    <td class="num-col rag-green">1,0</td>
+                    <td class="num-col col-budget">638 000</td>
+                    <td class="num-col col-regnskap">4 920 820</td>
+                    <td><span class="rag-badge rag-amber">🟡 Vikarpress</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">20230 - Grunnskole C</th>
+                    <td>Oppvekst</td>
+                    <td class="num-col">38,0</td>
+                    <td class="num-col">37,0</td>
+                    <td class="num-col rag-green">1,0</td>
+                    <td class="num-col col-budget">635 000</td>
+                    <td class="num-col col-regnskap">4 052 440</td>
+                    <td><span class="rag-badge rag-green">🟢 I rute</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">21310 - Voksenopplæring</th>
+                    <td>Oppvekst</td>
+                    <td class="num-col">8,0</td>
+                    <td class="num-col">8,0</td>
+                    <td class="num-col">0,0</td>
+                    <td class="num-col col-budget">613 700</td>
+                    <td class="num-col col-regnskap">490 960</td>
+                    <td><span class="rag-badge rag-green">🟢 I rute</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">22110 - PPT og veiledning</th>
+                    <td>Oppvekst</td>
+                    <td class="num-col">12,0</td>
+                    <td class="num-col">11,0</td>
+                    <td class="num-col rag-green">1,0</td>
+                    <td class="num-col col-budget">677 500</td>
+                    <td class="num-col col-regnskap">983 000</td>
+                    <td><span class="rag-badge rag-amber">🟡 Merforbruk</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">25310 - Omsorgssenter A</th>
+                    <td>Helse</td>
+                    <td class="num-col">48,0</td>
+                    <td class="num-col">46,0</td>
+                    <td class="num-col rag-red">2,0</td>
+                    <td class="num-col col-budget">595 000</td>
+                    <td class="num-col col-regnskap">3 534 398</td>
+                    <td><span class="rag-badge rag-red">🔴 Overtid/vikar</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">25320 - Omsorgssenter B</th>
+                    <td>Helse</td>
+                    <td class="num-col">36,0</td>
+                    <td class="num-col">35,0</td>
+                    <td class="num-col rag-green">1,0</td>
+                    <td class="num-col col-budget">592 000</td>
+                    <td class="num-col col-regnskap">2 777 027</td>
+                    <td><span class="rag-badge rag-red">🔴 Vikarbruk</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">25710 - Hjemmetjeneste Nord</th>
+                    <td>Helse</td>
+                    <td class="num-col">42,0</td>
+                    <td class="num-col">41,5</td>
+                    <td class="num-col rag-green">0,5</td>
+                    <td class="num-col col-budget">588 000</td>
+                    <td class="num-col col-regnskap">3 155 713</td>
+                    <td><span class="rag-badge rag-red">🔴 Overtid</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">25720 - Hjemmetjeneste Sør</th>
+                    <td>Helse</td>
+                    <td class="num-col">42,0</td>
+                    <td class="num-col">41,5</td>
+                    <td class="num-col rag-green">0,5</td>
+                    <td class="num-col col-budget">588 000</td>
+                    <td class="num-col col-regnskap">3 155 713</td>
+                    <td><span class="rag-badge rag-red">🔴 Overtid</span></td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr style="font-weight:700;">
+                    <th scope="row">Sum Kommunale Stillinger</th>
+                    <td>Alle</td>
+                    <td class="num-col">328,0</td>
+                    <td class="num-col">319,5</td>
+                    <td class="num-col rag-green">8,5</td>
+                    <td class="num-col col-budget">618 500</td>
+                    <td class="num-col col-regnskap">28 570 711</td>
+                    <td><span class="rag-badge rag-amber">8,5 Vakanser</span></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Interaktiv Lønnssimulator -->
+          <div class="panel">
+            <h3 style="font-size:0.9rem; font-weight:700; color:var(--text-primary); margin-bottom:0.4rem;">
+              🎛️ Lønns- &amp; Tariffoppgjørssimulator (What-If)
+            </h3>
+            <p style="font-size:0.77rem; color:var(--text-secondary); margin-bottom:0.65rem;">
+              Simuler helårseffekten av lønnsoppgjøret (KS-ramme), vikardekningsgrad og vakanssparing.
+            </p>
+
+            <div style="display:grid; gap:0.6rem; font-size:0.77rem;">
+              <div class="field-group">
+                <div style="display:flex; justify-content:space-between;">
+                  <label for="salary-sim-ks">KS Tariffoppgjør 2024 (% ramme fra 01.05):</label>
+                  <span id="salary-val-ks" style="font-weight:700;">5,2 %</span>
+                </div>
+                <input type="range" id="salary-sim-ks" min="3.0" max="7.0" step="0.1" value="5.2" style="width:100%;" />
+              </div>
+
+              <div class="field-group">
+                <div style="display:flex; justify-content:space-between;">
+                  <label for="salary-sim-vikar">Vikardekningsgrad ved sykefravær (%):</label>
+                  <span id="salary-val-vikar" style="font-weight:700;">80 %</span>
+                </div>
+                <input type="range" id="salary-sim-vikar" min="40" max="100" step="5" value="80" style="width:100%;" />
+              </div>
+
+              <div class="field-group">
+                <div style="display:flex; justify-content:space-between;">
+                  <label for="salary-sim-vakans">Vakanssparing / Utsettelse av nyansettelser:</label>
+                  <span id="salary-val-vakans" style="font-weight:700;">1,5 mnd</span>
+                </div>
+                <input type="range" id="salary-sim-vakans" min="0" max="4.0" step="0.5" value="1.5" style="width:100%;" />
+              </div>
+
+              <div class="field-group">
+                <div style="display:flex; justify-content:space-between;">
+                  <label for="salary-sim-klp">KLP Pensjonspremiesats (%):</label>
+                  <span id="salary-val-klp" style="font-weight:700;">14,8 %</span>
+                </div>
+                <input type="range" id="salary-sim-klp" min="12.0" max="18.0" step="0.2" value="14.8" style="width:100%;" />
+              </div>
+            </div>
+
+            <!-- Simulerte resultater -->
+            <div style="background:var(--bg-subtle); border:1px solid var(--border-light); border-radius:4px; padding:0.65rem; margin-top:0.75rem; font-size:0.76rem;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+                <span>Årsvirkning av lønnsoppgjøret (KS):</span>
+                <strong id="salary-res-ks" class="col-regnskap">+8 072 000 kr</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+                <span>Beregnet vikarinnsparing (4 mnd rest):</span>
+                <strong id="salary-res-vikar" class="rag-green">-840 000 kr</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+                <span>Beregnet vakansinnsparing (8,5 FTE):</span>
+                <strong id="salary-res-vakans" class="rag-green">-657 000 kr</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+                <span>Sosiale kostnader (KLP + AGA 14,1 %):</span>
+                <strong id="salary-res-sosial">82 140 000 kr</strong>
+              </div>
+              <div style="border-top:1px solid var(--border-light); padding-top:0.35rem; margin-top:0.35rem; display:flex; justify-content:space-between; font-weight:700;">
+                <span>Simulert Netto EOY Lønnsavvik:</span>
+                <strong id="salary-res-netto" class="rag-amber">+5 085 000 kr</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Faglig notat om Lønnsstyring & Retningslinjer -->
+        <div class="panel">
+          <h3 style="font-size:0.9rem; font-weight:700; color:var(--text-primary); margin-bottom:0.35rem;">
+            ⚖️ Kommuneloven § 13-1 &amp; Økonomireglement: Styringsrett ved Lønnsavvik
+          </h3>
+          <div style="font-size:0.77rem; color:var(--text-secondary); line-height:1.45; display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div>
+              <strong style="color:var(--text-primary);">Administrative strakstiltak (Enhetsleders fullmakt):</strong>
+              <ul style="padding-inline-start:1.1rem; margin-top:0.25rem; display:grid; gap:0.2rem;">
+                <li>Stopp i overtid og mertid som ikke er akutt lovpålagt jf. AML § 10-6.</li>
+                <li>Inndragning av vakanser og utsettelse av nyansettelser (vakanssparing).</li>
+                <li>Omfordeling av oppgaver og vaktplaner i Gat uten ekstern innleie.</li>
+                <li>Rask og nøyaktig registrering av fravær for å sikre rettidig sykelønnsrefusjon fra NAV.</li>
+              </ul>
+            </div>
+            <div>
+              <strong style="color:var(--text-primary);">Politiske vedtak (Krever Bystyresak jf. § 14-4):</strong>
+              <ul style="padding-inline-start:1.1rem; margin-top:0.25rem; display:grid; gap:0.2rem;">
+                <li>Permanent endring av bemanningsplan eller opprettelse av nye stillingshjemler.</li>
+                <li>Tilleggsbevilgning for tariffavvik som overskrider den sentrale lønnsreserven.</li>
+                <li>Bruk av disposisjonsfond til dekning av lønnsrelaterte driftsunderskudd.</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -4942,6 +5342,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
           minAns.value = curAnsvar;
         }
         refreshMonthlyReport();
+    updateSalaryBudgetSimulator();
 
         // Kjør re-render av alle dynamiske analyser og grafer
         renderAllDynamicReports();
@@ -5943,6 +6344,55 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         if (btn) btn.textContent = "🛡️ Kjør Data Quality Validering nå";
         alert("🛡️ Data Quality validering fullført med 0,00 kr differanse.");
       });
+    });
+
+
+    // =========================================================================
+    // 16. BUDSJETTMODUL: LØNNSSIMULATOR (KS, VIKARER, VAKANSER, KLP)
+    // =========================================================================
+    function updateSalaryBudgetSimulator() {
+      const ksEl = document.getElementById("salary-sim-ks");
+      const vikarEl = document.getElementById("salary-sim-vikar");
+      const vakansEl = document.getElementById("salary-sim-vakans");
+      const klpEl = document.getElementById("salary-sim-klp");
+      if (!ksEl || !vikarEl || !vakansEl || !klpEl) return;
+
+      const ksPct = parseFloat(ksEl.value) || 5.2;
+      const vikarPct = parseFloat(vikarEl.value) || 80;
+      const vakansMnd = parseFloat(vakansEl.value) || 1.5;
+      const klpPct = parseFloat(klpEl.value) || 14.8;
+
+      document.getElementById("salary-val-ks").textContent = `${ksPct.toFixed(1).replace(".", ",")} %`;
+      document.getElementById("salary-val-vikar").textContent = `${vikarPct} %`;
+      document.getElementById("salary-val-vakans").textContent = `${vakansMnd.toFixed(1).replace(".", ",")} mnd`;
+      document.getElementById("salary-val-klp").textContent = `${klpPct.toFixed(1).replace(".", ",")} %`;
+
+      const baseFastlonn = 233062968;
+      const ksVirkning = Math.round(baseFastlonn * (ksPct / 100.0) * (8 / 12));
+      const vikarRest4M = 4200000;
+      const vikarSaving = Math.round(vikarRest4M * (1.0 - vikarPct / 100.0));
+      const snittLonnMnd = 618500 / 12;
+      const vakansSaving = Math.round(8.5 * snittLonnMnd * Math.min(4, vakansMnd));
+      const totalSosialPct = klpPct + 14.1;
+      const totalLonnSim = baseFastlonn + ksVirkning;
+      const totalSosial = Math.round(totalLonnSim * (totalSosialPct / 100.0));
+      const ksDiff = ksVirkning - Math.round(baseFastlonn * 0.052 * (8 / 12));
+      const netVariance = 6582116 + ksDiff - vikarSaving - vakansSaving;
+
+      document.getElementById("salary-res-ks").textContent = `${ksVirkning >= 0 ? "+" : ""}${fmtNum(ksVirkning)} kr`;
+      document.getElementById("salary-res-vikar").textContent = `-${fmtNum(vikarSaving)} kr`;
+      document.getElementById("salary-res-vakans").textContent = `-${fmtNum(vakansSaving)} kr`;
+      document.getElementById("salary-res-sosial").textContent = `${fmtNum(totalSosial)} kr`;
+
+      const nettoEl = document.getElementById("salary-res-netto");
+      if (nettoEl) {
+        nettoEl.textContent = `${netVariance >= 0 ? "+" : ""}${fmtNum(netVariance)} kr`;
+        nettoEl.className = netVariance > 10000000 ? "rag-red" : (netVariance > 0 ? "rag-amber" : "rag-green");
+      }
+    }
+
+    ["salary-sim-ks", "salary-sim-vikar", "salary-sim-vakans", "salary-sim-klp"].forEach(id => {
+      document.getElementById(id)?.addEventListener("input", updateSalaryBudgetSimulator);
     });
 
   </script>
