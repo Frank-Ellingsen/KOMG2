@@ -346,6 +346,56 @@ def run_all_tests():
                     "bestillingsnotat" in doc_preview_enhet.lower() or "avviksforklaring" in doc_preview_enhet.lower() or "NOT-2026" in doc_preview_enhet)
 
         # -------------------------------------------------------------
+        # TEST 7B: Faktura, Selvkost & Ad hoc Utleie og Lønn
+        # -------------------------------------------------------------
+        print("\n--- TESTBLOKK 7B: Faktura, Selvkost & Ad hoc Utleie og Lønn ---")
+        page.click('.nav-btn[data-target="view-invoicing"]')
+        page.wait_for_timeout(150)
+
+        # 1. Test Selvkost dropdown med ekstern utleie
+        page.select_option("#sk-omraade", "SKOLE_UTLEIE")
+        page.wait_for_timeout(100)
+        tag_utleie = page.inner_text("#sk-hjemmel-tag")
+        rental_rate = page.inner_text("#adhoc-calc-rental-rate")
+        record_test("Selvkostområde Skole Utleie setter korrekt tag", "Ad hoc Ekstern Utleie" in tag_utleie, f"Tag: {tag_utleie}")
+        record_test("Ad hoc utleie beregner 480,00 kr/t for gymsal", "480,00 kr/t" in rental_rate, f"Sats: {rental_rate}")
+
+        # 2. Test generering av ekstern utleiefaktura (Art 1650)
+        page.click("#btn-create-adhoc-rental-invoice")
+        page.wait_for_timeout(100)
+        receipt_rental = page.inner_text("#adhoc-receipt-container")
+        record_test("Ad hoc ekstern faktura genereres med Art 1650 og KID", 
+                    "Art 1650" in receipt_rental and "KID" in receipt_rental, 
+                    f"Kvittering: {receipt_rental}")
+
+        # 3. Test Selvkost dropdown med intern selvkost lønn
+        page.select_option("#sk-omraade", "SKOLE_INTERN_LONN")
+        page.wait_for_timeout(100)
+        tag_intern = page.inner_text("#sk-hjemmel-tag")
+        salary_rate = page.inner_text("#adhoc-calc-hourly-rate")
+        salary_tot = page.inner_text("#adhoc-calc-total-salary")
+        record_test("Selvkostområde Skole Intern Lønn setter korrekt tag", "Ad hoc Intern Selvkost" in tag_intern, f"Tag: {tag_intern}")
+        record_test("Ad hoc intern lønn beregner 538,46 kr/t", "538,46 kr/t" in salary_rate, f"Sats: {salary_rate}")
+        record_test("Ad hoc intern lønn beregner 13 462 kr for 25 timer", "13 462 kr" in salary_tot, f"Total: {salary_tot}")
+
+        # 4. Test bokføring av internordre (Art 780/380 eliminering)
+        page.click("#btn-create-adhoc-salary-order")
+        page.wait_for_timeout(100)
+        receipt_salary = page.inner_text("#adhoc-receipt-container")
+        record_test("Ad hoc internordre bokføres med full eliminering jf. GKRS",
+                    "Internordre" in receipt_salary and "Full eliminering" in receipt_salary,
+                    f"Kvittering: {receipt_salary}")
+
+        elim_table_text = page.inner_text("#tbody-internal-eliminations")
+        record_test("Internordren er lagt til i eliminasjonstabellen med Art 780/380",
+                    "780000" in elim_table_text and "380000" in elim_table_text,
+                    f"Eliminasjonstabell: {elim_table_text[:120]}...")
+
+        # Sett selvkost tilbake til VA
+        page.select_option("#sk-omraade", "VA")
+        page.wait_for_timeout(100)
+
+        # -------------------------------------------------------------
         # TEST 8: Modul 12: Min Økonomi & Månedsrapport (Inkl. Tufte Sparklines)
         # -------------------------------------------------------------
         print("\n--- TESTBLOKK 8: Min Økonomi & Predefinerte Rapporter (Inkl. Sparkline) ---")

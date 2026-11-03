@@ -3105,7 +3105,7 @@
                 <th>Konsolideringsstatus</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="tbody-internal-eliminations">
               <tr>
                 <td>Byggservice &amp; Teknisk Drift</td>
                 <td>Art 780000 Intern salgsinntekt</td>
@@ -3142,31 +3142,41 @@
           <p style="font-size:0.79rem; color:var(--text-secondary); margin-bottom:0.75rem;">
             Formel: <code>Gebyrkrav = Direkte Drift + Indirekte Støtte + Avskrivninger + Kalkulatorisk Rente (5-år Swap + 0,5 %)</code>. 5-års utjevning i selvkostfond.
           </p>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:0.75rem; margin-bottom:0.85rem;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:0.75rem; margin-bottom:0.75rem;">
             <div class="field-group">
-              <label for="sk-omraade">Selvkostområde:</label>
-              <select id="sk-omraade" style="width:100%; padding:0.32rem;">
-                <option value="VA">Vann og Avløp (Funksjon 340/345)</option>
-                <option value="RENOVASJON">Renovasjon &amp; Avfall (Funksjon 350)</option>
-                <option value="BYGGESAK">Byggesaksbehandling (pbl § 33-1, Fn 301)</option>
-                <option value="OPPMALING">Oppmåling &amp; Kart (matrikkelloven § 32)</option>
+              <label for="sk-omraade">Selvkostområde &amp; Tjenestetype:</label>
+              <select id="sk-omraade" style="width:100%; padding:0.32rem; font-size:0.8rem; border:1px solid var(--border-light); border-radius:3px;">
+                <optgroup label="Lovregulerte Gebyrområder (FOR-2019-12-11-1738)">
+                  <option value="VA" selected>💧 Vann og Avløp (Funksjon 340/345)</option>
+                  <option value="RENOVASJON">♻️ Renovasjon &amp; Avfall (Funksjon 350)</option>
+                  <option value="BYGGESAK">🏗️ Byggesaksbehandling (pbl § 33-1, Fn 301)</option>
+                  <option value="OPPMALING">📐 Oppmåling &amp; Kart (matrikkelloven § 32, Fn 320)</option>
+                  <option value="FEIING">🔥 Feiing &amp; Branntilsyn (brannloven § 28, Fn 338)</option>
+                </optgroup>
+                <optgroup label="Ad hoc Selvkost &amp; Fakturering (Skole &amp; Helse og Omsorg)">
+                  <option value="SKOLE_UTLEIE">🏫 Skole &amp; Oppvekst – Ekstern utleie lokaler/gymsal (Art 1650, Fn 202/385)</option>
+                  <option value="HELSE_UTLEIE">🏥 Helse og Omsorg – Ekstern utleie lokaler/dagsenter (Art 1650, Fn 253/254)</option>
+                  <option value="SKOLE_INTERN_LONN">🧑‍🏫 Oppvekst &amp; Skole – Internfakturert selvkost lønn &amp; undervisning (Art 780/380, Fn 202/214)</option>
+                  <option value="HELSE_INTERN_LONN">🩺 Helse og Omsorg – Internfakturert selvkost personell &amp; fagstøtte (Art 780/380, Fn 254/261)</option>
+                  <option value="EIENDOM_INTERN_DRIFT">🏢 Eiendom &amp; Drift – Internfakturert vaktmester &amp; renhold (Art 780/380, Fn 120/130)</option>
+                </optgroup>
               </select>
             </div>
             <div class="field-group">
               <label for="sk-direkte">Direkte Driftsutgifter (kr):</label>
-              <input type="number" id="sk-direkte" value="12500000" step="100000" style="width:100%; padding:0.3rem;" />
+              <input type="number" id="sk-direkte" value="12500000" step="50000" style="width:100%; padding:0.3rem;" />
             </div>
             <div class="field-group">
               <label for="sk-indirekte">Indirekte Støttefunksjoner (kr):</label>
-              <input type="number" id="sk-indirekte" value="1450000" step="50000" style="width:100%; padding:0.3rem;" />
+              <input type="number" id="sk-indirekte" value="1450000" step="25000" style="width:100%; padding:0.3rem;" />
             </div>
             <div class="field-group">
               <label for="sk-avskriv">Avskrivninger Anleggsmidler (kr):</label>
-              <input type="number" id="sk-avskriv" value="3200000" step="100000" style="width:100%; padding:0.3rem;" />
+              <input type="number" id="sk-avskriv" value="3200000" step="50000" style="width:100%; padding:0.3rem;" />
             </div>
             <div class="field-group">
               <label for="sk-kapitalbase">Kapitalbase for renteberegning (kr):</label>
-              <input type="number" id="sk-kapitalbase" value="68000000" step="1000000" style="width:100%; padding:0.3rem;" />
+              <input type="number" id="sk-kapitalbase" value="68000000" step="500000" style="width:100%; padding:0.3rem;" />
             </div>
             <div class="field-group">
               <label for="sk-swaprente">Kalkulatorisk Rente (Swap 3,75% + 0,5%):</label>
@@ -3174,12 +3184,18 @@
             </div>
             <div class="field-group">
               <label for="sk-gebyrinntekt">Budsjettert Gebyrinntekt (kr):</label>
-              <input type="number" id="sk-gebyrinntekt" value="19800000" step="100000" style="width:100%; padding:0.3rem;" />
+              <input type="number" id="sk-gebyrinntekt" value="19800000" step="50000" style="width:100%; padding:0.3rem;" />
             </div>
             <div class="field-group">
               <label for="sk-ibfond">Inngående Balanse Selvkostfond (kr):</label>
-              <input type="number" id="sk-ibfond" value="-850000" step="50000" style="width:100%; padding:0.3rem;" />
+              <input type="number" id="sk-ibfond" value="-850000" step="25000" style="width:100%; padding:0.3rem;" />
             </div>
+          </div>
+
+          <!-- Dynamisk Hjemmels- og Regnskapsnotat -->
+          <div id="sk-hjemmel-box" style="margin-bottom:0.75rem; padding:0.45rem 0.65rem; background:var(--bg-subtle, rgba(0,0,0,0.02)); border-left:3px solid var(--accent, #2563EB); font-size:0.76rem; color:var(--text-secondary); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem;">
+            <span id="sk-hjemmel-text">📜 <strong>Hjemmel &amp; Beregningsprinsipp:</strong> Forskrift om selvkost § 3–§ 8 (Vass- og avløpsanleggslova § 3). Maks 100 % selvkost og 5-års fondsavsetning.</span>
+            <span id="sk-hjemmel-tag" class="rag-badge rag-green" style="font-size:0.7rem;">Lovregulert Gebyr</span>
           </div>
 
           <!-- Resultat Selvkost -->
@@ -3203,6 +3219,183 @@
               <span class="kpi-label">Utgående Balanse Selvkostfond</span>
               <span class="kpi-value" id="sk-val-ubfond" style="font-size:1.05rem;">-1 090 000 kr</span>
               <span class="kpi-sub" id="sk-sub-status">🟢 Innefor 5-årsregelen</span>
+            </div>
+          </div>
+
+          <!-- ===================================================================
+               AD HOC FAKTURERINGSKALKULATOR (SKOLE & HELSE OG OMSORG)
+               =================================================================== -->
+          <div id="adhoc-invoice-container" style="margin-top:1.1rem; padding-top:0.9rem; border-top:1px solid var(--border-light);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.65rem;">
+              <div>
+                <h4 style="font-size:0.88rem; font-weight:700; color:var(--text-primary); margin:0 0 0.15rem 0;">
+                  ⚡ Ad hoc Faktureringskalkulator: Timepris Lønn &amp; Lokalleie (Skole &amp; Helse og Omsorg)
+                </h4>
+                <p style="font-size:0.77rem; color:var(--text-secondary); margin:0;">
+                  Beregner nøyaktig selvkost for internfakturert personell/undervisning (Art 780/380) og ekstern utleie av kommunale lokaler (Art 1650) jf. forskrift om selvkost og GKRS.
+                </p>
+              </div>
+              <div style="display:flex; gap:0.35rem;" role="tablist">
+                <button type="button" id="adhoc-tab-btn-salary" class="slicer-chip active" style="padding:0.24rem 0.65rem; font-size:0.75rem;">
+                  🧑‍🏫 Intern Selvkost Lønn (Art 780/380)
+                </button>
+                <button type="button" id="adhoc-tab-btn-rental" class="slicer-chip" style="padding:0.24rem 0.65rem; font-size:0.75rem;">
+                  🏫 Ekstern Lokalleie (Art 1650)
+                </button>
+              </div>
+            </div>
+
+            <!-- FANE 1: Intern Selvkost Lønn & Undervisning (Art 780/380) -->
+            <div id="adhoc-salary-panel" style="display:block;">
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:0.65rem; margin-bottom:0.75rem;">
+                <div class="field-group">
+                  <label for="adhoc-salary-profile" style="font-size:0.76rem; font-weight:600;">Stillingstype / Tjeneste:</label>
+                  <select id="adhoc-salary-profile" style="width:100%; padding:0.28rem; font-size:0.78rem;">
+                    <option value="skole_spesped">🏫 Skole: Spesialpedagog / Lærer (Undervisning / Leksehjelp)</option>
+                    <option value="skole_musikk">🏫 Skole / Kultur: Musikk-/Kulturskolelærer (Kurs / Prosjekt)</option>
+                    <option value="helse_sykepleier">🩺 Helse: Spesialsykepleier / Vernepleier (Fagveiledning / Pleie)</option>
+                    <option value="helse_fysio">🩺 Helse: Fysio- / Ergoterapeut (Kartlegging / Ergonomi)</option>
+                    <option value="helse_helsefagarb">🩺 Helse: Helsefagarbeider / Miljøarbeider (Tilsyn / Avlastning)</option>
+                    <option value="teknisk_vaktmester">🏢 Teknisk / Drift: Vaktmester / Tilsynsvakt</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label for="adhoc-seller-unit" style="font-size:0.76rem; font-weight:600;">Leverende enhet (Krediteres Art 780):</label>
+                  <select id="adhoc-seller-unit" style="width:100%; padding:0.28rem; font-size:0.78rem;">
+                    <option value="2020">2020 – Grunnskoleopplæring (Skole)</option>
+                    <option value="2140">2140 – Skolefritidstilbud (SFO)</option>
+                    <option value="25310">25310 – Omsorgssenter / Sykehjem A (Helse)</option>
+                    <option value="25710">25710 – Hjemmetjenesten Sone Nord (Helse)</option>
+                    <option value="11200">11200 – IT og Digitale Tjenester</option>
+                    <option value="13010">13010 – Byggservice og Teknisk Drift</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label for="adhoc-buyer-unit" style="font-size:0.76rem; font-weight:600;">Mottakende enhet (Debiteres Art 380):</label>
+                  <select id="adhoc-buyer-unit" style="width:100%; padding:0.28rem; font-size:0.78rem;">
+                    <option value="2140">2140 – Skolefritidstilbud (SFO)</option>
+                    <option value="2020">2020 – Grunnskoleopplæring (Skole)</option>
+                    <option value="25720">25720 – Hjemmetjenesten Sone Sør (Helse)</option>
+                    <option value="25320">25320 – Omsorgssenter / Sykehjem B (Helse)</option>
+                    <option value="26110">26110 – Felleskjøkken og Catering</option>
+                    <option value="11100">11100 – Kommunedirektør &amp; Fellesadm.</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label for="adhoc-salary-hours" style="font-size:0.76rem; font-weight:600;">Levert antall timer:</label>
+                  <input type="number" id="adhoc-salary-hours" value="25" min="1" max="500" step="1" style="width:100%; padding:0.28rem; font-size:0.78rem;" />
+                </div>
+              </div>
+
+              <!-- Selvkostkalkyle spesifikasjon (Tufte Clean) -->
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:0.5rem; margin-bottom:0.75rem; padding:0.6rem 0.75rem; background:var(--bg-surface, #ffffff); border:1px solid var(--border-light); border-radius:3px;">
+                <div>
+                  <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Grunnlønn pr. time:</div>
+                  <div id="adhoc-calc-direct-rate" style="font-size:0.92rem; font-weight:700; color:var(--text-primary);">375,76 kr/t</div>
+                  <div style="font-size:0.7rem; color:var(--text-secondary);">Årslønn: <span id="adhoc-calc-annual">620 000 kr</span> (1650 t)</div>
+                </div>
+                <div>
+                  <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Sosiale kostnader:</div>
+                  <div id="adhoc-calc-social-rate" style="font-size:0.92rem; font-weight:700; color:var(--text-primary);">+95,07 kr/t</div>
+                  <div id="adhoc-calc-social-sub" style="font-size:0.7rem; color:var(--text-secondary);">SPK (11,2 %) + AGA (14,1 %)</div>
+                </div>
+                <div>
+                  <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Indirekte overhead:</div>
+                  <div id="adhoc-calc-overhead-rate" style="font-size:0.92rem; font-weight:700; color:var(--text-primary);">+67,64 kr/t</div>
+                  <div id="adhoc-calc-overhead-sub" style="font-size:0.7rem; color:var(--text-secondary);">18,0 % ledelse &amp; støtte</div>
+                </div>
+                <div>
+                  <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Selvkost Timesats:</div>
+                  <div id="adhoc-calc-hourly-rate" style="font-size:1.05rem; font-weight:800; color:var(--accent, #2563EB);">538,47 kr/t</div>
+                  <div style="font-size:0.7rem; color:var(--clr-ok-text, #16A34A);">100,0 % selvkost (GKRS)</div>
+                </div>
+                <div style="background:var(--bg-subtle, #F8FAFC); padding:0.4rem; border-radius:3px;">
+                  <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Totalt Internbeløp:</div>
+                  <div id="adhoc-calc-total-salary" style="font-size:1.1rem; font-weight:800; color:var(--text-primary);">13 462 kr</div>
+                  <div style="font-size:0.7rem; color:var(--text-secondary);"><span id="adhoc-calc-hours-disp">25</span> timer levert</div>
+                </div>
+              </div>
+
+              <!-- Action Bar & Eliminering -->
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                <div style="font-size:0.75rem; color:var(--text-secondary);">
+                  ℹ️ <strong>Bokføring:</strong> Kjøper debiteres <strong>Art 380</strong> | Selger krediteres <strong>Art 780</strong>. Elimineres 100 % på kommunenivå (Netto 0 kr).
+                </div>
+                <button type="button" id="btn-create-adhoc-salary-order" class="btn btn-primary" style="padding:0.32rem 0.75rem; font-size:0.78rem; font-weight:600; display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer;">
+                  <span>➕ Bokfør Internordre (Art 780/380)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- FANE 2: Ekstern Lokalleie (Art 1650) -->
+            <div id="adhoc-rental-panel" style="display:none;">
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:0.65rem; margin-bottom:0.75rem;">
+                <div class="field-group">
+                  <label for="adhoc-rental-profile" style="font-size:0.76rem; font-weight:600;">Lokale / Byggtype:</label>
+                  <select id="adhoc-rental-profile" style="width:100%; padding:0.28rem; font-size:0.78rem;">
+                    <option value="skole_gymsal">🏫 Skole: Gymsal / Idrettshall kveldstid</option>
+                    <option value="skole_auditorium">🏫 Skole: Auditorium / Klasserom / Musikkrom</option>
+                    <option value="helse_dagsenter">🏥 Helse: Dagsenter / Møterom / Kafeteria</option>
+                    <option value="helse_terapirom">🏥 Helse: Behandlingsrom / Treningssal</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label for="adhoc-rental-unit" style="font-size:0.76rem; font-weight:600;">Utleieenhet (Krediteres Art 1650):</label>
+                  <select id="adhoc-rental-unit" style="width:100%; padding:0.28rem; font-size:0.78rem;">
+                    <option value="2020">2020 – Grunnskoleopplæring (Skolelokaler)</option>
+                    <option value="25310">25310 – Omsorgssenter / Sykehjem A (Lokaler)</option>
+                    <option value="25320">25320 – Omsorgssenter / Sykehjem B (Lokaler)</option>
+                    <option value="13010">13010 – Byggservice og Teknisk Drift</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label for="adhoc-rental-customer" style="font-size:0.76rem; font-weight:600;">Ekstern Leietaker / Organisasjon:</label>
+                  <input type="text" id="adhoc-rental-customer" value="Mandal Idrettslag (Allidrett)" style="width:100%; padding:0.28rem; font-size:0.78rem;" />
+                </div>
+                <div class="field-group">
+                  <label for="adhoc-rental-hours" style="font-size:0.76rem; font-weight:600;">Antall leietimer / kvelder:</label>
+                  <input type="number" id="adhoc-rental-hours" value="18" min="1" max="500" step="1" style="width:100%; padding:0.28rem; font-size:0.78rem;" />
+                </div>
+              </div>
+
+              <!-- Selvkostleie spesifikasjon -->
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:0.5rem; margin-bottom:0.75rem; padding:0.6rem 0.75rem; background:var(--bg-surface, #ffffff); border:1px solid var(--border-light); border-radius:3px;">
+                <div>
+                  <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Direkte FDV &amp; Tilsyn:</div>
+                  <div id="adhoc-calc-rental-fdv" style="font-size:0.92rem; font-weight:700; color:var(--text-primary);">320,00 kr/t</div>
+                  <div style="font-size:0.7rem; color:var(--text-secondary);">Renhold, strøm, vakt</div>
+                </div>
+                <div>
+                  <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Kapitaldel (Avskrivning/Rente):</div>
+                  <div id="adhoc-calc-rental-cap" style="font-size:0.92rem; font-weight:700; color:var(--text-primary);">+160,00 kr/t</div>
+                  <div style="font-size:0.7rem; color:var(--text-secondary);">Kalk. rente (Swap + 0,5%)</div>
+                </div>
+                <div>
+                  <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Selvkost Leiesats:</div>
+                  <div id="adhoc-calc-rental-rate" style="font-size:1.05rem; font-weight:800; color:var(--accent, #2563EB);">480,00 kr/t</div>
+                  <div style="font-size:0.7rem; color:var(--text-secondary);">Mval. § 3-11 unntatt mva</div>
+                </div>
+                <div style="background:var(--bg-subtle, #F8FAFC); padding:0.4rem; border-radius:3px;">
+                  <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;">Totalt Leiebeløp:</div>
+                  <div id="adhoc-calc-total-rental" style="font-size:1.1rem; font-weight:800; color:var(--text-primary);">8 640 kr</div>
+                  <div style="font-size:0.7rem; color:var(--text-secondary);"><span id="adhoc-calc-rental-hours-disp">18</span> timer &bull; Art 1650</div>
+                </div>
+              </div>
+
+              <!-- Action Bar & EHF Faktura -->
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                <div style="font-size:0.75rem; color:var(--text-secondary);">
+                  ℹ️ <strong>Fakturering:</strong> Postes på <strong>Art 1650 (Husleieinntekter)</strong>. EHF 3.0 Peppol BIS med Modulus 10 KID. Unntatt mva jf. mval. § 3-11.
+                </div>
+                <button type="button" id="btn-create-adhoc-rental-invoice" class="btn btn-primary" style="padding:0.32rem 0.75rem; font-size:0.78rem; font-weight:600; display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer;">
+                  <span>📄 Generer Ekstern Faktura (Art 1650)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Kvitterings / Logg-område for nyopprettede Ad hoc fakturaer -->
+            <div id="adhoc-receipt-container" style="display:none; margin-top:0.75rem; padding:0.55rem 0.75rem; background:#F0FDF4; border:1px solid #86EFAC; border-radius:4px; font-size:0.77rem; color:#14532D;">
+              <!-- Dynamically populated receipt -->
             </div>
           </div>
         </div>
@@ -6640,8 +6833,266 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     }
 
     // =========================================================================
-    // 10. SELVKOST ENGINE (MODULE 9)
+    // 10. SELVKOST ENGINE & AD HOC FAKTURERING (MODULE 9)
     // =========================================================================
+    const SELVKOST_PRESETS = {
+      VA: {
+        direkte: 12500000,
+        indirekte: 1450000,
+        avskriv: 3200000,
+        kapitalbase: 68000000,
+        swaprente: 4.25,
+        gebyrinntekt: 19800000,
+        ibfond: -850000,
+        hjemmel: "Forskrift om selvkost § 3–§ 8 (Vass- og avløpsanleggslova § 3). Maks 100 % selvkost og 5-års fondsavsetning.",
+        tag: "Lovregulert Gebyr",
+        tagClass: "rag-green",
+        adhocMode: null
+      },
+      RENOVASJON: {
+        direkte: 8900000,
+        indirekte: 920000,
+        avskriv: 850000,
+        kapitalbase: 14500000,
+        swaprente: 4.25,
+        gebyrinntekt: 11250000,
+        ibfond: 420000,
+        hjemmel: "Forskrift om selvkost § 3–§ 8 (Forurensningsloven § 34). Avfallsgebyr skal dekke fulle kostnader.",
+        tag: "Lovregulert Gebyr",
+        tagClass: "rag-green",
+        adhocMode: null
+      },
+      BYGGESAK: {
+        direkte: 4800000,
+        indirekte: 780000,
+        avskriv: 120000,
+        kapitalbase: 1800000,
+        swaprente: 4.25,
+        gebyrinntekt: 5650000,
+        ibfond: -150000,
+        hjemmel: "Plan- og bygningsloven § 33-1 & Forskrift om selvkost. Gebyrregulativ for byggesak.",
+        tag: "Lovregulert Gebyr",
+        tagClass: "rag-green",
+        adhocMode: null
+      },
+      OPPMALING: {
+        direkte: 2950000,
+        indirekte: 430000,
+        avskriv: 160000,
+        kapitalbase: 2200000,
+        swaprente: 4.25,
+        gebyrinntekt: 3580000,
+        ibfond: 60000,
+        hjemmel: "Matrikkelloven § 32 & Forskrift om selvkost. Gebyrer for oppmålingsforretning.",
+        tag: "Lovregulert Gebyr",
+        tagClass: "rag-green",
+        adhocMode: null
+      },
+      FEIING: {
+        direkte: 1850000,
+        indirekte: 210000,
+        avskriv: 85000,
+        kapitalbase: 1100000,
+        swaprente: 4.25,
+        gebyrinntekt: 2190000,
+        ibfond: -45000,
+        hjemmel: "Brann- og eksplosjonsvernloven § 28. Feiing og tilsyn med fyringsanlegg.",
+        tag: "Lovregulert Gebyr",
+        tagClass: "rag-green",
+        adhocMode: null
+      },
+      SKOLE_UTLEIE: {
+        direkte: 450000,
+        indirekte: 65000,
+        avskriv: 180000,
+        kapitalbase: 4200000,
+        swaprente: 4.25,
+        gebyrinntekt: 873500,
+        ibfond: 0,
+        hjemmel: "Ad hoc ekstern lokalleie (Skole/Idrett): Mval. § 3-11 unntak (fast eiendom) • Kostnadsdekning for vakt/renhold/slitasje • Krediteres Art 1650",
+        tag: "Ad hoc Ekstern Utleie",
+        tagClass: "rag-blue",
+        adhocMode: "rental",
+        rentalProfile: "skole_gymsal"
+      },
+      HELSE_UTLEIE: {
+        direkte: 280000,
+        indirekte: 45000,
+        avskriv: 95000,
+        kapitalbase: 2100000,
+        swaprente: 4.25,
+        gebyrinntekt: 509250,
+        ibfond: 0,
+        hjemmel: "Ad hoc ekstern lokalleie (Helse/Dagsenter): Mval. § 3-11 unntak • Krediteres Art 1650 Husleieinntekter",
+        tag: "Ad hoc Ekstern Utleie",
+        tagClass: "rag-blue",
+        adhocMode: "rental",
+        rentalProfile: "helse_dagsenter"
+      },
+      SKOLE_INTERN_LONN: {
+        direkte: 1250000,
+        indirekte: 185000,
+        avskriv: 15000,
+        kapitalbase: 300000,
+        swaprente: 4.25,
+        gebyrinntekt: 1462750,
+        ibfond: 0,
+        hjemmel: "Ad hoc intern selvkost lønn & undervisning: Art 780 Salg / Art 380 Kjøp • Full eliminering i konsolidert regnskap • SPK/AGA/Overhead",
+        tag: "Ad hoc Intern Selvkost",
+        tagClass: "rag-amber",
+        adhocMode: "salary",
+        salaryProfile: "skole_spesped"
+      },
+      HELSE_INTERN_LONN: {
+        direkte: 1580000,
+        indirekte: 235000,
+        avskriv: 25000,
+        kapitalbase: 450000,
+        swaprente: 4.25,
+        gebyrinntekt: 1859125,
+        ibfond: 0,
+        hjemmel: "Ad hoc intern selvkost pleie, personell & fagstøtte: Art 780 Salg / Art 380 Kjøp • KLP 14,8 % + AGA 14,1 % + adm. overhead",
+        tag: "Ad hoc Intern Selvkost",
+        tagClass: "rag-amber",
+        adhocMode: "salary",
+        salaryProfile: "helse_sykepleier"
+      },
+      EIENDOM_INTERN_DRIFT: {
+        direkte: 890000,
+        indirekte: 120000,
+        avskriv: 65000,
+        kapitalbase: 800000,
+        swaprente: 4.25,
+        gebyrinntekt: 1109000,
+        ibfond: 0,
+        hjemmel: "Ad hoc intern drift (vaktmester, renhold, arrangementstilsyn): Art 780/380 • Full kostnadsdekning",
+        tag: "Ad hoc Intern Selvkost",
+        tagClass: "rag-amber",
+        adhocMode: "salary",
+        salaryProfile: "teknisk_vaktmester"
+      }
+    };
+
+    const ADHOC_SALARY_PROFILES = {
+      skole_spesped: {
+        title: "Spesialpedagog / Lærer (Oppvekst & Skole)",
+        annualSalary: 620000,
+        pensionRate: 0.112,
+        pensionName: "SPK (11,2 %)",
+        agaRate: 0.141,
+        overheadPct: 0.18,
+        overheadName: "18,0 % ledelse & IT-støtte",
+        defaultHours: 25,
+        defaultSeller: "2020",
+        defaultBuyer: "2140",
+        taskName: "Spesialpedagogisk undervisning & leksehjelp"
+      },
+      skole_musikk: {
+        title: "Musikk-/Kulturskolelærer (Kurs / Prosjekt)",
+        annualSalary: 575000,
+        pensionRate: 0.112,
+        pensionName: "SPK (11,2 %)",
+        agaRate: 0.141,
+        overheadPct: 0.16,
+        overheadName: "16,0 % instrument & drift",
+        defaultHours: 20,
+        defaultSeller: "2020",
+        defaultBuyer: "25310",
+        taskName: "Musikk- og kulturundervisning"
+      },
+      helse_sykepleier: {
+        title: "Spesialsykepleier / Vernepleier (Helse og Omsorg)",
+        annualSalary: 615000,
+        pensionRate: 0.148,
+        pensionName: "KLP (14,8 %)",
+        agaRate: 0.141,
+        overheadPct: 0.20,
+        overheadName: "20,0 % fagledelse & smittevern",
+        defaultHours: 30,
+        defaultSeller: "25310",
+        defaultBuyer: "25710",
+        taskName: "Spesialsykepleiefaglig oppfølging og veiledning"
+      },
+      helse_fysio: {
+        title: "Fysio- / Ergoterapeut (Kartlegging / Ergonomi)",
+        annualSalary: 575000,
+        pensionRate: 0.148,
+        pensionName: "KLP (14,8 %)",
+        agaRate: 0.141,
+        overheadPct: 0.18,
+        overheadName: "18,0 % utstyr & administrasjon",
+        defaultHours: 15,
+        defaultSeller: "25710",
+        defaultBuyer: "2020",
+        taskName: "Ergonomisk elevkartlegging og tilrettelegging"
+      },
+      helse_helsefagarb: {
+        title: "Helsefagarbeider / Miljøarbeider (Tilsyn / Avlastning)",
+        annualSalary: 495000,
+        pensionRate: 0.148,
+        pensionName: "KLP (14,8 %)",
+        agaRate: 0.141,
+        overheadPct: 0.16,
+        overheadName: "16,0 % driftsstøtte",
+        defaultHours: 35,
+        defaultSeller: "25320",
+        defaultBuyer: "25720",
+        taskName: "Miljøarbeid og avlastningstilsyn"
+      },
+      teknisk_vaktmester: {
+        title: "Vaktmester / Byggdrifter (Arrangementstilsyn)",
+        annualSalary: 460000,
+        pensionRate: 0.148,
+        pensionName: "KLP (14,8 %)",
+        agaRate: 0.141,
+        overheadPct: 0.15,
+        overheadName: "15,0 % verktøy & ledelse",
+        defaultHours: 20,
+        defaultSeller: "13010",
+        defaultBuyer: "2020",
+        taskName: "Kvelds- og arrangementstilsyn lokaler"
+      }
+    };
+
+    const ADHOC_RENTAL_PROFILES = {
+      skole_gymsal: {
+        title: "Skole: Gymsal / Idrettshall kveldstid",
+        directRate: 320,
+        capRate: 160,
+        defaultHours: 18,
+        defaultSeller: "2020",
+        defaultCustomer: "Mandal Idrettslag (Allidrett)",
+        facilityName: "Mandal Skole Gymsal & Garderober"
+      },
+      skole_auditorium: {
+        title: "Skole: Auditorium / Klasserom / Musikkrom",
+        directRate: 210,
+        capRate: 90,
+        defaultHours: 12,
+        defaultSeller: "2020",
+        defaultCustomer: "Mandal Vise- og Sangkor",
+        facilityName: "Skole Auditorium & Musikkrom"
+      },
+      helse_dagsenter: {
+        title: "Helse: Dagsenter / Møterom / Kafeteria",
+        directRate: 240,
+        capRate: 110,
+        defaultHours: 10,
+        defaultSeller: "25310",
+        defaultCustomer: "Røde Kors Besøksvenn Mandal",
+        facilityName: "Omsorgssenter A Dagsentersal"
+      },
+      helse_terapirom: {
+        title: "Helse: Behandlingsrom / Treningssal",
+        directRate: 270,
+        capRate: 130,
+        defaultHours: 8,
+        defaultSeller: "25320",
+        defaultCustomer: "Rehabiliteringsforeningen Agder",
+        facilityName: "Omsorgssenter B Treningssal"
+      }
+    };
+
     function updateSelvkostCalc() {
       const direkte = parseFloat(document.getElementById("sk-direkte")?.value) || 0;
       const indirekte = parseFloat(document.getElementById("sk-indirekte")?.value) || 0;
@@ -6670,6 +7121,281 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         elRes.style.color = aarsres >= 0 ? "var(--clr-ok-text)" : "var(--clr-warn-text)";
       }
       if (document.getElementById("sk-val-ubfond")) document.getElementById("sk-val-ubfond").textContent = `${fmtNum(ubFond)} kr`;
+    }
+
+    function onSelvkostOmraadeChange() {
+      const selEl = document.getElementById("sk-omraade");
+      if (!selEl) return;
+      const val = selEl.value;
+      const preset = SELVKOST_PRESETS[val];
+      if (!preset) return;
+
+      const setVal = (id, v) => {
+        const el = document.getElementById(id);
+        if (el) el.value = v;
+      };
+
+      setVal("sk-direkte", preset.direkte);
+      setVal("sk-indirekte", preset.indirekte);
+      setVal("sk-avskriv", preset.avskriv);
+      setVal("sk-kapitalbase", preset.kapitalbase);
+      setVal("sk-swaprente", preset.swaprente);
+      setVal("sk-gebyrinntekt", preset.gebyrinntekt);
+      setVal("sk-ibfond", preset.ibfond);
+
+      const hjemmelText = document.getElementById("sk-hjemmel-text");
+      const hjemmelTag = document.getElementById("sk-hjemmel-tag");
+      if (hjemmelText) hjemmelText.innerHTML = `📜 <strong>Hjemmel &amp; Beregningsprinsipp:</strong> ${preset.hjemmel}`;
+      if (hjemmelTag) {
+        hjemmelTag.textContent = preset.tag;
+        hjemmelTag.className = `rag-badge ${preset.tagClass}`;
+      }
+
+      updateSelvkostCalc();
+
+      if (preset.adhocMode === "salary") {
+        switchAdhocTab("salary");
+        if (preset.salaryProfile) {
+          const profSel = document.getElementById("adhoc-salary-profile");
+          if (profSel) {
+            profSel.value = preset.salaryProfile;
+            const p = ADHOC_SALARY_PROFILES[preset.salaryProfile];
+            if (p) {
+              const sellSel = document.getElementById("adhoc-seller-unit");
+              const buySel = document.getElementById("adhoc-buyer-unit");
+              if (sellSel) sellSel.value = p.defaultSeller;
+              if (buySel) buySel.value = p.defaultBuyer;
+            }
+            updateAdhocSalaryCalc();
+          }
+        }
+      } else if (preset.adhocMode === "rental") {
+        switchAdhocTab("rental");
+        if (preset.rentalProfile) {
+          const rentSel = document.getElementById("adhoc-rental-profile");
+          if (rentSel) {
+            rentSel.value = preset.rentalProfile;
+            const rp = ADHOC_RENTAL_PROFILES[preset.rentalProfile];
+            if (rp) {
+              const sellSel = document.getElementById("adhoc-rental-unit");
+              const custInp = document.getElementById("adhoc-rental-customer");
+              if (sellSel) sellSel.value = rp.defaultSeller;
+              if (custInp) custInp.value = rp.defaultCustomer;
+            }
+            updateAdhocRentalCalc();
+          }
+        }
+      }
+    }
+
+    function switchAdhocTab(tab) {
+      const btnSalary = document.getElementById("adhoc-tab-btn-salary");
+      const btnRental = document.getElementById("adhoc-tab-btn-rental");
+      const pnlSalary = document.getElementById("adhoc-salary-panel");
+      const pnlRental = document.getElementById("adhoc-rental-panel");
+
+      if (tab === "salary") {
+        btnSalary?.classList.add("active");
+        btnRental?.classList.remove("active");
+        if (pnlSalary) pnlSalary.style.display = "block";
+        if (pnlRental) pnlRental.style.display = "none";
+        updateAdhocSalaryCalc();
+      } else {
+        btnRental?.classList.add("active");
+        btnSalary?.classList.remove("active");
+        if (pnlRental) pnlRental.style.display = "block";
+        if (pnlSalary) pnlSalary.style.display = "none";
+        updateAdhocRentalCalc();
+      }
+    }
+
+    function updateAdhocSalaryCalc() {
+      const profKey = document.getElementById("adhoc-salary-profile")?.value || "skole_spesped";
+      const prof = ADHOC_SALARY_PROFILES[profKey] || ADHOC_SALARY_PROFILES.skole_spesped;
+      const hours = parseFloat(document.getElementById("adhoc-salary-hours")?.value) || 25;
+
+      const productiveHours = 1650;
+      const directRate = prof.annualSalary / productiveHours;
+      const socialRate = (prof.annualSalary * (prof.pensionRate + prof.agaRate)) / productiveHours;
+      const overheadRate = (prof.annualSalary * prof.overheadPct) / productiveHours;
+      const hourlyRate = directRate + socialRate + overheadRate;
+      const totalAmount = Math.round(hourlyRate * hours);
+
+      if (document.getElementById("adhoc-calc-direct-rate")) {
+        document.getElementById("adhoc-calc-direct-rate").textContent = `${directRate.toFixed(2).replace(".", ",")} kr/t`;
+      }
+      if (document.getElementById("adhoc-calc-annual")) {
+        document.getElementById("adhoc-calc-annual").textContent = `${fmtNum(prof.annualSalary)} kr`;
+      }
+      if (document.getElementById("adhoc-calc-social-rate")) {
+        document.getElementById("adhoc-calc-social-rate").textContent = `+${socialRate.toFixed(2).replace(".", ",")} kr/t`;
+      }
+      if (document.getElementById("adhoc-calc-social-sub")) {
+        document.getElementById("adhoc-calc-social-sub").textContent = `${prof.pensionName} + AGA (14,1 %)`;
+      }
+      if (document.getElementById("adhoc-calc-overhead-rate")) {
+        document.getElementById("adhoc-calc-overhead-rate").textContent = `+${overheadRate.toFixed(2).replace(".", ",")} kr/t`;
+      }
+      if (document.getElementById("adhoc-calc-overhead-sub")) {
+        document.getElementById("adhoc-calc-overhead-sub").textContent = prof.overheadName;
+      }
+      if (document.getElementById("adhoc-calc-hourly-rate")) {
+        document.getElementById("adhoc-calc-hourly-rate").textContent = `${hourlyRate.toFixed(2).replace(".", ",")} kr/t`;
+      }
+      if (document.getElementById("adhoc-calc-total-salary")) {
+        document.getElementById("adhoc-calc-total-salary").textContent = `${fmtNum(totalAmount)} kr`;
+      }
+      if (document.getElementById("adhoc-calc-hours-disp")) {
+        document.getElementById("adhoc-calc-hours-disp").textContent = `${hours}`;
+      }
+    }
+
+    function updateAdhocRentalCalc() {
+      const profKey = document.getElementById("adhoc-rental-profile")?.value || "skole_gymsal";
+      const prof = ADHOC_RENTAL_PROFILES[profKey] || ADHOC_RENTAL_PROFILES.skole_gymsal;
+      const hours = parseFloat(document.getElementById("adhoc-rental-hours")?.value) || 18;
+
+      const hourlyRate = prof.directRate + prof.capRate;
+      const totalAmount = Math.round(hourlyRate * hours);
+
+      if (document.getElementById("adhoc-calc-rental-fdv")) {
+        document.getElementById("adhoc-calc-rental-fdv").textContent = `${prof.directRate.toFixed(2).replace(".", ",")} kr/t`;
+      }
+      if (document.getElementById("adhoc-calc-rental-cap")) {
+        document.getElementById("adhoc-calc-rental-cap").textContent = `+${prof.capRate.toFixed(2).replace(".", ",")} kr/t`;
+      }
+      if (document.getElementById("adhoc-calc-rental-rate")) {
+        document.getElementById("adhoc-calc-rental-rate").textContent = `${hourlyRate.toFixed(2).replace(".", ",")} kr/t`;
+      }
+      if (document.getElementById("adhoc-calc-total-rental")) {
+        document.getElementById("adhoc-calc-total-rental").textContent = `${fmtNum(totalAmount)} kr`;
+      }
+      if (document.getElementById("adhoc-calc-rental-hours-disp")) {
+        document.getElementById("adhoc-calc-rental-hours-disp").textContent = `${hours}`;
+      }
+    }
+
+    function createAdhocSalaryOrder() {
+      const profKey = document.getElementById("adhoc-salary-profile")?.value || "skole_spesped";
+      const prof = ADHOC_SALARY_PROFILES[profKey] || ADHOC_SALARY_PROFILES.skole_spesped;
+      const hours = parseFloat(document.getElementById("adhoc-salary-hours")?.value) || 25;
+      const seller = document.getElementById("adhoc-seller-unit")?.value || prof.defaultSeller;
+      const buyer = document.getElementById("adhoc-buyer-unit")?.value || prof.defaultBuyer;
+
+      const directRate = prof.annualSalary / 1650;
+      const socialRate = (prof.annualSalary * (prof.pensionRate + prof.agaRate)) / 1650;
+      const overheadRate = (prof.annualSalary * prof.overheadPct) / 1650;
+      const hourlyRate = directRate + socialRate + overheadRate;
+      const totalAmount = Math.round(hourlyRate * hours);
+
+      const orderNo = `IO-2024-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      // Append new row to internal elimination table
+      const tbody = document.getElementById("tbody-internal-eliminations");
+      if (tbody) {
+        const tr = document.createElement("tr");
+        tr.style.background = "#F0FDF4";
+        tr.innerHTML = `
+          <td><strong>${prof.taskName}</strong> <span style="font-size:0.7rem; color:var(--text-secondary);">(${hours} timer à ${hourlyRate.toFixed(0)} kr/t)</span></td>
+          <td>Art 780000 Intern salgsinntekt (${seller})</td>
+          <td>Art 380000 Intern kjøpsutgift (${buyer})</td>
+          <td>${seller} &rarr; ${buyer}</td>
+          <td class="num-col"><strong>${fmtNum(totalAmount)},00</strong></td>
+          <td><span class="rag-badge rag-green">🟢 Eliminert</span></td>
+        `;
+        tbody.prepend(tr);
+      }
+
+      // Show receipt banner
+      const receipt = document.getElementById("adhoc-receipt-container");
+      if (receipt) {
+        receipt.style.display = "block";
+        receipt.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <strong>✅ Internordre ${orderNo} er bokført og eliminert:</strong><br/>
+              • <strong>Tjeneste:</strong> ${prof.taskName} (${hours} t @ ${hourlyRate.toFixed(2).replace(".", ",")} kr/time)<br/>
+              • <strong>Beløp:</strong> <strong>${fmtNum(totalAmount)} kr</strong> debiteres ansvar ${buyer} (Art 380) og krediteres ansvar ${seller} (Art 780).<br/>
+              • <strong>Konsolideringsstatus:</strong> Full eliminering på kommunenivå (Netto 0 kr) jf. GKRS &amp; KOSTRA.
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('adhoc-receipt-container').style.display='none'" style="padding:0.2rem 0.5rem; font-size:0.72rem; cursor:pointer;">Lukk</button>
+          </div>
+        `;
+      }
+    }
+
+    function createAdhocRentalInvoice() {
+      const profKey = document.getElementById("adhoc-rental-profile")?.value || "skole_gymsal";
+      const prof = ADHOC_RENTAL_PROFILES[profKey] || ADHOC_RENTAL_PROFILES.skole_gymsal;
+      const hours = parseFloat(document.getElementById("adhoc-rental-hours")?.value) || 18;
+      const seller = document.getElementById("adhoc-rental-unit")?.value || prof.defaultSeller;
+      const customer = document.getElementById("adhoc-rental-customer")?.value || prof.defaultCustomer;
+
+      const hourlyRate = prof.directRate + prof.capRate;
+      const totalAmount = Math.round(hourlyRate * hours);
+      const invNo = `FAK-2024-${Math.floor(1000 + Math.random() * 9000)}`;
+      const kid = `${seller}${Math.floor(100000 + Math.random() * 900000)}`;
+
+      // Show receipt banner
+      const receipt = document.getElementById("adhoc-receipt-container");
+      if (receipt) {
+        receipt.style.display = "block";
+        receipt.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <strong>✅ Ekstern Faktura ${invNo} generert til ${customer}:</strong><br/>
+              • <strong>Leieforhold:</strong> ${prof.title} (${hours} t @ ${hourlyRate.toFixed(2).replace(".", ",")} kr/time)<br/>
+              • <strong>Fakturabeløp:</strong> <strong>${fmtNum(totalAmount)} kr</strong> inntektsføres på Ansvar ${seller} (Art 1650 / Konto 165000 Husleieinntekter).<br/>
+              • <strong>Format &amp; KID:</strong> EHF 3.0 Peppol BIS • KID: <code>${kid}</code> (Modulus 10) • Forfall: 14 dager.<br/>
+              • <strong>MVA:</strong> 0 % MVA jf. merverdiavgiftsloven § 3-11 (utleie av fast eiendom).
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('adhoc-receipt-container').style.display='none'" style="padding:0.2rem 0.5rem; font-size:0.72rem; cursor:pointer;">Lukk</button>
+          </div>
+        `;
+      }
+    }
+
+    function initAdhocInvoicing() {
+      const omraadeSel = document.getElementById("sk-omraade");
+      if (omraadeSel) {
+        omraadeSel.addEventListener("change", onSelvkostOmraadeChange);
+      }
+
+      document.getElementById("adhoc-tab-btn-salary")?.addEventListener("click", () => switchAdhocTab("salary"));
+      document.getElementById("adhoc-tab-btn-rental")?.addEventListener("click", () => switchAdhocTab("rental"));
+
+      document.getElementById("adhoc-salary-profile")?.addEventListener("change", (e) => {
+        const p = ADHOC_SALARY_PROFILES[e.target.value];
+        if (p) {
+          const sellSel = document.getElementById("adhoc-seller-unit");
+          const buySel = document.getElementById("adhoc-buyer-unit");
+          if (sellSel) sellSel.value = p.defaultSeller;
+          if (buySel) buySel.value = p.defaultBuyer;
+        }
+        updateAdhocSalaryCalc();
+      });
+
+      document.getElementById("adhoc-salary-hours")?.addEventListener("input", updateAdhocSalaryCalc);
+
+      document.getElementById("adhoc-rental-profile")?.addEventListener("change", (e) => {
+        const rp = ADHOC_RENTAL_PROFILES[e.target.value];
+        if (rp) {
+          const sellSel = document.getElementById("adhoc-rental-unit");
+          const custInp = document.getElementById("adhoc-rental-customer");
+          if (sellSel) sellSel.value = rp.defaultSeller;
+          if (custInp) custInp.value = rp.defaultCustomer;
+        }
+        updateAdhocRentalCalc();
+      });
+
+      document.getElementById("adhoc-rental-hours")?.addEventListener("input", updateAdhocRentalCalc);
+
+      document.getElementById("btn-create-adhoc-salary-order")?.addEventListener("click", createAdhocSalaryOrder);
+      document.getElementById("btn-create-adhoc-rental-invoice")?.addEventListener("click", createAdhocRentalInvoice);
+
+      // Initial calculations
+      updateAdhocSalaryCalc();
+      updateAdhocRentalCalc();
     }
 
     // =========================================================================
@@ -8444,11 +9170,12 @@ function renderFavorableBarChart(report) {
       });
     }
 
-    // Selvkost Inputs (Module 9)
+    // Selvkost & Ad hoc Fakturering Inputs (Module 9)
     ["sk-direkte", "sk-indirekte", "sk-avskriv", "sk-kapitalbase", "sk-swaprente", "sk-gebyrinntekt", "sk-ibfond"].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener("input", updateSelvkostCalc);
     });
+    initAdhocInvoicing();
 
     // Prompt chips
     document.querySelectorAll(".prompt-chip").forEach(chip => {
