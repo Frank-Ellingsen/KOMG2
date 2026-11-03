@@ -243,6 +243,29 @@ def run_all_tests():
         }''')
         record_test("KOSTRA artstabell har 9 kostnadsarter", art_rows == 9, f"Arter: {art_rows}")
 
+        # Sjekk at KPI-tallene er dynamisk avstemt mot regnskap og DuckDB (ikke syntetiske 161M / 71M)
+        ramme_val = page.inner_text("#budget-kpi-ramme")
+        bokfort_val = page.inner_text("#budget-kpi-bokfort")
+        eac_kpi_val = page.inner_text("#budget-kpi-eac")
+        sosial_val = page.inner_text("#budget-kpi-sosial")
+        refusjon_val = page.inner_text("#budget-kpi-refusjon")
+
+        record_test("Budsjett KPI Vedtatt Lønnsramme er dynamisk avstemt (17 612 937 kr)",
+                    "17 612 937 kr" in ramme_val and "161 719 916" not in ramme_val,
+                    f"Ramme: {ramme_val}")
+        record_test("Budsjett KPI Bokført Lønn YTD er dynamisk avstemt (13 290 606 kr)",
+                    "13 290 606 kr" in bokfort_val and "71 745 459" not in bokfort_val,
+                    f"Bokført: {bokfort_val}")
+        record_test("Budsjett KPI Forventet Årsavvik Lønn er dynamisk avstemt (+2 322 973 kr)",
+                    "+2 322 973 kr" in eac_kpi_val and "+12 484 662" not in eac_kpi_val,
+                    f"EAC: {eac_kpi_val}")
+        record_test("Budsjett KPI NAV-refusjon er dynamisk avstemt (-732 705 kr)",
+                    "-732 705 kr" in refusjon_val and "-5 296 676" not in refusjon_val,
+                    f"Refusjon: {refusjon_val}")
+        record_test("Budsjett KPI Sosiale kostnader er dynamisk avstemt (3 738 319 kr)",
+                    "3 738 319 kr" in sosial_val and "40 098 215" not in sosial_val,
+                    f"Sosial: {sosial_val}")
+
 
 
         # -------------------------------------------------------------
