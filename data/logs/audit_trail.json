@@ -268,5 +268,77 @@
     ],
     "tokens_used": 340,
     "reconciled_check_diff_nok": 0.0
+  },
+  {
+    "timestamp": "2026-11-03T15:24:17.933270+00:00",
+    "endpoint": "/api/v1/chat",
+    "user_id": "controller@kristiansand.kommune.no",
+    "query_anonymized": "Hva er styringsretten etter § 13-1 og fnr [REDACTED_FNR]?",
+    "pii_detected": true,
+    "redacted_entities": [
+      "NO_FODSELSNUMMER"
+    ],
+    "retrieved_sources": [
+      "LOV-2018-06-22-83-§13-1",
+      "GAT-FRAMSIKT-SAMarbeid-2024",
+      "LOV-2018-06-22-83-§14-6",
+      "KRISTIANSAND-OKREG-2024-§4"
+    ],
+    "tokens_used": 340,
+    "reconciled_check_diff_nok": 0.0
+  },
+  {
+    "timestamp": "2026-11-03T15:32:38.132854+00:00",
+    "endpoint": "/api/v1/chat",
+    "user_id": "controller@kristiansand.kommune.no",
+    "query_anonymized": "Hva er styringsretten etter § 13-1 og fnr [REDACTED_FNR]?",
+    "pii_detected": true,
+    "redacted_entities": [
+      "NO_FODSELSNUMMER"
+    ],
+    "retrieved_sources": [
+      "child_veileder-til-kontoplanen-i-kostra-for-2026_pdf_1",
+      "child_lov_om_kommuner_og_fylkeskommuner__kommuneloven__-_lovdata_pdf_1",
+      "LOV-2018-06-22-83-§13-1",
+      "child_kommunedirektorens-forslag-til-okonomiplan-2027-2030_pdf_1"
+    ],
+    "tokens_used": 340,
+    "reconciled_check_diff_nok": 0.0
+  },
+  {
+    "timestamp": "2026-11-03T15:33:51.870936+00:00",
+    "endpoint": "/api/v1/chat",
+    "user_id": "controller@kristiansand.kommune.no",
+    "query_anonymized": "Hva er styringsretten etter § 13-1 og fnr [REDACTED_FNR]?",
+    "pii_detected": true,
+    "redacted_entities": [
+      "NO_FODSELSNUMMER"
+    ],
+    "retrieved_sources": [
+      "child_veileder-til-kontoplanen-i-kostra-for-2026_pdf_1",
+      "child_lov_om_kommuner_og_fylkeskommuner__kommuneloven__-_lovdata_pdf_1",
+      "LOV-2018-06-22-83-§13-1",
+      "child_kommunedirektorens-forslag-til-okonomiplan-2027-2030_pdf_1"
+    ],
+    "tokens_used": 340,
+    "reconciled_check_diff_nok": 0.0
+  },
+  {
+    "timestamp": "2026-11-03T15:40:12.806119+00:00",
+    "endpoint": "/api/v1/chat",
+    "user_id": "controller@kristiansand.kommune.no",
+    "query_anonymized": "Hva er styringsretten etter § 13-1 og fnr [REDACTED_FNR]?",
+    "pii_detected": true,
+    "redacted_entities": [
+      "NO_FODSELSNUMMER"
+    ],
+    "retrieved_sources": [
+      "child_lov_om_kommuner_og_fylkeskommuner__kommuneloven__-_lovdata_pdf_1",
+      "child_lov_om_kommuner_og_fylkeskommuner__kommuneloven__-_lovdata_pdf_1",
+      "child_veileder-til-kontoplanen-i-kostra-for-2026_pdf_1",
+      "child_veileder-til-kontoplanen-i-kostra-for-2026_pdf_1"
+    ],
+    "tokens_used": 340,
+    "reconciled_check_diff_nok": 0.0
   }
 ]

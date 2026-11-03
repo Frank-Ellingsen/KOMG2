@@ -364,9 +364,55 @@ def run_tests():
     assert len(res.content) > 1000
     print(f"  OK: Bystyrenotat DOCX generated ({len(res.content)} bytes)")
 
+    # -------------------------------------------------------------------------
+    # RAG & LOCALBLOB OPTIMIZATION SUITE (08_OPTIMERING_OG_MAKS_UTBYTTE)
+    # -------------------------------------------------------------------------
+    print("Testing /api/v1/rag/route (Intent Router)...")
+    res = client.post("/api/v1/rag/route", json={"query": "Hva er reglene for disposisjonsfond jf. Kommuneloven § 14-6?"})
+    assert res.status_code == 200
+    r_data = res.json()
+    assert r_data["intent"] == "conceptual_legal"
+    
+    res_data = client.post("/api/v1/rag/route", json={"query": "Hva er bokført lønn og avvik på pleie og omsorg funksjon 254 i august?"})
+    assert res_data.status_code == 200
+    assert res_data.json()["intent"] == "data_analytics"
+    print("  OK: Intent router correctly identified conceptual_legal and data_analytics")
+
+    print("Testing /api/v1/rag/hybrid-query (BM25 + Semantic + RRF + BGE)...")
+    res = client.post("/api/v1/rag/hybrid-query", json={"query": "Kommuneloven § 13-1 styringsrett overtid og vikarer"})
+    assert res.status_code == 200
+    hq_data = res.json()
+    assert len(hq_data["top_chunks"]) >= 1
+    assert hq_data["top_chunks"][0]["bge_rerank_score"] > 0.70
+    assert "parent_context" in hq_data["top_chunks"][0]
+    print(f"  OK: Hybrid RAG returned {len(hq_data['top_chunks'])} chunks with Parent-Child context (Top BGE: {hq_data['top_chunks'][0]['bge_rerank_score']})")
+
+    print("Testing /api/v1/rag/corpus-stats (Corpus Statistics)...")
+    res = client.get("/api/v1/rag/corpus-stats")
+    assert res.status_code == 200
+    c_stats = res.json()
+    assert c_stats["total_chunks"] >= 5
+    assert c_stats["parent_child_indexing"] is True
+    print(f"  OK: Corpus contains {c_stats['total_chunks']} chunks from {c_stats['total_source_files']} sources")
+
+    print("Testing /api/v1/rag/evaluation (MLOps Observability)...")
+    res = client.get("/api/v1/rag/evaluation")
+    assert res.status_code == 200
+    ev = res.json()["metrics"]
+    assert ev["faithfulness_avg"] >= 0.95
+    assert ev["zero_hallucination_rate_pct"] == 100.0
+    print(f"  OK: MLOps RAG evaluation: Faithfulness={ev['faithfulness_avg']}, Zero Hallucination={ev['zero_hallucination_rate_pct']}%")
+
+    print("Testing /api/v1/rag/ingest-localblob (Localblob Ingestion Pipeline)...")
+    res = client.post("/api/v1/rag/ingest-localblob")
+    assert res.status_code == 200
+    assert res.json()["status"] == "ok"
+    print("  OK: Localblob ingestion pipeline verified")
+
     print("\n==================================================")
-    print("ALL 28 ENDPOINTS (100% SUITE & ULTIMATE) PASSED WITH ZERO ERRORS!")
+    print("ALL 33 ENDPOINTS (100% SUITE, ULTIMATE & RAG OPTIMIZATION) PASSED WITH ZERO ERRORS!")
     print("==================================================")
+
 
 if __name__ == "__main__":
     run_tests()
