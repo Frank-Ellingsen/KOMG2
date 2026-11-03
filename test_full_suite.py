@@ -335,6 +335,7 @@ def run_all_tests():
             const kpi = document.getElementById("min-unit-variance-kpi")?.textContent || "";
             const rows = document.querySelectorAll("#min-unit-variance-tbody tr").length;
             const rects = document.querySelectorAll("#min-unit-variance-tbody svg rect").length;
+            const bulletLines = document.querySelectorAll("#min-unit-variance-tbody svg line").length;
             const has25310 = (document.getElementById("min-unit-variance-tbody")?.innerText || "").includes("25310");
             return {
                 boxVisible: box && getComputedStyle(box).display !== "none",
@@ -342,6 +343,7 @@ def run_all_tests():
                 kpi,
                 rows,
                 rects,
+                bulletLines,
                 has25310
             };
         }''')
@@ -352,6 +354,8 @@ def run_all_tests():
         record_test("Avviksfordeling KPI viser samlet YTD avvik (+1 285 614 kr)",
                     "1 285 614" in unit_variance_info["kpi"] or "1285614" in unit_variance_info["kpi"],
                     f"KPI: {unit_variance_info['kpi']}")
+        record_test("Avviksfordeling er utformet som Bullet Graph med Budsjett-målstrek og Regnskapssøyle",
+                    unit_variance_info["rects"] == 4 and unit_variance_info["bulletLines"] >= 8)
 
         # Sjekk Lønns- og Refusjonsprofil (Brutto vs. Netto & NAV sykelønnsrefusjon)
         sal_refund_info = page.evaluate('''() => {
@@ -415,12 +419,14 @@ def run_all_tests():
             const panel = document.getElementById("min-favorable-panel");
             const svg = document.querySelector("#min-favorable-tbody svg");
             const rects = document.querySelectorAll("#min-favorable-tbody svg rect").length;
+            const bulletLines = document.querySelectorAll("#min-favorable-tbody svg line").length;
             const tableRows = document.querySelectorAll("#min-favorable-tbody tr").length;
             const kpiText = document.getElementById("min-favorable-kpi")?.textContent || "";
             return {
                 panelVisible: panel && getComputedStyle(panel).display !== "none",
                 hasSvg: !!svg,
                 rects,
+                bulletLines,
                 tableRows,
                 kpiText
             };
@@ -429,6 +435,8 @@ def run_all_tests():
         record_test("Horisontal bar chart har 5 grønne søyler for topp 5 mindreforbruk", 
                     fav_chart_info["hasSvg"] and fav_chart_info["rects"] == 5,
                     f"SVG: {fav_chart_info['hasSvg']}, Søyler: {fav_chart_info['rects']}")
+        record_test("Mindreforbruksanalyse er utformet som Bullet Graph med Budsjett-målstrek og Regnskapssøyle",
+                    fav_chart_info["rects"] == 5 and fav_chart_info["bulletLines"] >= 10)
         record_test("Mindreforbruk data-tabell har 5 rader", fav_chart_info["tableRows"] == 5, f"Rader: {fav_chart_info['tableRows']}")
 
         # Sjekk Dynamisk AI-Tiltaksplan & Omdisponering mot Årsbalanse (EOY)

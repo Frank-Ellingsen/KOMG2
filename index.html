@@ -1774,7 +1774,7 @@
                     <th class="num-col" style="width:14%;">Årsbudsjett</th>
                     <th class="num-col" style="width:14%;">Prognose</th>
                     <th class="num-col" style="width:16%;">Mindreforbruk</th>
-                    <th style="text-align:left; width:120px;" title="Horisontal avvikssøyle for mindreforbruk (Tufte)">Mindreforbrukssøyle</th>
+                    <th style="text-align:left; width:140px;" title="Bullet graf: Fylt grønn søyle = Regnskap YTD | Mørk vertikal strek = Årsbudsjett">Mindreforbrukssøyle (Bullet: Budsjett | Regnskap)</th>
                   </tr></thead>
                 <tbody id="min-favorable-tbody">
                   <!-- Fylles dynamisk fra DuckDB -->
@@ -6987,16 +6987,14 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       const totBud = unitData.reduce((acc, u) => acc + u.ytdBud, 0);
       const totPct = totBud > 0 ? (totAvvik / totBud) * 100 : 0;
       if (kpiEl) {
-        kpiEl.textContent = `Samlet YTD avvik: ${totAvvik >= 0 ? '+' : ''}${fmtNOK(totAvvik)} (${totPct >= 0 ? '+' : ''}${totPct.toFixed(1).replace(".", ",")} %) • ${unitData.length} enheter`;
+        kpiEl.innerHTML = `<span style="font-variant-numeric:tabular-nums;">Samlet YTD avvik: ${totAvvik >= 0 ? '+' : ''}${fmtNOK(totAvvik)} (${totPct >= 0 ? '+' : ''}${totPct.toFixed(1).replace(".", ",")} %) • ${unitData.length} enheter</span> <span style="font-size:0.64rem; color:var(--text-muted); font-weight:normal; margin-left:0.35rem;">(Bullet: Søyle = Regnskap | Strek = Budsjett)</span>`;
       }
 
-      const maxVal = Math.max(...unitData.map(u => Math.abs(u.ytdAvvik)), 1.0);
+      const maxVal = Math.max(...unitData.map(u => Math.max(u.ytdBud, u.ytdReg)), 1.0) * 1.06;
       const barTrackWidth = 110;
 
-      // Render Edward Tufte compliant clean table with horizontal bar column
+      // Render Edward Tufte compliant clean table with Bullet Graph (Budsjett | Regnskap)
       const rowsHtml = unitData.map(u => {
-        const valAbs = Math.abs(u.ytdAvvik);
-        const barW = Math.max(4, Math.round((valAbs / maxVal) * barTrackWidth));
         const isOverrun = u.ytdAvvik > 0;
         const isUnderrun = u.ytdAvvik < 0;
         const barColor = isOverrun ? "#D62728" : (isUnderrun ? "#16A34A" : "#94A3B8");
@@ -7007,10 +7005,19 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
         const rowHighlight = u.isSelected ? "background:rgba(37, 99, 235, 0.08); font-weight:600;" : "";
         const cleanName = u.name.replace(/^[0-9]+\s*[-–]\s*/, "");
 
+        // Bullet coordinates: Budsjett = Target line, Regnskap = Bar
+        const budX = Math.round((u.ytdBud / maxVal) * barTrackWidth);
+        const regX = Math.max(2, Math.round((u.ytdReg / maxVal) * barTrackWidth));
+
         const barSvg = `
-          <svg width="${barTrackWidth}" height="14" viewBox="0 0 ${barTrackWidth} 14" style="vertical-align:middle; display:inline-block;" aria-label="Avvik: ${avvikStr}">
-            <title>${escapeHtml(u.name)}: Avvik ${avvikStr} (${pctStr})</title>
-            <rect x="0" y="1" width="${barW}" height="12" rx="2" fill="${barColor}" opacity="${u.isSelected ? '1.0' : '0.88'}" />
+          <svg width="${barTrackWidth + 10}" height="14" viewBox="0 0 ${barTrackWidth + 10} 14" style="vertical-align:middle; display:inline-block;" aria-label="Bullet: Regnskap ${fmtNOK(u.ytdReg)} vs. Budsjett ${fmtNOK(u.ytdBud)}">
+            <title>${escapeHtml(u.name)}: Regnskap ${fmtNOK(u.ytdReg)} | Budsjett ${fmtNOK(u.ytdBud)} (Avvik ${avvikStr})</title>
+            <!-- Background Track -->
+            <line x1="0" y1="7" x2="${barTrackWidth}" y2="7" stroke="#F1F5F9" stroke-width="9" stroke-linecap="round" />
+            <!-- Spend Bar (Regnskap YTD) -->
+            <rect x="0" y="2.5" width="${regX}" height="9" rx="1.5" fill="${barColor}" opacity="${u.isSelected ? '1.0' : '0.88'}" />
+            <!-- Budget Target Line (Budsjett YTD) -->
+            <line x1="${budX}" y1="0.5" x2="${budX}" y2="13.5" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
           </svg>
         `;
 
@@ -7026,7 +7033,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
             <td class="num-col ${valClass}" style="font-size:0.71rem; font-weight:700;">
               ${avvikStr} <span style="font-size:0.65rem; font-weight:500; opacity:0.85;">(${pctStr})</span>
             </td>
-            <td style="text-align:left; padding-left:0.5rem; width:${barTrackWidth + 10}px;">${barSvg}</td>
+            <td style="text-align:left; padding-left:0.5rem; width:${barTrackWidth + 15}px;">${barSvg}</td>
           </tr>
         `;
       }).join("");
@@ -7041,7 +7048,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
                 <th class="num-col">Budsjett YTD</th>
                 <th class="num-col">Regnskap YTD</th>
                 <th class="num-col">Avvik YTD</th>
-                <th style="text-align:left; padding-left:0.5rem; width:${barTrackWidth + 10}px;" title="Horisontal avvikssøyle (Rød = Merforbruk, Grønn = Mindreforbruk)">Avvikssøyle</th>
+                <th style="text-align:left; padding-left:0.5rem; width:${barTrackWidth + 15}px;" title="Bullet graf: Fylt søyle = Regnskap YTD | Mørk vertikal strek = Budsjett YTD">Avvikssøyle (Bullet: Budsjett | Regnskap)</th>
               </tr>
             </thead>
             <tbody id="min-unit-variance-tbody">
@@ -7096,22 +7103,32 @@ function renderFavorableBarChart(report) {
 
       const sumMindreforbruk = favRows.reduce((acc, r) => acc + (r.eoy_variance_nok || 0), 0);
       if (kpiEl) {
-        kpiEl.textContent = `Samlet topp ${favRows.length} mindreforbruk: ${fmtNOK(sumMindreforbruk, true)}`;
+        kpiEl.innerHTML = `<span>Samlet topp ${favRows.length} mindreforbruk: ${fmtNOK(sumMindreforbruk, true)}</span> <span style="font-size:0.64rem; color:var(--text-muted); font-weight:normal; margin-left:0.35rem;">(Bullet: Søyle = Regnskap | Strek = Budsjett)</span>`;
       }
 
-      const maxVal = Math.max(...favRows.map(r => Math.abs(r.eoy_variance_nok || 0)), 1.0);
+      const maxVal = Math.max(...favRows.map(r => Math.max(Math.abs(r.annual_budget_nok || 0), Math.abs(r.eoy_forecast_nok || 0), Math.abs(r.ytd_actual_nok || 0), Math.abs(r.eoy_variance_nok || 0))), 1.0) * 1.06;
       const barTrackWidth = 110;
 
-      // Populate table with right-hand horizontal bar chart column (Edward Tufte data-ink standard)
+      // Populate table with right-hand Bullet Graph column (Budsjett | Regnskap)
       tbody.innerHTML = favRows.map(r => {
         const val = r.eoy_variance_nok || 0;
-        const valAbs = Math.abs(val);
-        const barW = Math.max(5, Math.round((valAbs / maxVal) * barTrackWidth));
         const valStr = fmtNOK(val, true);
 
+        // Bullet coordinates: Budsjett = Target line, Regnskap = Spend bar
+        const budX = Math.round((Math.abs(r.annual_budget_nok || 0) / maxVal) * barTrackWidth);
+        const regVal = Math.abs(r.ytd_actual_nok || 0);
+        const regX = Math.round((regVal / maxVal) * barTrackWidth);
+        const barW = Math.max(r.ytd_actual_nok !== 0 ? 3 : 2, regX);
+
         const barSvg = `
-          <svg width="${barTrackWidth}" height="14" viewBox="0 0 ${barTrackWidth} 14" style="vertical-align:middle; display:inline-block;" aria-label="Mindreforbruk: ${valStr}">
-            <rect x="0" y="1" width="${barW}" height="12" rx="2" fill="#16A34A" />
+          <svg width="${barTrackWidth + 10}" height="14" viewBox="0 0 ${barTrackWidth + 10} 14" style="vertical-align:middle; display:inline-block;" aria-label="Bullet: Regnskap ${fmtNOK(r.ytd_actual_nok)} | Budsjett ${fmtNOK(r.annual_budget_nok)}">
+            <title>${escapeHtml(r.kontonavn || '')}: Regnskap ${fmtNOK(r.ytd_actual_nok)} | Prognose ${fmtNOK(r.eoy_forecast_nok)} | Årsbudsjett ${fmtNOK(r.annual_budget_nok)} (Mindreforbruk ${valStr})</title>
+            <!-- Background Track -->
+            <line x1="0" y1="7" x2="${barTrackWidth}" y2="7" stroke="#F1F5F9" stroke-width="9" stroke-linecap="round" />
+            <!-- Spend Bar (Regnskap YTD) -->
+            <rect x="0" y="2.5" width="${barW}" height="9" rx="1.5" fill="#16A34A" />
+            <!-- Budget Target Line (Årsbudsjett) -->
+            <line x1="${budX}" y1="0.5" x2="${budX}" y2="13.5" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round" />
           </svg>
         `;
 
@@ -7123,7 +7140,7 @@ function renderFavorableBarChart(report) {
             <td class="num-col">${fmtNOK(r.annual_budget_nok)}</td>
             <td class="num-col">${fmtNOK(r.eoy_forecast_nok)}</td>
             <td class="num-col rag-green" style="font-weight:700;">${valStr}</td>
-            <td style="text-align:left; padding-left:0.5rem;">${barSvg}</td>
+            <td style="text-align:left; padding-left:0.5rem; width:${barTrackWidth + 15}px;">${barSvg}</td>
           </tr>
         `;
       }).join("");
