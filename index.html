@@ -908,6 +908,248 @@
       background-color: var(--header-accent);
     }
 
+    /* =========================================================================
+       Floating Chatbot Pop-Up Widget (Always Accessible Across All Views)
+       ========================================================================= */
+    .chatbot-popup-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      font-family: inherit;
+    }
+
+    .chatbot-launcher-btn {
+      appearance: none;
+      border: 1px solid var(--border-light);
+      background-color: var(--header-dark);
+      color: #FFFFFF;
+      padding: 0.65rem 1.15rem;
+      border-radius: 9999px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.28);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+      user-select: none;
+    }
+
+    .chatbot-launcher-btn:hover {
+      background-color: var(--header-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.36);
+    }
+
+    .chatbot-launcher-btn:active {
+      transform: translateY(0);
+    }
+
+    .chatbot-launcher-icon {
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+
+    .chatbot-launcher-pulse {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #10B981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4);
+    }
+
+    .chatbot-popup-card {
+      position: fixed;
+      bottom: 78px;
+      right: 24px;
+      width: 420px;
+      max-width: calc(100vw - 32px);
+      height: 580px;
+      max-height: calc(100vh - 96px);
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.24), 0 4px 12px rgba(15, 23, 42, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 10000;
+      animation: chatbotPopupSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes chatbotPopupSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .chatbot-popup-header {
+      background-color: var(--header-dark);
+      color: #FFFFFF;
+      padding: 0.65rem 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .chatbot-popup-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .chatbot-popup-badge-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #10B981;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+      flex-shrink: 0;
+    }
+
+    .chatbot-popup-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin: 0;
+      color: #FFFFFF;
+      line-height: 1.2;
+    }
+
+    .chatbot-popup-subtitle {
+      font-size: 0.7rem;
+      color: #94A3B8;
+      display: block;
+      line-height: 1.2;
+    }
+
+    .chatbot-popup-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .chatbot-ctrl-btn {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: #CBD5E1;
+      padding: 0.3rem 0.45rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      line-height: 1;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .chatbot-ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #FFFFFF;
+    }
+
+    .chatbot-popup-chips {
+      padding: 0.45rem 0.75rem;
+      background-color: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-hairline);
+      display: flex;
+      gap: 0.35rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+
+    .chatbot-popup-chips::-webkit-scrollbar {
+      display: none;
+    }
+
+    .popup-prompt-chip {
+      appearance: none;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      color: var(--text-primary);
+      padding: 0.25rem 0.55rem;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .popup-prompt-chip:hover {
+      background-color: var(--bg-zebra);
+      border-color: var(--header-dark);
+    }
+
+    .chatbot-popup-messages {
+      flex: 1;
+      padding: 0.85rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      background-color: var(--bg-surface);
+    }
+
+    .chatbot-popup-messages .chat-msg {
+      max-inline-size: 92%;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .chatbot-popup-input-bar {
+      display: flex;
+      padding: 0.55rem 0.75rem;
+      gap: 0.45rem;
+      border-top: 1px solid var(--border-hairline);
+      background-color: var(--bg-subtle);
+    }
+
+    .chatbot-popup-input-bar input {
+      flex: 1;
+      padding: 0.45rem 0.65rem;
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+    }
+
+    .chatbot-popup-input-bar input:focus {
+      outline: none;
+      border-color: var(--header-dark);
+    }
+
+    .chatbot-popup-send-btn {
+      appearance: none;
+      background-color: var(--header-dark);
+      color: #FFFFFF;
+      border: 1px solid var(--header-dark);
+      padding: 0.45rem 0.85rem;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .chatbot-popup-send-btn:hover {
+      background-color: var(--header-accent);
+    }
+
+
     .btn-secondary {
       appearance: none;
       background-color: var(--bg-surface);
@@ -1187,7 +1429,7 @@
     @media print {
       @page { size: A4 portrait; margin: 8mm 10mm 10mm 10mm; }
       body { background: #FFFFFF !important; color: #000000 !important; font-size: 8.5pt; }
-      .app-sidebar, .module-nav, .slicer-bar, .cockpit-btn, #btn-theme-toggle, .prompt-chips-bar, #chat-form, #min-report-type-bar, #min-filter-container, #min-refresh, #min-print, #min-coverage-note, #btn-simulate-month-end, #min-simulation-console { display: none !important; }
+      .app-sidebar, .module-nav, .slicer-bar, .cockpit-btn, #btn-theme-toggle, .prompt-chips-bar, #chat-form, #chatbot-popup-container, .chatbot-popup-container, .chatbot-launcher-btn, .chatbot-popup-card, #min-report-type-bar, #min-filter-container, #min-refresh, #min-print, #min-coverage-note, #btn-simulate-month-end, #min-simulation-console { display: none !important; }
       .app-layout { display: block !important; }
       .spa-view { display: block !important; }
       .spa-view.inactive { display: none !important; }
@@ -4854,6 +5096,55 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     </div>
   </dialog>
 
+  <!-- Floating Chatbot Pop-Up Widget (Always Accessible Across All Views) -->
+  <div id="chatbot-popup-container" class="chatbot-popup-container">
+    <!-- Floating Launcher Trigger Button -->
+    <button type="button" id="chatbot-launcher-btn" class="chatbot-launcher-btn" aria-label="Åpne KOSTRA KI-Rådgiver Chatbot" aria-expanded="false" title="Åpne KOSTRA KI-Rådgiver (Hybrid RAG &amp; Lovverk)">
+      <span class="chatbot-launcher-icon">💬</span>
+      <span class="chatbot-launcher-label">KI-Rådgiver</span>
+      <span class="chatbot-launcher-pulse" aria-hidden="true"></span>
+    </button>
+
+    <!-- Floating Chatbot Window / Pop-Up Card -->
+    <div id="chatbot-popup-card" class="chatbot-popup-card" style="display: none;" role="dialog" aria-modal="false" aria-labelledby="chatbot-popup-title">
+      <div class="chatbot-popup-header">
+        <div class="chatbot-popup-title-wrap">
+          <div class="chatbot-popup-badge-dot"></div>
+          <div>
+            <h3 id="chatbot-popup-title" class="chatbot-popup-title">KOSTRA KI-Rådgiver</h3>
+            <span class="chatbot-popup-subtitle">Hybrid RAG • Lovverk &amp; Regnskap</span>
+          </div>
+        </div>
+        <div class="chatbot-popup-controls">
+          <button type="button" class="chatbot-ctrl-btn" id="chatbot-expand-view-btn" title="Åpne i fullskjerm (Modul 6)" aria-label="Åpne i fullskjerm">⛶</button>
+          <button type="button" class="chatbot-ctrl-btn" id="chatbot-clear-btn" title="Tøm samtale" aria-label="Tøm samtale">🗑️</button>
+          <button type="button" class="chatbot-ctrl-btn" id="chatbot-close-btn" title="Lukk chat pop-up" aria-label="Lukk samtale">✕</button>
+        </div>
+      </div>
+
+      <!-- Quick Chips Bar in Pop-Up -->
+      <div class="chatbot-popup-chips" aria-label="Hurtigspørsmål">
+        <button type="button" class="popup-prompt-chip" data-prompt="intent_legal">⚖️ § 13-1 Fullmakt</button>
+        <button type="button" class="popup-prompt-chip" data-prompt="intent_data">📊 M01–M08 Avvik</button>
+        <button type="button" class="popup-prompt-chip" data-prompt="intent_hybrid">🔀 Tiltaksplan</button>
+        <button type="button" class="popup-prompt-chip" data-prompt="intent_external">🌐 Lovdatasøk</button>
+      </div>
+
+      <!-- Pop-Up Messages Container -->
+      <div id="popup-chat-messages" class="chatbot-popup-messages" aria-live="polite">
+        <div class="chat-msg assistant">
+          <strong>KOSTRA KI-Rådgiver:</strong> Hei! Jeg er din økonomi- og rådgiver co-pilot. Still meg spørsmål om KOSTRA-regnskapet, Kommuneloven, budsjettavvik for <strong>Helse &amp; Omsorg</strong> eller <strong>Oppvekst</strong>, eller administrative omdisponeringer.
+        </div>
+      </div>
+
+      <!-- Pop-Up Input Form -->
+      <form id="popup-chat-form" class="chatbot-popup-input-bar">
+        <input type="text" id="popup-chat-input" placeholder="Still et spørsmål til KI-rådgiveren..." aria-label="Skriv spørsmål i chat pop-up" autocomplete="off" />
+        <button type="submit" class="chatbot-popup-send-btn" aria-label="Send melding" title="Send melding">➤</button>
+      </form>
+    </div>
+  </div>
+
   <script>
     // =========================================================================
     // 1. EMBEDDED GOLD LAYER DATA & CONSTANTS (modelready_fact & DuckDB)
@@ -7505,12 +7796,42 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
     function appendChat(role, htmlText) {
       const box = document.getElementById("chat-messages");
-      if (!box) return;
-      const div = document.createElement("div");
-      div.className = `chat-msg ${role}`;
-      div.innerHTML = htmlText;
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
+      if (box) {
+        const div = document.createElement("div");
+        div.className = `chat-msg ${role}`;
+        div.innerHTML = htmlText;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+      }
+      const popBox = document.getElementById("popup-chat-messages");
+      if (popBox) {
+        const divPop = document.createElement("div");
+        divPop.className = `chat-msg ${role}`;
+        divPop.innerHTML = htmlText;
+        popBox.appendChild(divPop);
+        popBox.scrollTop = popBox.scrollHeight;
+      }
+    }
+
+    function toggleChatbotPopup(forceState) {
+      const card = document.getElementById("chatbot-popup-card");
+      const btn = document.getElementById("chatbot-launcher-btn");
+      if (!card || !btn) return;
+
+      const isHidden = card.style.display === "none" || card.style.display === "";
+      const shouldOpen = typeof forceState === "boolean" ? forceState : isHidden;
+
+      if (shouldOpen) {
+        card.style.display = "flex";
+        btn.setAttribute("aria-expanded", "true");
+        const inp = document.getElementById("popup-chat-input");
+        if (inp) inp.focus();
+        const pBox = document.getElementById("popup-chat-messages");
+        if (pBox) pBox.scrollTop = pBox.scrollHeight;
+      } else {
+        card.style.display = "none";
+        btn.setAttribute("aria-expanded", "false");
+      }
     }
 
     // =========================================================================
@@ -9258,6 +9579,85 @@ function renderFavorableBarChart(report) {
         appendChat("assistant", getDynamicChatAnswer("intent_data"));
       } else {
         appendChat("assistant", getDynamicChatAnswer("intent_legal"));
+      }
+    });
+
+    // Floating Chatbot Pop-Up Event Listeners
+    const btnChatLauncher = document.getElementById("chatbot-launcher-btn");
+    const btnChatClose = document.getElementById("chatbot-close-btn");
+    const btnChatClear = document.getElementById("chatbot-clear-btn");
+    const btnChatExpand = document.getElementById("chatbot-expand-view-btn");
+    const popupChatForm = document.getElementById("popup-chat-form");
+    const popupChatInput = document.getElementById("popup-chat-input");
+
+    if (btnChatLauncher) {
+      btnChatLauncher.addEventListener("click", () => toggleChatbotPopup());
+    }
+    if (btnChatClose) {
+      btnChatClose.addEventListener("click", () => toggleChatbotPopup(false));
+    }
+    if (btnChatClear) {
+      btnChatClear.addEventListener("click", () => {
+        const popBox = document.getElementById("popup-chat-messages");
+        if (popBox) {
+          popBox.innerHTML = `
+            <div class="chat-msg assistant">
+              <strong>KOSTRA KI-Rådgiver:</strong> Hei! Samtalen er tilbakestilt. Still meg spørsmål om KOSTRA-regnskapet, Kommuneloven, budsjettavvik for <strong>Helse &amp; Omsorg</strong> eller <strong>Oppvekst</strong>, eller administrative omdisponeringer.
+            </div>`;
+        }
+      });
+    }
+    if (btnChatExpand) {
+      btnChatExpand.addEventListener("click", () => {
+        toggleChatbotPopup(false);
+        switchToView("view-chatbot");
+        const mainInp = document.getElementById("chat-input");
+        if (mainInp) mainInp.focus();
+      });
+    }
+
+    // Popup prompt chips
+    document.querySelectorAll(".popup-prompt-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const key = chip.dataset.prompt;
+        appendChat("user", chip.textContent);
+        appendChat("assistant", getDynamicChatAnswer(key));
+        renderCitationDrawer(key);
+      });
+    });
+
+    // Popup form submit
+    if (popupChatForm) {
+      popupChatForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const q = popupChatInput ? popupChatInput.value.trim() : "";
+        if (!q) return;
+        if (popupChatInput) popupChatInput.value = "";
+
+        const pii = presidioAnonymizeClient(q);
+        appendChat("user", q + (pii.piiDetected ? ` <span class="rag-badge rag-amber" style="font-size:0.65rem;">(GDPR-skjermet: ${pii.detected.join(", ")})</span>` : ""));
+        renderCitationDrawer(pii.clean);
+
+        const routed = routeQueryClient(pii.clean);
+        if (routed === "EXTERNAL_LOOKUP") {
+          appendChat("assistant", getDynamicChatAnswer("intent_external"));
+        } else if (routed === "PRESCRIPTIVE_HYBRID") {
+          appendChat("assistant", getDynamicChatAnswer("intent_hybrid"));
+        } else if (routed === "DATA_ANALYTICS") {
+          appendChat("assistant", getDynamicChatAnswer("intent_data"));
+        } else {
+          appendChat("assistant", getDynamicChatAnswer("intent_legal"));
+        }
+      });
+    }
+
+    // Global Escape key listener to close chatbot popup if open
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") {
+        const card = document.getElementById("chatbot-popup-card");
+        if (card && card.style.display === "flex") {
+          toggleChatbotPopup(false);
+        }
       }
     });
 
