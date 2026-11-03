@@ -66,28 +66,66 @@ For at applikasjonen skal være 100 % intuitiv og handlingsrettet for alle kommu
 ```
 
 ### 🏠 Rom 1: «Min Hverdag» (For Enhetsledere & Rektorer)
-* **Målgruppe:** Rektorer, avdelingsledere i pleie og omsorg, barnehageledere.
-* **Formål:** Full operasjonell avdelingsstatus på 30 sekunder.
+* **Målgruppe:** Rektorer, avdelingsledere i pleie og omsorg, barnehageledere og enhetsledere.
+* **Formål:** Full operasjonell avdelingsstatus, avviksfordeling, refusjonsavstemming og handlingsrom på under ett minutt.
 * **Kjernekomponenter:**
-  * **Trafikklys-status:** Grønn (I rute), Gul (Følg med), Rød (Tiltak kreves).
-  * **«Hva bør jeg gjøre i dag?»:** Liste med lovlige, administrative tiltak innenfor lederens egen styringsrett jf. Kommuneloven § 13-1 (vikarstopp art 1020, overtidsbegrensning art 1040 via Visma Gat Optur Plus, vakanssparing).
-  * **Søk i naturlig norsk:** Fritekstfelt for enhetsspørsmål (*«Hvorfor har vi merforbruk på vikarer i august?»*).
+  * **Trafikklys-status (RAG):** Grønn (I rute), Gul (Følg med), Rød (Kritisk avvik / tiltak kreves).
+  * **«Hva bør jeg gjøre i dag?»:** 3 prioriterte tiltakskort med lovlige, administrative fullmakter jf. Kommuneloven § 13-1 (vikarstopp art 1020, overtidsbegrensning art 1040 via Visma Gat Optur Plus, vakanssparing).
+  * **Månedlig Regnskap & Avviksbane (M01–M08):**
+    * Dynamisk **Tufte SVG Sparkline** med budsjett- og regnskapskurve, samt direkte annotering av topp- og bunnmåneder (snitt og maks).
+    * Månedlig regnskapstabell med **betingede avvikssøyler (conditional bar length)** og MoM-trend (Måned-over-måned) uten formatstøy.
+  * **Avviksfordeling pr. Ansvarssted (Bullet Graph):**
+    * Sammenligner alle aktive ansvarssteder i valgt sektor (f.eks. Omsorgssentre og Hjemmetjenester i Helse og Omsorg) ved hjelp av Edward Tufte Bullet Graphs med budsjettmålstrek og regnskapssøyle.
+  * **Lønns- og Refusjonsprofil (KOSTRA Art 10xx, 127x mot Art 1710 NAV-Refusjoner):**
+    * 4-korts KPI: Brutto personalkostnad, NAV Sykelønnsrefusjon (Art 171000), NAV Foreldrepenger (Art 171005) og Netto personalkostnad etter refusjoner.
+    * Transparent varsel om NAV Digisyfo 4–6 ukers saksbehandlingstid.
+    * Kostnadsdriver-tabell tilpasset uten rullegardin (ingen vertikal scroll), med direkte innrykk og motregning av Art 1710 under vikarlønn (102000) og vikarbyrå (127040), samt beregning av netto fraværsbelastning.
+  * **Største Mindreforbruk (Mindreforbruksanalyse & Bullet Graph):**
+    * Viser topp 5 kontoer med mindreforbruk som kan omdisponeres administrativt.
+    * **Forsiktighetsprinsipp for inntekter/tilskudd (konto 112098 Tilskudd lærlinger):** Negative regnskapstall ekstrapoleres *ikke* ukritisk til årsslutt; prognosen holdes til faktisk bokført beløp for å unngå urealistisk overbudsjettering.
+  * **Dynamisk AI-Tiltaksplan & Tiltakskontrakt:**
+    * Genererer en helhetlig tiltakspakke med konkrete månedlige omdisponeringer for å bringe enheten i årsbalanse (0 kr avvik) innenfor Arbeidsmiljølovens guardrails (AML § 10-8).
 
 ### 📊 Rom 2: «Budsjett & Simulering» (For Økonomirådgivere & Controllere)
-* **Målgruppe:** Økonomirådgivere, økonomisjefer og prosjektcontrollere.
-* **Formål:** Modellere helårsprognosen (EOY), kjøre preskriptive simuleringer og eksportere til Framsikt.
+* **Målgruppe:** Økonomirådgivere, økonomisjefer, prosjektcontrollere og virksomhetsstyring.
+* **Formål:** Modellere helårsprognosen (EAC/ETC), kjøre bakkeforankrede lønnssimuleringer og eksportere reguleringer direkte til Framsikt.
 * **Kjernekomponenter:**
-  * **Prognoseveien (EAC):** Interaktiv kurve over forventet årsresultat ved årets slutt.
-  * **Budsjettsimulator («Hva skjer hvis...»):** Test ansettelsesstopp (1–6 mnd), vikar- og overtidsstopp i sanntid.
-  * **Framsikt 1-Klikks Eksport:** Genererer `framsikt_budsjettendringer_eoy.xlsx` med 0,00 kr feilmargin.
+  * **Bakkeforankret Lønns- og Stillingsbudsjett (KOSTRA Art 1010–1099, 1270, 1710):**
+    * 100 % dynamisk avstemt mot faktiske innleste data (`KOSTRA_ART_SNAPSHOTS` og `DUCKDB_MONTHLY_REPORT_SNAPSHOTS`):
+      * *Totalt for kommunen:* Vedtatt lønnsramme **40 549 437 kr**, brutto YTD **31 314 606 kr**, NAV-refusjoner **-2 382 705 kr**, netto personalkostnad YTD **28 931 901 kr**.
+      * *Helse og Omsorg:* Vedtatt ramme **17 612 937 kr**, brutto YTD **13 290 606 kr**, NAV-refusjoner **-732 705 kr**, netto YTD **12 557 901 kr** (168,0 planlagte FTE).
+      * *Oppvekst og Utdanning:* Vedtatt ramme **22 936 500 kr**, brutto YTD **18 024 000 kr**, NAV-refusjoner **-1 650 000 kr**, netto YTD **16 374 000 kr** (160,0 FTE).
+    * Bemanningsramme-tabell med besatte årsverk, planlagte årsverk, vakanser og gjennomsnittlig brutto månedslønn.
+  * **Stillingskategori & Lønnsframskriving 2025 (Framsikt):**
+    * Syntetisk stillingsstruktur skalert etter det aktive filterets faktiske fastlønnsbudsjett (Art 1010).
+    * Differensierte pensjonsordninger: KS HTA Kap. 3.4/4 med KLP 14,8 % (pleie/omsorg) vs. Statens Pensjonskasse SPK 11,2 % (lærere/skole), pluss Arbeidsgiveravgift AGA 14,1 %.
+    * Kommunal deflatorsimulering (lønnsvekst 4,2 % – 5,6 %, glidning og pensjonspremieavvik).
+  * **Lønns- & Tariffoppgjørssimulator (What-If):**
+    * 4 interaktive parametere: KS tariffoppgjør ramme (% fra 01.05), vikardekningsgrad (%), vakanssparing (mnd) og pensjonspremiesats (KLP/SPK %).
+    * Sanntids framskriving av Basislønnsmasse 2024, Lønnsvekst 2025, Sosiale kostnader 2025 og Beregnet Lønnsbudsjett 2025 – perfekt avstemt mot beslutningskortene.
+  * **Prognoseveien (EAC/ETC) & LOY-Simulator:**
+    * 4-slider kutt-simulator for administrative omdisponeringer (vikarer, overtid, konsulenter, driftsanskaffelser) med sanntids SVG-trajektorie mot årsbalanse.
+  * **Framsikt 1-Klikks Eksport:** Genererer `framsikt_budsjettendringer_eoy.csv` (12 kolonner UTF-8 BOM) klar for import i Framsikt.
 
 ### 🛒 Rom 3: «Innkjøp, Avtaler & Tilskudd» (For Fagansvarlige & Saksbehandlere)
-* **Målgruppe:** Anskaffelsesansvarlige, prosjektledere, saksbehandlere for tilskudd og selvkost.
-* **Formål:** LOA-terskelkontroll, avtalesjekk, tilskuddsforvaltning og selvkostberegninger.
+* **Målgruppe:** Anskaffelsesansvarlige, prosjektledere, saksbehandlere for utgående faktura, tilskuddsforvaltning og selvkost.
+* **Formål:** LOA-terskelkontroll, avtalesjekk, konsolideringseliminering, preskriptiv selvkost og ad hoc-fakturering.
 * **Kjernekomponenter:**
-  * **Innkjøpssjekk (LOA):** Terskelkontroll (<500k, 500k–1,3m, EØS 2,5m/62,9m), 30 % miljøvektlegging og Maverick spend-deteksjon.
-  * **Tilskuddsportal:** Inngående statlige midler (IMDi, Udir, Toppfinansiering av særlig ressurskrevende tjenester) og utgående kommunale tilskudd (500k-regel for utbetaling).
-  * **Fakturering & Selvkost:** Selvkostfond (VA/Renovasjon etter FOR-2019-12-11-1738) og interkommunal KOSTRA-konsolidering (art 380/780).
+  * **Innkjøpssjekk (LOA):** DFØ 7-trinns anskaffelsesprosess, terskelkontroll (<500k mikroanskaffelser, 1,3 mill. kr nasjonal terskel, EØS 2,5m/62,9m), 30 % miljøvektlegging (LOA § 5) og Maverick spend-deteksjon.
+  * **Preskriptiv Selvkostkalkulator (Forskrift om selvkost FOR-2019-12-11-1738):**
+    * Formel: $\text{Gebyrkrav} = \text{Direkte Drift} + \text{Indirekte Støtte} + \text{Avskrivninger} + \text{Kalkulatorisk Rente (5-år Swap} + 0{,}5\,\%) \pm 5\text{-års fondsavsetning}$.
+    * Utvidet selvkostområde-dropdown med optgroups for:
+      * *Lovregulerte gebyrområder:* Vann og Avløp (Fn 340/345), Renovasjon & Avfall (Fn 350), Byggesaksbehandling (pbl § 33-1, Fn 301), Oppmåling & Kart (matrikkelloven § 32), Feiing & Branntilsyn (brannloven § 28).
+      * *Ad hoc Selvkost & Lokalleie:* Skole utleie, Helse utleie, Skole intern lønn, Helse intern personell, Eiendom intern drift.
+  * **Ad hoc Faktureringskalkulator for Timepris & Lokalleie (Skole & Helse):**
+    * **Intern Selvkost Lønn (Art 780/380):**
+      * Beregner full selvkost-timesats (1 650 produktive timer) for spesialpedagog/lærer (538,46 kr/t), musikkpedagog (492,41 kr/t), spesialsykepleier (554,99 kr/t), fysioterapeut (511,92 kr/t), helsefagarbeider (434,66 kr/t) og vaktmester (422,98 kr/t).
+      * 1-klikks bokføring som legger internordren rett inn i eliminasjonstabellen med status `🟢 Eliminert` og garanterer netto 0 kr på konsernnivå jf. GKRS og KOSTRA.
+    * **Ekstern Lokalleie (Art 1650):**
+      * Beregner selvkostleie for gymsal/idrettshall (480 kr/t), auditorium/klasserom (300 kr/t), dagsentersal (350 kr/t) og behandlingsrom (400 kr/t), basert på direkte FDV-tilsyn og kapitalandel.
+      * 1-klikks generering av EHF 3.0 Peppol BIS-faktura med Modulus 10 KID, 14 dagers forfall og MVA-unntak jf. merverdiavgiftsloven § 3-11 (utleie av fast eiendom).
+  * **Konsolideringseliminering (Art 380 vs 780):** Sanntids eliminasjonstabell som sikrer at interne leveranser (byggdrift, felleskjøkken, IT-drift) har differanse `0,00 kr`.
+  * **Tilskuddsportal (Stat & Kommune):** Inngående statlige midler (IMDi integreringstilskudd, Udir kompetanseløft, Toppfinansiering ressurskrevende helsetjenester) og utgående kommunale tilskudd med 4-trinns utbetalingskontroll.
 
 ### 📑 Rom 4: «Saksbehandling & Politikk» (For Kommunalsjefer & Bystyre)
 * **Målgruppe:** Kommunedirektør, kommunalsjefer, politisk sekretariat og bystyremedlemmer.
@@ -418,11 +456,24 @@ Tjenester som starter:
 ## 🧪 Verifikasjon & Tester
 
 ### 1. Full E2E Nettlesertest (Playwright E2E Testsuite)
-Kjør den fullstendige, automatiserte nettlesertesten som verifiserer samtlige 16 moduler, dynamisk filterkaskadering, EDA FT Visuals, lønnsbudsjett (KOSTRA arter & årsverk), Recommender, Årshjul og feilfri konsoll:
+Kjør den fullstendige, automatiserte nettlesertesten som verifiserer samtlige 16 moduler, dynamisk filterkaskadering, EDA FT Visuals, bakkeforankret lønns- og stillingsbudsjett, Ad hoc fakturering & selvkost, Recommender, Årshjul og feilfri konsoll:
 ```powershell
 python test_full_suite.py
 ```
-*Forventet resultat: `50 av 50 tester bestått (100.0 %) — Null console.error, null JavaScript runtime exceptions`.*
+*Forventet resultat: `97 av 97 tester bestått (100.0 %) — Null console.error, null JavaScript runtime exceptions over 10 testblokker`.*
+
+#### Oversikt over de 10 Testblokkene:
+* **Testblokk 1:** Sideoppstart, tittel og feilfri nettleserkonsoll (0 runtime exceptions, 0 console.error).
+* **Testblokk 2 & 2B:** SPA-navigasjon mellom 11 views samt rollebasert navigasjon for De 4 Arbeidsrommene.
+* **Testblokk 3:** Dynamisk filterkaskadering (Sektor, Ansvar, Funksjon, Periode) og toppbannersynkronisering.
+* **Testblokk 4:** EDA & Financial Times Visual Vocabulary (Scatterplot, OLS trendlinje $R^2 = 0{,}94$, Tufte fargekontroll).
+* **Testblokk 5:** Lønns- og Stillingsbudsjett (Bakkeforankret mot KOSTRA snapshots, 168,0 FTE, 17,6M ramme, 13,3M YTD brutto, 12,6M YTD netto, 15,0M stillingsbasis).
+* **Testblokk 6:** Recommender & Tiltaksmatrise (Lovhjemler, AML § 10-8 guardrail, administrative EOY-tiltak).
+* **Testblokk 7:** Årshjul, Kommunelov-frister og 1-klikks dokumentgenerator (Bystyresaker og bestillingsnotater).
+* **Testblokk 7B:** Faktura, Selvkost & Ad hoc Utleie og Lønn (Skole utleie 480 kr/t, EHF 3.0 faktura med Art 1650 og KID, Skole intern lønn 538,46 kr/t, 1-klikks bokføring i eliminasjonstabell med Art 780/380).
+* **Testblokk 8:** Min Økonomi & Månedsrapport (Tufte SVG Sparkline M01–M08, betingede avvikssøyler, avviksfordeling med Bullet Graphs, lønns- og refusjonsprofil mot Art 1710, mindreforbruksanalyse med forsiktighetsprinsipp for konto 112098, AI-tiltaksplan).
+* **Testblokk 9:** Komplett tilbakestilling (Reset) til totalutvalg (328,0 planlagte FTE).
+* **Testblokk 10:** Sluttkontroll av feillogg (garanterer 100 % feilfri konsoll gjennom hele testløpet).
 
 ### 2. FastAPI Backend REST Testsuite
 Kjør den automatiserte enhetstesten for å verifisere at samtlige 10 REST-endepunkter fungerer:
