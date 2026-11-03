@@ -275,7 +275,7 @@ Systemets kjerne er bygget på en **3-lags Medallion Lakehouse-arkitektur** impl
                    ▼                        ▼                           ▼
 ┌────────────────────────────┐ ┌──────────────────────────┐ ┌────────────────────────────┐
 │ FastAPI REST API (:8000)   │ │ Frittstående Web Cockpit │ │ Excel & Power BI Suite     │
-│ - 33 REST-endepunkter      │ │ (index.html, 5 800+ l.)  │ │ - Excel-Reporting-         │
+│ - 34 REST-endepunkter      │ │ (index.html, 5 800+ l.)  │ │ - Excel-Reporting-         │
 │ - Presidio PII Gateway     │ │ - 15 interaktive moduler │ │   Analysis.xlsb (FAST)     │
 │ - Hybrid RAG (BM25 + BGE)  │ │ - 100 % dynamisk filter  │ │ - pbi-reporting-project    │
 │ - 4-veis Intent Routing    │ │ - Framsikt & Årshjul     │ │   (.pbip / TMDL)           │
@@ -311,6 +311,7 @@ FastAPI-serveren (`src/api_server.py`) kjører asynkront og eksponerer produksjo
 | `/api/v1/exports/einnsyn-pdf` | `GET` | eInnsyn-klart saksnotat i PDF-format med formelt brevhode. |
 | `/api/v1/exports/bystyrenotat-pdf` | `GET` | 1-klikks formelt bystyrenotat i PDF-format med vedtaksforslag. |
 | `/api/v1/exports/bystyrenotat-docx`| `GET` | 1-klikks formelt bystyrenotat i Word DOCX-format for saksbehandling. |
+| `/api/v1/copilot/query` | `POST` | Copilot v2 Intent Router koblet mot ChromaDB (`kostra_knowledge_base`) og DuckDB. |
 | `/api/v1/rag/route` | `POST` | 4-veis Intent Router (`CONCEPTUAL_LEGAL`, `DATA_ANALYTICS`, `PRESCRIPTIVE_HYBRID`, `EXTERNAL_LOOKUP`). |
 | `/api/v1/rag/hybrid-query` | `POST` | 5-trinns Hybrid RAG-søk (BM25 + Semantic Cosine + RRF Fusion + BGE Cross-Encoder + Parent-Child). |
 | `/api/v1/rag/ingest-localblob` | `POST` | Automatisk indekseringspipeline for 50+ kommunale PDF-er og dokumenter i `localblob/`. |
@@ -440,9 +441,9 @@ Kom - G2/
 ├── models/                             # Serialiserte ML-modeller (.pkl / joblib)
 └── src/
     ├── app.py                          # Streamlit AI Workbench (8 moduler)
-    ├── api_server.py                   # FastAPI REST backend (33 endepunkter, 100 % testdekning)
+    ├── api_server.py                   # FastAPI REST backend (34 endepunkter, 100 % testdekning)
     ├── rag_localblob_engine.py         # Hybrid RAG, Parent-Child Chunking & 4-veis Intent Router
-    ├── test_api_endpoints.py           # Automatisert testsuite for FastAPI (33/33 tester)
+    ├── test_api_endpoints.py           # Automatisert testsuite for FastAPI (34/34 tester)
     ├── db_manager.py                   # DuckDB Medallion ETL og Ingestion Engine
     ├── canonical.py                    # Pydantic validering og dataskjema
     └── retrain_pipeline.py             # MLOps omtrening og modelldrift-evaluering

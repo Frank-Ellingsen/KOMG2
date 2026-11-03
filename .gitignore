@@ -32,6 +32,7 @@ env/
 duckdb.exe
 *.exe
 data/chromadb/
+chroma_db/
 data/database/
 localblob/
 

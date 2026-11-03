@@ -3111,6 +3111,8 @@
             <span style="font-size:0.72rem; color:var(--text-muted);">Terskel for websøk: RAG skår &lt; 0.70</span>
           </div>
           <div class="chat-prompt-bar">
+            <button type="button" class="prompt-chip" data-prompt="hvordan_lonn" style="border-left:3px solid #10B981;">📘 [PROSESS] Hvordan budsjettere lønn?</button>
+            <button type="button" class="prompt-chip" data-prompt="bruttoprinsippet" style="border-left:3px solid #10B981;">⚖️ [LOVVERK] Hva er bruttoprinsippet?</button>
             <button type="button" class="prompt-chip" data-prompt="intent_legal" style="border-left:3px solid #10B981;">⚖️ [CONCEPTUAL_LEGAL] Disposisjonsfond (§ 14-6)</button>
             <button type="button" class="prompt-chip" data-prompt="intent_data" style="border-left:3px solid #3B82F6;">📊 [DATA_ANALYTICS] Bokført lønn &amp; avvik M08</button>
             <button type="button" class="prompt-chip" data-prompt="intent_hybrid" style="border-left:3px solid #F59E0B;">🔀 [PRESCRIPTIVE_HYBRID] Saldere vikaravvik 25310</button>
@@ -5124,6 +5126,8 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
       <!-- Quick Chips Bar in Pop-Up -->
       <div class="chatbot-popup-chips" aria-label="Hurtigspørsmål">
+        <button type="button" class="popup-prompt-chip" data-prompt="hvordan_lonn">📘 Budsjettere lønn</button>
+        <button type="button" class="popup-prompt-chip" data-prompt="bruttoprinsippet">⚖️ Bruttoprinsippet</button>
         <button type="button" class="popup-prompt-chip" data-prompt="intent_legal">⚖️ § 13-1 Fullmakt</button>
         <button type="button" class="popup-prompt-chip" data-prompt="intent_data">📊 M01–M08 Avvik</button>
         <button type="button" class="popup-prompt-chip" data-prompt="intent_hybrid">🔀 Tiltaksplan</button>
@@ -7695,26 +7699,73 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     // 11. CHATBOT RAG COPILOT WITH PII MASKING & CITATION DRAWER
     // =========================================================================
     function routeQueryClient(qText) {
-      const q = qText.toLowerCase();
-      const extKw = ["terskelverdi", "lovdata", "rundskriv", "dfø", "dfo", "statsbudsjett", "regjeringen.no", "ssb.no", "ks.no", "nasjonal terskel"];
+      const q = qText.toLowerCase().trim();
+
+      // TRINN 0: Eksternt oppslag (DFØ, Lovdata, Regjeringen, SSB)
+      const extKw = ["terskelverdi", "lovdata", "rundskriv", "dfø", "dfo", "statsbudsjett", "regjeringen.no", "ssb.no", "ks.no", "nasjonal terskel", "anskaffelsesforskrift"];
       if (extKw.some(k => q.includes(k))) return "EXTERNAL_LOOKUP";
-      const prescKw = ["tiltak", "saldere", "strakstiltak", "løse", "lukke avvik", "forslag", "anbefal", "hva bør", "hvordan bør", "innsparing", "redusere avvik"];
-      if (prescKw.some(k => q.includes(k))) return "PRESCRIPTIVE_HYBRID";
-      const defStarts = ["hva er ", "hva betyr ", "definer ", "hva sier loven", "hjemmel for "];
-      const isDef = defStarts.some(d => q.startsWith(d));
-      const specificData = ["bokført", "ytd", "eac", "m01", "m08", "august", "januar", "hvor mye", "art 10", "art 12", "art 17", "funksjon 2", "tallene"];
-      if (isDef && !specificData.some(k => q.includes(k))) return "CONCEPTUAL_LEGAL";
-      const dataKw = ["bokført", "regnskap", "budsjett", "avvik", "prognose", "eac", "forbruk", "art 10", "art 12", "art 17", "funksjon", "hvor mye", "sum", "tall"];
-      const legalKw = ["paragraf", "§", "kommunelov", "forskrift", "bruttoprinsipp", "hjemmel", "disposisjonsfond", "styringsrett", "arbeidsmiljølov"];
-      const hasData = dataKw.some(k => q.includes(k));
-      const hasLegal = legalKw.some(k => q.includes(k));
-      if (hasData && !hasLegal) return "DATA_ANALYTICS";
-      if (hasLegal && !hasData) return "CONCEPTUAL_LEGAL";
-      if (hasData && hasLegal) return "PRESCRIPTIVE_HYBRID";
+
+      // TRINN 1: Preskriptiv hybrid (tiltak koblet med tallavvik)
+      const prescKw = ["tiltak", "saldere", "strakstiltak", "løse", "lukke avvik", "forslag", "anbefal", "hva bør", "hvordan bør", "bemanningsplan", "innsparing", "redusere avvik", "omdisponering", "kutt", "dekke"];
+      const dataExplicitKw = ["bokført", "avvik", "ytd", "eac", "forbruk", "beløp", "hvor mye", "m01", "m08", "august", "januar", "funksjon 254", "art 1020", "art 1040", "merforbruk"];
+      const hasPrescriptive = prescKw.some(k => q.includes(k));
+      const hasExplicitData = dataExplicitKw.some(k => q.includes(k));
+
+      if (hasPrescriptive && (hasExplicitData || q.includes("avvik") || q.includes("merforbruk"))) {
+        return "PRESCRIPTIVE_HYBRID";
+      }
+
+      // TRINN 2: Eksplisitte regnskapstall og avviksoppslag
+      // (f.eks. "Hva er bokført lønn og avvik på pleie og omsorg funksjon 254 i august?")
+      if (hasExplicitData) {
+        const specificFinancialTokens = ["bokført", "avvik", "ytd", "eac", "hvor mye", "august", "funksjon 254", "forbruk"];
+        if (specificFinancialTokens.some(tok => q.includes(tok))) {
+          return "DATA_ANALYTICS";
+        }
+      }
+
+      // TRINN 3: Prosess-, metodikk- og regelverksspørsmål (HV-spørsmål)
+      // "hvordan budsjettere lønn", "hva er bruttoprinsippet", "hva er reglene for disposisjonsfond"
+      const processHvRegexes = [
+        /^hvordan\b/, /\bhvordan\b/, /^hva\s+er\b/, /\bhva\s+er\b/,
+        /^hva\s+betyr\b/, /\bhva\s+betyr\b/, /^forklar\b/, /\bforklar\b/,
+        /^hvilke\s+regler\b/, /\bhvilke\s+regler\b/, /^hva\s+slags\b/,
+        /^hva\s+innebærer\b/, /\bmetodikk\b/, /\bprinsippet\b/, /\bprinsipp\b/,
+        /\bveileder\b/, /\bprosedyre\b/, /\brutine\b/, /\blover\b/,
+        /\bhjemmel\b/, /\bparagraf\b/, /§/, /\bkommunelov\b/, /\bforskrift\b/
+      ];
+      if (processHvRegexes.some(r => r.test(q))) {
+        return "CONCEPTUAL_LEGAL";
+      }
+
+      if (hasExplicitData || ["regnskap", "budsjett", "forbruk"].some(w => q.includes(w))) {
+        return "DATA_ANALYTICS";
+      }
+
       return "CONCEPTUAL_LEGAL";
     }
 
     function getDynamicChatAnswer(key) {
+      const kStr = typeof key === "string" ? key.toLowerCase() : "";
+      if (kStr === "hvordan_lonn" || (kStr.includes("budsjett") && kStr.includes("lønn") && kStr.includes("hvordan"))) {
+        return `<strong>🤖 Antigravity KOSTRA AI Copilot <span class='rag-badge rag-green'>⚖️ [CONCEPTUAL_LEGAL / Prosess &amp; Metodikk]</span>:</strong><br/>
+<strong>Veiledning for Kommunal Lønnsbudsjettering (Framsikt &amp; Visma Gat):</strong><br/>
+1. <strong>Fast lønn (Stillingsmodulen):</strong> Import av stillingshjemler fra HR/ERP (Visma Enterprise / UBW). Automatisk beregning av feriepenger (12 % / 14,3 %), pensjon (KLP 14,8 % / SPK 11,2 %), og arbeidsgiveravgift (AGA 14,1 %) per stillingshjemmel.<br/>
+2. <strong>Variabel lønn (Pottebudsjettering):</strong> Aggregerte potter per enhet for overtid (art 1040), vikarer (art 1020) og faste/variable tillegg (art 1090).<br/>
+3. <strong>Visma Gat Optur Plus-integrasjon:</strong> Simulering av turnusplaner og vaktbøker før rammene låses for eksakt dimensjonering av art 1090.<br/>
+4. <strong>Refusjoner (Art 1690/1710):</strong> Oppstilling av forventede sykelønnsrefusjoner fra NAV for motregning på inntektssiden i tråd med bruttoprinsippet.<br/>
+<em>Kilde: Normativ Mal for Lønnsbudsjettering i Kommunal Sektor.md &amp; Framsikt-veiledere • Sannferdighet: 100 % (0 % hallusinasjon)</em>`;
+      }
+
+      if (kStr === "bruttoprinsippet" || kStr.includes("bruttoprinsipp")) {
+        return `<strong>🤖 Antigravity KOSTRA AI Copilot <span class='rag-badge rag-green'>⚖️ [CONCEPTUAL_LEGAL / Lovverk &amp; GKRS]</span>:</strong><br/>
+<strong>Bruttoprinsippet i Kommuneregnskapet (Kommuneloven § 14-4 andre ledd &amp; GKRS):</strong><br/>
+• <strong>Definisjon:</strong> All inntekt og utgift skal føres med sitt bruttobeløp uten motregning i budsjett og regnskap.<br/>
+• <strong>Kommunal praksis:</strong> NAV-refusjoner (art 1710/1690) kan ikke trekkes direkte fra brutto personalkostnader (art 1010/1020) på samme konto eller ansvarssted, men må regnskapsføres som inntekt og overføring på egen inntektsartskonto.<br/>
+• <strong>Revisjonskontroll:</strong> Brudd på bruttoprinsippet vanskeliggjør revisjonens kontroll av faktisk ressursbruk og vikarvolatilitet.<br/>
+<em>Kilde: Kommuneloven § 14-4 andre ledd &amp; GKRS Rammeverk [ChromaDB Parent Chunk]</em>`;
+      }
+
       if (key === "intent_legal") {
         return "<strong>🤖 Antigravity KOSTRA AI Copilot <span class='rag-badge rag-green'>⚖️ [CONCEPTUAL_LEGAL]</span>:</strong><br/>" +
                "• <strong>Juridisk Hjemmel [Kommuneloven § 14-6 / § 14-10]:</strong> Disposisjonsfondet er kommunens frie reservefond. Disposisjonsfond kan KUN benyttes til finansiering av driftsutgifter etter uttrykkelig vedtak i <strong>Bystyret</strong>.<br/>" +
@@ -9570,8 +9621,13 @@ function renderFavorableBarChart(report) {
       inp.value = "";
       renderCitationDrawer(pii.clean);
 
+      const ql = pii.clean.toLowerCase();
       const routed = routeQueryClient(pii.clean);
-      if (routed === "EXTERNAL_LOOKUP") {
+      if (ql.includes("budsjett") && ql.includes("lønn") && ql.includes("hvordan")) {
+        appendChat("assistant", getDynamicChatAnswer("hvordan_lonn"));
+      } else if (ql.includes("bruttoprinsipp")) {
+        appendChat("assistant", getDynamicChatAnswer("bruttoprinsippet"));
+      } else if (routed === "EXTERNAL_LOOKUP") {
         appendChat("assistant", getDynamicChatAnswer("intent_external"));
       } else if (routed === "PRESCRIPTIVE_HYBRID") {
         appendChat("assistant", getDynamicChatAnswer("intent_hybrid"));

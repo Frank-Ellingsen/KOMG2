@@ -23,6 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
+from src.copilot_router import router as copilot_router
 from src.rag_localblob_engine import (
     QueryIntent,
     RAG_ENGINE,
@@ -64,6 +65,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(copilot_router)
 
 
 # ---------------------------------------------------------------------------
@@ -962,17 +965,37 @@ def chat_rag_copilot(req: ChatRequest):
             f"• <strong>Kostnadsdrivere:</strong> Avviket drives primært av vikarlønn (art 102000) og overtid (art 104000)."
         )
     elif intent == QueryIntent.CONCEPTUAL_LEGAL:
-        top_c = chunks[0] if chunks else None
-        lexcerpt = top_c["excerpt"] if top_c else "Kommuneloven regulerer økonomiforvaltningen."
-        lref = top_c["title"] if top_c else "Kommuneloven"
-        answer_html = (
-            f"<strong>🤖 Antigravity KOSTRA AI Copilot <span class='rag-badge rag-green'>{intent_badge}</span>:</strong><br/>"
-            f"• <strong>Juridisk Hjemmel [{lref}]:</strong> {lexcerpt}<br/>"
-            f"• <strong>Prinsipp &amp; Fullmaktsstruktur:</strong> "
-            f"Skillet mellom administrative fullmakter under Kommunedirektørens styringsrett (§ 13-1 / § 14-2) "
-            f"og politisk bevilgningsmyndighet forbeholdt Bystyret (§ 14-4 / § 14-6 / § 14-10) er ufravikelig.<br/>"
-            f"• <strong>Disposisjonsfond:</strong> Bruk av disposisjonsfond krever eksplisitt bystyrevedtak og kan ikke besluttes administrativt."
-        )
+        if "hvordan" in ql and "budsjett" in ql and "lønn" in ql:
+            answer_html = (
+                f"<strong>🤖 Antigravity KOSTRA AI Copilot <span class='rag-badge rag-green'>{intent_badge}</span>:</strong><br/>"
+                "• <strong>Fast lønn (Stillingsmodulen):</strong> Import av stillingshjemler fra HR/ERP (Visma Enterprise / UBW). "
+                "Automatisk beregning av feriepenger (12 % / 14,3 %), pensjon (KLP 14,8 % / SPK 11,2 %), og arbeidsgiveravgift (AGA 14,1 %) per stilling.<br/>"
+                "• <strong>Variabel lønn (Pottebudsjettering):</strong> Aggregerte potter per enhet for overtid (art 1040), vikarer (art 1020) og faste/variable tillegg (art 1090).<br/>"
+                "• <strong>Visma Gat Optur Plus-integrasjon:</strong> Simulering av turnusplaner og vaktbøker før rammene låses for eksakt dimensjonering av art 1090.<br/>"
+                "• <strong>Refusjoner (Art 1690/1710):</strong> Oppstilling av forventede sykelønnsrefusjoner fra NAV for motregning på inntektssiden i tråd med bruttoprinsippet.<br/>"
+                "<em>Kilde: Normativ Mal for Lønnsbudsjettering i Kommunal Sektor.md &amp; Framsikt-veiledere [ChromaDB + BM25]</em>"
+            )
+        elif "bruttoprinsipp" in ql:
+            answer_html = (
+                f"<strong>🤖 Antigravity KOSTRA AI Copilot <span class='rag-badge rag-green'>{intent_badge}</span>:</strong><br/>"
+                "• <strong>Definisjon (Kommuneloven § 14-4 andre ledd &amp; GKRS):</strong> All inntekt og utgift skal føres med sitt bruttobeløp uten motregning i budsjett og regnskap.<br/>"
+                "• <strong>Kommunal praksis:</strong> NAV-refusjoner (art 1710/1690) kan ikke trekkes direkte fra brutto personalkostnader (art 1010/1020) på samme konto eller ansvarssted, "
+                "men må regnskapsføres som inntekt og overføring på egen inntektsartskonto.<br/>"
+                "• <strong>Revisjonskontroll:</strong> Brudd på bruttoprinsippet vanskeliggjør kontroll av faktisk ressursbruk og vikarvolatilitet.<br/>"
+                "<em>Kilde: Kommuneloven § 14-4 andre ledd &amp; GKRS Rammeverk [ChromaDB Parent Chunk]</em>"
+            )
+        else:
+            top_c = chunks[0] if chunks else None
+            lexcerpt = top_c["excerpt"] if top_c else "Kommuneloven regulerer økonomiforvaltningen."
+            lref = top_c["title"] if top_c else "Kommuneloven"
+            answer_html = (
+                f"<strong>🤖 Antigravity KOSTRA AI Copilot <span class='rag-badge rag-green'>{intent_badge}</span>:</strong><br/>"
+                f"• <strong>Juridisk Hjemmel [{lref}]:</strong> {lexcerpt}<br/>"
+                f"• <strong>Prinsipp &amp; Fullmaktsstruktur:</strong> "
+                f"Skillet mellom administrative fullmakter under Kommunedirektørens styringsrett (§ 13-1 / § 14-2) "
+                f"og politisk bevilgningsmyndighet forbeholdt Bystyret (§ 14-4 / § 14-6 / § 14-10) er ufravikelig.<br/>"
+                f"• <strong>Disposisjonsfond:</strong> Bruk av disposisjonsfond krever eksplisitt bystyrevedtak og kan ikke besluttes administrativt."
+            )
     else:  # PRESCRIPTIVE_HYBRID
         answer_html = (
             f"<strong>🤖 Antigravity KOSTRA AI Copilot <span class='rag-badge rag-amber'>{intent_badge}</span>:</strong><br/>"

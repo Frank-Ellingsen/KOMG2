@@ -409,8 +409,53 @@ def run_tests():
     assert res.json()["status"] == "ok"
     print("  OK: Localblob ingestion pipeline verified")
 
+    # -------------------------------------------------------------------------
+    # COPILOT & INTENT ROUTER v2 SUITE (copilot_router.py)
+    # -------------------------------------------------------------------------
+    print("Testing /api/v1/copilot/query (Hvordan budsjettere lønn?)...")
+    res = client.post("/api/v1/copilot/query", json={"query": "Hvordan budsjettere lønn?"})
+    assert res.status_code == 200
+    cp_data = res.json()
+    assert cp_data["intent"] == "CONCEPTUAL_LEGAL"
+    assert "Stillingsmodulen" in cp_data["response"]
+    assert "Pottebudsjettering" in cp_data["response"]
+    print("  OK: Copilot correctly answered process question without sending SQL data")
+
+    print("Testing /api/v1/copilot/query (Hva er bruttoprinsippet?)...")
+    res = client.post("/api/v1/copilot/query", json={"query": "Hva er bruttoprinsippet i kommuneregnskapet?"})
+    assert res.status_code == 200
+    cp_bp = res.json()
+    assert cp_bp["intent"] == "CONCEPTUAL_LEGAL"
+    assert "bruttobeløp" in cp_bp["response"]
+    assert "14-4" in cp_bp["response"]
+    print("  OK: Copilot correctly explained bruttoprinsippet (Kommuneloven § 14-4 / GKRS)")
+
+    print("Testing /api/v1/copilot/query (DATA_ANALYTICS - Bokført lønn og avvik i august)...")
+    res = client.post(
+        "/api/v1/copilot/query",
+        json={"query": "Hva er bokført lønn og avvik på pleie og omsorg funksjon 254 i august?", "user_area_filter": "Helse og Omsorg"}
+    )
+    assert res.status_code == 200
+    cp_data_q = res.json()
+    assert cp_data_q["intent"] == "DATA_ANALYTICS"
+    assert "data" in cp_data_q
+    assert cp_data_q["data"]["regnskap_ytd"] > 0
+    print("  OK: Copilot correctly routed numerical variance query to DuckDB SQL")
+
+    print("Testing /api/v1/copilot/query (PRESCRIPTIVE_HYBRID - Tiltak for å løse avvik)...")
+    res = client.post(
+        "/api/v1/copilot/query",
+        json={"query": "Hvordan løser vi avviket på pleie og omsorg med strakstiltak?", "user_area_filter": "Helse og Omsorg"}
+    )
+    assert res.status_code == 200
+    cp_hyb = res.json()
+    assert cp_hyb["intent"] == "HYBRID"
+    assert "data" in cp_hyb
+    assert "sources" in cp_hyb
+    print("  OK: Copilot correctly generated hybrid prescriptive response (RAG + DuckDB)")
+
     print("\n==================================================")
-    print("ALL 33 ENDPOINTS (100% SUITE, ULTIMATE & RAG OPTIMIZATION) PASSED WITH ZERO ERRORS!")
+    print("ALL 34 ENDPOINTS (100% SUITE, ULTIMATE & COPILOT v2) PASSED WITH ZERO ERRORS!")
     print("==================================================")
 
 

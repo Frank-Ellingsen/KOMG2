@@ -49,12 +49,14 @@ class QueryIntent(str, Enum):
 
 def route_query(user_query: str) -> QueryIntent:
     """
-    Rutes query to correct execution path based on keywords, pattern detection,
-    and semantic cues to prevent hallucination and unnecessary data crunching.
+    Intent Router v2:
+    Klassifiserer brukerens intensjon deterministisk ved syntaktisk HV-mønstergjenkjenning
+    for å forhindre at prosess- og metodespørsmål ("hvordan budsjettere lønn?", "hva er bruttoprinsippet?")
+    feilrutes til SQL (DATA_ANALYTICS).
     """
-    q = user_query.lower()
+    q = user_query.strip().lower()
 
-    # 1. External Lookup triggers
+    # TRINN 0: Sjekk eksternt oppslag (DFØ, Lovdata, Regjeringen, SSB)
     ext_kw = [
         "terskelverdi", "lovdata", "rundskriv", "dfø", "dfo", "statsbudsjett",
         "regjeringen.no", "ssb.no", "ks.no", "nasjonal terskel", "anskaffelsesforskrift"
@@ -62,48 +64,45 @@ def route_query(user_query: str) -> QueryIntent:
     if any(k in q for k in ext_kw):
         return QueryIntent.EXTERNAL_LOOKUP
 
-    # 2. Prescriptive Hybrid triggers (Action / solution combined with variance)
+    # TRINN 1: Preskriptiv hybrid (tiltak koblet med tallavvik)
     presc_kw = [
         "tiltak", "saldere", "strakstiltak", "løse", "lukke avvik", "forslag",
-        "anbefal", "hva bør", "hvordan bør", "bemanningsplan", "innsparing", "redusere avvik"
+        "anbefal", "hva bør", "hvordan bør", "bemanningsplan", "innsparing", "redusere avvik",
+        "omdisponering", "kutt", "dekke"
     ]
-    if any(k in q for k in presc_kw):
+    data_explicit_kw = [
+        "bokført", "avvik", "ytd", "eac", "forbruk", "beløp", "hvor mye",
+        "m01", "m02", "m03", "m04", "m05", "m06", "m07", "m08", "m09", "m10", "m11", "m12",
+        "august", "januar", "funksjon 254", "art 1020", "art 1040", "merforbruk"
+    ]
+    has_prescriptive = any(k in q for k in presc_kw)
+    has_explicit_data = any(k in q for k in data_explicit_kw)
+
+    if has_prescriptive and (has_explicit_data or "avvik" in q or "merforbruk" in q):
         return QueryIntent.PRESCRIPTIVE_HYBRID
 
-    # 3. Conceptual Legal Definitions (What is X, define X without specific numbers)
-    definition_starts = ["hva er ", "hva betyr ", "definer ", "hva sier loven", "hjemmel for "]
-    is_def = any(q.startswith(d) for d in definition_starts)
+    # TRINN 2: Sjekk om spørringen eksplisitt ber om konkrete regnskapstall
+    # (f.eks. "Hva er bokført lønn og avvik på pleie og omsorg funksjon 254 i august?")
+    if has_explicit_data:
+        specific_financial_tokens = ["bokført", "avvik", "ytd", "eac", "hvor mye", "august", "funksjon 254", "forbruk"]
+        if any(tok in q for tok in specific_financial_tokens):
+            return QueryIntent.DATA_ANALYTICS
 
-    specific_data_tokens = [
-        "bokført", "ytd", "eac", "m01", "m02", "m03", "m04", "m05", "m06", "m07",
-        "m08", "m09", "m10", "m11", "m12", "august", "januar", "hvor mye", "art 10",
-        "art 12", "art 17", "funksjon 2", "tallene"
+    # TRINN 3: Prosess-, regelverks- og fagspørsmål ("HV-spørsmål")
+    # ("hvordan budsjettere lønn", "hva er bruttoprinsippet", "hva er reglene for disposisjonsfond")
+    process_hv_patterns = [
+        r"^hvordan\b", r"\bhvordan\b", r"^hva\s+er\b", r"\bhva\s+er\b",
+        r"^hva\s+betyr\b", r"\bhva\s+betyr\b", r"^forklar\b", r"\bforklar\b",
+        r"^hvilke\s+regler\b", r"\bhvilke\s+regler\b", r"^hva\s+slags\b",
+        r"^hva\s+innebærer\b", r"\bmetodikk\b", r"\bprinsippet\b", r"\bprinsipp\b",
+        r"\bveileder\b", r"\bprosedyre\b", r"\brutine\b", r"\blover\b",
+        r"\bhjemmel\b", r"\bparagraf\b", r"§", r"\bkommunelov\b", r"\bforskrift\b"
     ]
-    has_specific_data = any(k in q for k in specific_data_tokens)
-
-    if is_def and not has_specific_data:
+    if any(re.search(p, q) for p in process_hv_patterns):
         return QueryIntent.CONCEPTUAL_LEGAL
 
-    # 4. General Data Analytics vs Legal
-    data_kw = [
-        "bokført", "regnskap", "budsjett", "avvik", "prognose", "eac", "forbruk",
-        "burn rate", "art 10", "art 12", "art 17", "konto", "funksjon", "hvor mye",
-        "sum", "tall", "august", "m08", "nok", "kr", "merforbruk", "mindreforbruk"
-    ]
-    has_data = any(k in q for k in data_kw)
-
-    legal_kw = [
-        "paragraf", "§", "kommunelov", "forskrift", "bruttoprinsipp", "hjemmel",
-        "disposisjonsfond", "styringsrett", "arbeidsmiljølov", "definer", "rettslig"
-    ]
-    has_legal = any(k in q for k in legal_kw)
-
-    if has_data and not has_legal:
+    if has_explicit_data or any(w in q for w in ["regnskap", "budsjett", "forbruk"]):
         return QueryIntent.DATA_ANALYTICS
-    elif has_legal and not has_data:
-        return QueryIntent.CONCEPTUAL_LEGAL
-    elif has_data and has_legal:
-        return QueryIntent.PRESCRIPTIVE_HYBRID
 
     return QueryIntent.CONCEPTUAL_LEGAL
 
@@ -196,6 +195,52 @@ class ParentChildChunker:
 
 # Built-in Core Knowledge Chunks (Guaranteed available immediately)
 STATIC_CORPUS: List[Dict[str, Any]] = [
+    {
+        "doc_id": "NORMATIV-LONNSBUDSJETT-MAL",
+        "title": "Normativ Mal for Lønnsbudsjettering i Kommunal Sektor & Framsikt Stillingsmodul",
+        "source_file": "localblob/Normativ Mal for Lønnsbudsjettering i Kommunal Sektor.md",
+        "paragraf": "Framsikt Stillingsmodul & Visma Gat Optur Plus",
+        "myndighetsnivaa": "METODIKK_FAGLIG",
+        "kostra_relevans": ["art_101000", "art_102000", "art_104000", "art_109000", "art_169000", "art_171000"],
+        "gjelder_kommuner": ["KRISTIANSAND", "ALLE"],
+        "oppdatert_dato": "2026-01-01",
+        "keywords": ["budsjettere", "lønn", "hvordan", "metodikk", "stillingsmodul", "framsikt", "visma", "gat", "klp", "spk", "aga", "feriepenger", "pottebudsjettering", "refusjoner"],
+        "excerpt": (
+            "Fast lønn (Stillingsmodulen): Import av stillingshjemler fra HR/ERP (Visma Enterprise / UBW). "
+            "Automatisk beregning av feriepenger (12 % / 14,3 %), pensjon (KLP 14,8 % / SPK 11,2 %), og arbeidsgiveravgift (AGA 14,1 %) per stilling. "
+            "Variabel lønn (Pottebudsjettering): Aggregerte potter per enhet for overtid (art 1040), vikarer (art 1020) og faste/variable tillegg (art 1090). "
+            "Visma Gat Optur Plus-integrasjon: Simulering av turnusplaner og vaktbøker før rammene låses for eksakt dimensjonering av art 1090. "
+            "Refusjoner (Art 1690/1710): Oppstilling av forventede sykelønnsrefusjoner fra NAV for motregning på inntektssiden."
+        ),
+        "parent_context": (
+            "Kommunal Lønnsbudsjettering og Årshjul i Framsikt. Lønnsbudsjettet utgjør normalt 60-75 % av kommunens driftsutgifter og bygges opp i to hovedløp: "
+            "1. Stillingsbudsjett for faste årsverk (art 1010) med bitemporal beregning av ansiennitetsopprykk, KLP/SPK pensjonspremie og arbeidsgiveravgift. "
+            "2. Pottebudsjett for variable vakt- og fraværskostnader (art 1020, 1040, 1090) basert på historisk turnusutfall i Visma Gat. "
+            "Forventede refusjoner fra NAV (art 1690/1710) budsjetteres på inntektssiden i tråd med bruttoprinsippet."
+        )
+    },
+    {
+        "doc_id": "GKRS-KOMMUNELOV-BRUTTOPRINSIPPET",
+        "title": "Kommuneloven § 14-4 andre ledd & GKRS Rammeverk – Bruttoprinsippet i Kommuneregnskapet",
+        "source_file": "localblob/Kommuneregnskapet-rammeverk-og-grunnleggende-prinsipper.pdf",
+        "paragraf": "§ 14-4 andre ledd & GKRS Pkt. 3.2",
+        "myndighetsnivaa": "LOVVERK_GKRS",
+        "kostra_relevans": ["art_101000", "art_102000", "art_171000", "art_169000"],
+        "gjelder_kommuner": ["KRISTIANSAND", "ALLE"],
+        "oppdatert_dato": "2026-01-01",
+        "keywords": ["bruttoprinsippet", "brutto", "motregning", "kommuneloven", "14-4", "gkrs", "refusjon", "nav", "sykelønn", "inntekt", "utgift"],
+        "excerpt": (
+            "Definisjon av bruttoprinsippet (Kommuneloven § 14-4 andre ledd): All inntekt og utgift skal føres med sitt bruttobeløp uten motregning i budsjett og regnskap. "
+            "Kommunal praksis: NAV-refusjoner (art 1710/1690) kan ikke trekkes fra brutto lønnsutgifter (art 1010/1020) på samme konto eller ansvar, "
+            "men må regnskapsføres som inntekt og overføring fra staten på egen artskonto (art 1710/171000)."
+        ),
+        "parent_context": (
+            "Kommuneloven Kapittel 14 Økonomiforvaltning. § 14-4 Budsjettregler. Driftsbudsjettet og investeringsbudsjettet skal settes opp etter bruttoprinsippet "
+            "slik at alle kjente utgifter og inntekter tas med. Det er forbudt å nettobudsjettere ved å motregne forventede inntekter mot driftsutgifter. "
+            "I henhold til GKRS (God kommunal regnskapsskikk) skal lønnsutgifter til vikarer ved sykefravær regnskapsføres fullt ut på art 1020/1040, "
+            "mens sykelønnsrefusjoner og foreldrepenger fra NAV føres som overføring fra staten på art 1710/171000 uten direkte saldering mot personellkontoene."
+        )
+    },
     {
         "doc_id": "LOV-2018-06-22-83-§13-1",
         "title": "Kommuneloven § 13-1 — Kommunedirektørens styringsrett og løpende ledelse",
