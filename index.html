@@ -9387,7 +9387,7 @@ function renderRecommenderModule(ctx) {
       const glidning = glidningEl ? parseFloat(glidningEl.value) || 0.6 : 0.6;
       const klpPct = klpEl ? parseFloat(klpEl.value) || 14.8 : 14.8;
       const spkPct = spkEl ? parseFloat(spkEl.value) || 11.2 : 11.2;
-      const agaRate = 0.141; // 14,1 % Arbeidsgiveravgift Sone 1
+      const growthRate = (deflator + glidning) / 100.0;
 
       // Oppdater visning på slider-labels
       const valDeflator = document.getElementById("pos-val-deflator");
@@ -9401,16 +9401,34 @@ function renderRecommenderModule(ctx) {
       const statDeflator = document.getElementById("pos-stat-deflator");
       if (statDeflator) statDeflator.textContent = `${(deflator + glidning).toFixed(1).replace(".", ",")} %`;
 
-      // 1. Filtrer stillinger og beregn FTE for utvalget
-      const growthRate = (deflator + glidning) / 100.0;
-      let posList = [];
+      // 1. Hent faktiske innleste regnskapstall fra DUCKDB_MONTHLY_REPORT_SNAPSHOTS & KOSTRA_ART_SNAPSHOTS
+      const snapKey = `${sektor}__${ansvar}`;
+      const snap = (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined" && DUCKDB_MONTHLY_REPORT_SNAPSHOTS[snapKey])
+        || (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined" && DUCKDB_MONTHLY_REPORT_SNAPSHOTS[`${sektor}__ALL`])
+        || (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined" && DUCKDB_MONTHLY_REPORT_SNAPSHOTS["ALL__ALL"])
+        || {};
+      const pp = snap.personnel_profile || {};
+      const artSnap = (typeof KOSTRA_ART_SNAPSHOTS !== "undefined" && KOSTRA_ART_SNAPSHOTS[snapKey])
+        || (typeof KOSTRA_ART_SNAPSHOTS !== "undefined" && KOSTRA_ART_SNAPSHOTS[`${sektor}__ALL`])
+        || (typeof KOSTRA_ART_SNAPSHOTS !== "undefined" && KOSTRA_ART_SNAPSHOTS["ALL__ALL"])
+        || {};
+      const artMap = artSnap.art_map || {};
 
+      const actualRammeBud = Math.round(pp.brutto_annual_budget_nok || 40549437);
+      const actualFastlonnBud = Math.round(artMap["Art 1010"] ? artMap["Art 1010"].ann_bud : (actualRammeBud * 0.718));
+      const actualSosialBud = Math.round(
+        (artMap["Art 1090"] ? artMap["Art 1090"].ann_bud : 0) +
+        (artMap["Art 1099"] ? artMap["Art 1099"].ann_bud : 0) || (actualRammeBud * 0.241)
+      );
+      const actualVariableBud = Math.max(0, actualRammeBud - actualFastlonnBud - actualSosialBud);
+
+      // 2. Filtrer stillinger og beregn FTE for utvalget
+      let posList = [];
       (typeof SALARY_POSITIONS_DATA !== "undefined" ? SALARY_POSITIONS_DATA : []).forEach(p => {
         if (sektor !== "ALL" && p.sektor !== sektor) return;
 
         let fte = 0;
         if (ansvar === "ALL") {
-          // Summer over enheter i p.fteByUnit som matcher filteret
           Object.entries(p.fteByUnit).forEach(([unitCode, unitFte]) => {
             const uMeta = (typeof ANSVAR_UNITS !== "undefined" && ANSVAR_UNITS[unitCode]) || {};
             if (sektor !== "ALL" && uMeta.sektor && uMeta.sektor !== sektor) return;
@@ -9426,27 +9444,31 @@ function renderRecommenderModule(ctx) {
         }
       });
 
-      // 2. Oppdater filter-undertittel og FTE-badge
-      const subTitleEl = document.getElementById("positions-filter-subtitle");
-      const fteBadgeEl = document.getElementById("positions-fte-badge");
       const totFte = posList.reduce((acc, p) => acc + p.fte, 0);
 
+      // Oppdater filter-undertittel og FTE-badge
+      const subTitleEl = document.getElementById("positions-filter-subtitle");
+      const fteBadgeEl = document.getElementById("positions-fte-badge");
       const sekLabel = sektor === "ALL" ? "Alle Sektorer (Helse og Skole)" : sektor;
       const ansLabel = ansvar === "ALL" ? "Alle ansvarssteder" : (ANSVAR_UNITS[ansvar]?.name || ansvar);
       if (subTitleEl) {
-        subTitleEl.textContent = `Stillingskategorier for ${sekLabel} (${ansLabel}) • KS HTA garantilønn, KLP/SPK pensjon og AGA 14,1 %`;
+        subTitleEl.textContent = `Stillingskategorier for ${sekLabel} (${ansLabel}) • KOSTRA Art 10xx & 127x innleste data, KLP/SPK pensjon og AGA 14,1 %`;
       }
       if (fteBadgeEl) {
         fteBadgeEl.textContent = `${totFte.toFixed(1).replace(".", ",")} FTE i utvalg`;
       }
 
       if (posList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:1.2rem; color:var(--text-muted);">Ingen stillingskategorier funnet for dette filterutvalget.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:1.2rem; color:var(--text-muted);">Ingen stillingskategorier funnet for dette filterutvalget.</td></tr>`;
         if (tfoot) tfoot.innerHTML = "";
         return;
       }
 
-      // 3. Beregn summer og rader
+      // 3. Skaler grunnlønn basert på faktisk innlest fastlønnsbudsjett (Art 1010)
+      const sumWeight = posList.reduce((acc, p) => acc + (p.fte * p.baseSalary2024), 0);
+      const scaleFactor = sumWeight > 0 ? (actualFastlonnBud / sumWeight) : 1.0;
+      const variableRatio = actualRammeBud > 0 ? (actualVariableBud / actualRammeBud) : 0;
+
       let sumLonn2024 = 0;
       let sumSosial2024 = 0;
       let sumTotal2024 = 0;
@@ -9457,20 +9479,27 @@ function renderRecommenderModule(ctx) {
       tbody.innerHTML = posList.map(p => {
         const pRate = p.pensionType === "SPK" ? (spkPct / 100.0) : (klpPct / 100.0);
         
-        // 2024 tall
-        const lonn2024 = Math.round(p.fte * p.baseSalary2024);
+        // Faktisk avstemt fastlønn 2024
+        const lonn2024 = Math.round(p.fte * p.baseSalary2024 * scaleFactor);
+        const snittLonn2024 = p.fte > 0 ? Math.round(lonn2024 / p.fte) : p.baseSalary2024;
+
+        // Sosiale kostnader 2024
         const pensjon2024 = lonn2024 * pRate;
-        const aga2024 = (lonn2024 + pensjon2024) * agaRate;
+        const aga2024 = (lonn2024 + pensjon2024) * 0.141;
         const sosial2024 = Math.round(pensjon2024 + aga2024);
-        const total2024 = lonn2024 + sosial2024;
+
+        // Andel av variable personalkostnader (overtid, vikar, tillegg)
+        const varAndel2024 = Math.round(lonn2024 * (variableRatio / (1 - variableRatio || 1)));
+        const total2024 = lonn2024 + sosial2024 + varAndel2024;
 
         // 2025 framskriving
-        const nyLonnSnitt2025 = Math.round(p.baseSalary2024 * (1.0 + growthRate));
-        const lonn2025 = Math.round(p.fte * nyLonnSnitt2025);
+        const nySnittLonn2025 = Math.round(snittLonn2024 * (1.0 + growthRate));
+        const lonn2025 = Math.round(p.fte * nySnittLonn2025);
         const pensjon2025 = lonn2025 * pRate;
-        const aga2025 = (lonn2025 + pensjon2025) * agaRate;
+        const aga2025 = (lonn2025 + pensjon2025) * 0.141;
         const sosial2025 = Math.round(pensjon2025 + aga2025);
-        const total2025 = lonn2025 + sosial2025;
+        const varAndel2025 = Math.round(varAndel2024 * (1.0 + growthRate));
+        const total2025 = lonn2025 + sosial2025 + varAndel2025;
 
         const endring = total2025 - total2024;
         const endringPct = total2024 > 0 ? (endring / total2024) * 100 : 0;
@@ -9488,11 +9517,11 @@ function renderRecommenderModule(ctx) {
             <td style="font-family:var(--font-mono); font-size:0.7rem; color:var(--text-secondary);">${p.code} • ${p.tariff}</td>
             <td><span class="rag-badge" style="background:#F1F5F9; color:var(--header-dark); font-size:0.67rem;">${p.pensionType} (${(pRate * 100).toFixed(1).replace(".", ",")} %)</span></td>
             <td class="num-col" style="font-weight:700;">${p.fte.toFixed(1).replace(".", ",")}</td>
-            <td class="num-col col-budget">${fmtNum(p.baseSalary2024)} kr</td>
+            <td class="num-col col-budget">${fmtNum(snittLonn2024)} kr</td>
             <td class="num-col">${fmtNum(lonn2024)} kr</td>
             <td class="num-col" style="color:var(--text-secondary);">${fmtNum(sosial2024)} kr</td>
             <td class="num-col" style="font-weight:600; background:rgba(0,0,0,0.02);">${fmtNum(total2024)} kr</td>
-            <td class="num-col col-regnskap" style="font-weight:600;">${fmtNum(nyLonnSnitt2025)} kr</td>
+            <td class="num-col col-regnskap" style="font-weight:600;">${fmtNum(nySnittLonn2025)} kr</td>
             <td class="num-col" style="font-weight:700; color:var(--header-dark);">${fmtNum(total2025)} kr</td>
             <td class="num-col rag-amber" style="font-weight:600;">+${fmtNum(endring)} kr <span style="font-size:0.66rem; font-weight:normal;">(+${endringPct.toFixed(1).replace(".", ",")} %)</span></td>
           </tr>
@@ -9535,14 +9564,14 @@ function renderRecommenderModule(ctx) {
       const vekstLonnPct = sumLonn2024 > 0 ? (vekstLonn / sumLonn2024) * 100 : 0;
       const vekstSosialPct = sumSosial2024 > 0 ? (vekstSosial / sumSosial2024) * 100 : 0;
 
-      if (sumBasisEl) sumBasisEl.textContent = `${fmtNum(sumLonn2024)} kr`;
-      if (sumBasisSubEl) sumBasisSubEl.textContent = `Totalt 2024 inkl. sosiale (${(sumSosial2024 / 1000000).toFixed(2).replace(".", ",")} M): ${fmtNum(sumTotal2024)} kr`;
+      if (sumBasisEl) sumBasisEl.textContent = `${fmtNum(sumTotal2024)} kr`;
+      if (sumBasisSubEl) sumBasisSubEl.textContent = `Fastlønn: ${fmtNum(sumLonn2024)} kr • Sosiale: ${fmtNum(sumSosial2024)} kr`;
       if (sumVekstEl) sumVekstEl.textContent = `+${fmtNum(vekstLonn)} kr`;
-      if (sumVekstPctEl) sumVekstPctEl.textContent = `+${vekstLonnPct.toFixed(1).replace(".", ",")} % vekst (Ny grunnlønn: ${fmtNum(sumLonn2025)} kr)`;
+      if (sumVekstPctEl) sumVekstPctEl.textContent = `+${vekstLonnPct.toFixed(1).replace(".", ",")} % vekst (Ny fastlønn: ${fmtNum(sumLonn2025)} kr)`;
       if (sumSosialEl) sumSosialEl.textContent = `${fmtNum(sumSosial2025)} kr`;
-      if (sumSosialSubEl) sumSosialSubEl.textContent = `Vekst vs 2024 (${(sumSosial2024 / 1000000).toFixed(2).replace(".", ",")} M): +${fmtNum(vekstSosial)} kr (+${vekstSosialPct.toFixed(1).replace(".", ",")} %)`;
+      if (sumSosialSubEl) sumSosialSubEl.textContent = `Pensjon + AGA 14,1 % (+${fmtNum(vekstSosial)} kr vs 2024)`;
       if (sumTotal2025El) sumTotal2025El.textContent = `${fmtNum(sumTotal2025)} kr`;
-      if (sumDiffEl) sumDiffEl.textContent = `Samlet budsjettvekst: +${fmtNum(vekstTotal)} kr (+${vekstTotalPct.toFixed(1).replace(".", ",")} %) • Lønn +${(vekstLonn / 1000000).toFixed(2).replace(".", ",")}M / Sos +${(vekstSosial / 1000000).toFixed(2).replace(".", ",")}M`;
+      if (sumDiffEl) sumDiffEl.textContent = `Samlet budsjettvekst: +${fmtNum(vekstTotal)} kr (+${vekstTotalPct.toFixed(1).replace(".", ",")} %) • Lønn +${fmtNum(vekstLonn)} / Sos +${fmtNum(vekstSosial)}`;
     }
     
 function renderSalaryBudgetModule(ctx) {
@@ -9790,36 +9819,25 @@ function renderSalaryBudgetModule(ctx) {
       const ctx = typeof getFilteredContext === "function" ? getFilteredContext() : { sektor: "ALL", ansvar: "ALL", funksjon: "ALL" };
       const { sektor, ansvar, funksjon } = ctx;
 
-      // Beregn utvalgets basis og veide sosiale kostnader direkte fra stillingsstrukturen (SALARY_POSITIONS_DATA)
-      let baseFastlonn = 0;
-      let totPlanFte = 0;
-      let weightedSosialBasis2024 = 0;
+      // Hent faktiske innleste tall for utvalget (KOSTRA Art 10xx & 127x)
+      const snapKey = `${sektor}__${ansvar}`;
+      const snap = (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined" && DUCKDB_MONTHLY_REPORT_SNAPSHOTS[snapKey])
+        || (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined" && DUCKDB_MONTHLY_REPORT_SNAPSHOTS[`${sektor}__ALL`])
+        || (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined" && DUCKDB_MONTHLY_REPORT_SNAPSHOTS["ALL__ALL"])
+        || {};
+      const pp = snap.personnel_profile || {};
+      const artSnap = (typeof KOSTRA_ART_SNAPSHOTS !== "undefined" && KOSTRA_ART_SNAPSHOTS[snapKey])
+        || (typeof KOSTRA_ART_SNAPSHOTS !== "undefined" && KOSTRA_ART_SNAPSHOTS[`${sektor}__ALL`])
+        || (typeof KOSTRA_ART_SNAPSHOTS !== "undefined" && KOSTRA_ART_SNAPSHOTS["ALL__ALL"])
+        || {};
+      const artMap = artSnap.art_map || {};
 
-      (typeof SALARY_POSITIONS_DATA !== "undefined" ? SALARY_POSITIONS_DATA : []).forEach(p => {
-        if (sektor !== "ALL" && p.sektor !== sektor) return;
-
-        let fte = 0;
-        if (ansvar === "ALL") {
-          Object.entries(p.fteByUnit).forEach(([unitCode, unitFte]) => {
-            const uMeta = (typeof ANSVAR_UNITS !== "undefined" && ANSVAR_UNITS[unitCode]) || {};
-            if (sektor !== "ALL" && uMeta.sektor && uMeta.sektor !== sektor) return;
-            if (funksjon !== "ALL" && uMeta.fn && uMeta.fn !== funksjon) return;
-            fte += unitFte;
-          });
-        } else {
-          fte = p.fteByUnit[ansvar] || 0.0;
-        }
-
-        if (fte > 0) {
-          totPlanFte += fte;
-          const posLonn = Math.round(fte * p.baseSalary2024);
-          baseFastlonn += posLonn;
-          const pRate = p.pensionType === "SPK" ? (spkPct / 100.0) : (klpPct / 100.0);
-          const pens = posLonn * pRate;
-          const aga = (posLonn + pens) * 0.141;
-          weightedSosialBasis2024 += Math.round(pens + aga);
-        }
-      });
+      const actualRammeBud = Math.round(pp.brutto_annual_budget_nok || 40549437);
+      const baseFastlonn = Math.round(artMap["Art 1010"] ? artMap["Art 1010"].ann_bud : (actualRammeBud * 0.718));
+      const actualSosialBud = Math.round(
+        (artMap["Art 1090"] ? artMap["Art 1090"].ann_bud : 0) +
+        (artMap["Art 1099"] ? artMap["Art 1099"].ann_bud : 0) || (actualRammeBud * 0.241)
+      );
 
       // Hent vakanser fra aktive enheter
       const filteredUnits = (typeof SALARY_UNITS_DATA !== "undefined" ? SALARY_UNITS_DATA : []).filter(u => {
@@ -9829,16 +9847,19 @@ function renderSalaryBudgetModule(ctx) {
         return true;
       });
 
+      let totPlanFte = 0;
       let totVakansFte = 0;
       filteredUnits.forEach(u => {
+        totPlanFte += u.ftePlan;
         totVakansFte += u.vakans;
       });
 
       const avgSnittLonn = totPlanFte > 0 ? (baseFastlonn / totPlanFte) : 577904;
-      const effectiveSosialRate = baseFastlonn > 0 ? (weightedSosialBasis2024 / baseFastlonn) : 0.291238;
+      const effectiveSosialRate = baseFastlonn > 0 ? (actualSosialBud / baseFastlonn) : 0.3359;
 
       const ksVirkning = Math.round(baseFastlonn * (ksPct / 100.0) * (8 / 12));
-      const vikarRest4M = Math.round(baseFastlonn * 0.046);
+      const vikarBud = Math.round((artMap["Art 1020"] ? artMap["Art 1020"].ann_bud : 0) + (artMap["Art 1270"] ? artMap["Art 1270"].ann_bud : 0) || (baseFastlonn * 0.05));
+      const vikarRest4M = Math.round(vikarBud * (4 / 12));
       const vikarSaving = Math.round(vikarRest4M * (1.0 - vikarPct / 100.0));
       const snittLonnMnd = avgSnittLonn / 12;
       const vakansSaving = Math.round(totVakansFte * snittLonnMnd * Math.min(4, vakansMnd));
@@ -9847,13 +9868,7 @@ function renderSalaryBudgetModule(ctx) {
       const totalSosial = Math.round(totalLonnSim * effectiveSosialRate);
       const ksDiff = ksVirkning - Math.round(baseFastlonn * 0.052 * (8 / 12));
 
-      // Hent netto avvik fra snapshot for aktiv enhet/sektor
-      const snapKey = `${sektor}__${ansvar}`;
-      const snap = (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined" && DUCKDB_MONTHLY_REPORT_SNAPSHOTS[snapKey])
-        || (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined" && DUCKDB_MONTHLY_REPORT_SNAPSHOTS[`${sektor}__ALL`])
-        || (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined" && DUCKDB_MONTHLY_REPORT_SNAPSHOTS["ALL__ALL"])
-        || {};
-      const pp = snap.personnel_profile || {};
+      // Hent brutto EOY avvik fra snapshot for aktiv enhet/sektor
       const baseAvvik = Math.round(pp.brutto_eoy_variance_nok || 2322973);
       const netVariance = baseAvvik + ksDiff - vikarSaving - vakansSaving;
 
