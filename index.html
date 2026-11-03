@@ -3612,6 +3612,110 @@
             </div>
           </div>
 
+          
+        <!-- STILLINGSSTRUKTUR & LØNNSBUDSJETTERING NESTE ÅR (FRAMSIKT-MODELL) -->
+        <div class="panel" id="panel-salary-positions" style="margin-bottom:1rem; border-top:3px solid var(--clr-fig-budsjett);">
+          <div class="panel-title" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <h3 style="font-size:0.95rem; font-weight:700; color:var(--text-primary); margin-bottom:0.2rem;">
+                🧑‍💼 Stillingsstruktur &amp; Lønnsbudsjettering Neste År (Framsikt-grunnlag)
+              </h3>
+              <span class="panel-subtitle" id="positions-filter-subtitle">
+                Stillingskategorier for Helse og Omsorg • KS HTA garantilønn, KLP/SPK pensjon og AGA 14,1 %
+              </span>
+            </div>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <span class="rag-badge rag-green" id="positions-fte-badge">168,0 FTE i utvalg</span>
+              <span class="rag-badge" style="background:#EEF2F6; color:var(--text-secondary); font-family:var(--font-mono); font-size:0.7rem;">Deflator 2025: <span id="pos-stat-deflator">4,2 %</span></span>
+            </div>
+          </div>
+
+          <!-- Interaktive Framsikt Budsjettframskrivings-kontroller -->
+          <div style="background:var(--bg-subtle, #F8FAFC); border:1px solid var(--border-light, #E2E8F0); border-radius:4px; padding:0.75rem 0.9rem; margin:0.6rem 0 0.9rem; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:0.85rem; font-size:0.76rem;">
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+                <label for="pos-sim-deflator" style="font-weight:600;">Lønnsvekst / TBU Deflator 2025:</label>
+                <span id="pos-val-deflator" style="font-weight:700; color:var(--clr-fig-regnskap);">4,2 %</span>
+              </div>
+              <input type="range" id="pos-sim-deflator" min="2.0" max="7.0" step="0.1" value="4.2" style="width:100%;">
+              <span style="font-size:0.68rem; color:var(--text-muted);">Helårsvirkning KS 2024 + anslag 2025</span>
+            </div>
+
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+                <label for="pos-sim-glidning" style="font-weight:600;">Ansiennitetsopprykk / Glidning:</label>
+                <span id="pos-val-glidning" style="font-weight:700;">0,6 %</span>
+              </div>
+              <input type="range" id="pos-sim-glidning" min="0.0" max="2.0" step="0.1" value="0.6" style="width:100%;">
+              <span style="font-size:0.68rem; color:var(--text-muted);">Årlig automatisk ansiennitetsvekst</span>
+            </div>
+
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+                <label for="pos-sim-klp" style="font-weight:600;">KLP Pensjonspremie (Helse/Adm):</label>
+                <span id="pos-val-klp" style="font-weight:700;">14,8 %</span>
+              </div>
+              <input type="range" id="pos-sim-klp" min="12.0" max="18.0" step="0.2" value="14.8" style="width:100%;">
+              <span style="font-size:0.68rem; color:var(--text-muted);">Tjenestepensjon jf. KLP-regulativ</span>
+            </div>
+
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+                <label for="pos-sim-spk" style="font-weight:600;">SPK Pensjonspremie (Skole):</label>
+                <span id="pos-val-spk" style="font-weight:700;">11,2 %</span>
+              </div>
+              <input type="range" id="pos-sim-spk" min="9.0" max="15.0" step="0.2" value="11.2" style="width:100%;">
+              <span style="font-size:0.68rem; color:var(--text-muted);">Lærerpensjon Statens Pensjonskasse</span>
+            </div>
+          </div>
+
+          <!-- Sammendragskort for Neste Års Lønnsbudsjett (2025) -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.6rem; margin-bottom:0.85rem;">
+            <div style="background:#fff; border:1px solid var(--border-light); padding:0.55rem 0.75rem; border-radius:4px;">
+              <span style="font-size:0.7rem; color:var(--text-secondary); display:block;">Basislønnsmasse 2024</span>
+              <strong id="pos-sum-basis" style="font-size:0.95rem; color:var(--header-dark); font-family:var(--font-mono);">0 kr</strong>
+              <span style="font-size:0.66rem; color:var(--text-muted); display:block;">Ordinær grunnlønn før sosiale</span>
+            </div>
+            <div style="background:#fff; border:1px solid var(--border-light); padding:0.55rem 0.75rem; border-radius:4px;">
+              <span style="font-size:0.7rem; color:var(--text-secondary); display:block;">Lønnsvekst &amp; Glidning 2025</span>
+              <strong id="pos-sum-vekst" style="font-size:0.95rem; color:var(--clr-fig-regnskap); font-family:var(--font-mono);">0 kr</strong>
+              <span style="font-size:0.66rem; color:var(--text-muted); display:block;" id="pos-sum-vekst-pct">+4,8 % samlet lønnsvekst</span>
+            </div>
+            <div style="background:#fff; border:1px solid var(--border-light); padding:0.55rem 0.75rem; border-radius:4px;">
+              <span style="font-size:0.7rem; color:var(--text-secondary); display:block;">Sosiale Kostnader 2025</span>
+              <strong id="pos-sum-sosial" style="font-size:0.95rem; color:var(--text-primary); font-family:var(--font-mono);">0 kr</strong>
+              <span style="font-size:0.66rem; color:var(--text-muted); display:block;">Pensjon (KLP/SPK) + AGA 14,1 %</span>
+            </div>
+            <div style="background:#fff; border:1px solid var(--border-light); border-left:3px solid var(--clr-fig-budsjett); padding:0.55rem 0.75rem; border-radius:4px;">
+              <span style="font-size:0.7rem; color:var(--clr-fig-budsjett); font-weight:700; display:block;">Beregnet Lønnsbudsjett 2025</span>
+              <strong id="pos-sum-total2025" style="font-size:1.05rem; color:var(--header-dark); font-family:var(--font-mono);">0 kr</strong>
+              <span style="font-size:0.66rem; color:var(--clr-fig-budsjett); font-weight:600; display:block;" id="pos-sum-diff">Endring: +0 kr (+0,0 %)</span>
+            </div>
+          </div>
+
+          <!-- Stillingskategoritabell -->
+          <div class="table-wrapper">
+            <table class="tufte-table" style="font-size:0.75rem;" id="table-salary-positions">
+              <thead>
+                <tr>
+                  <th>Stillingstype</th>
+                  <th>Stillingskode &amp; Tariffgruppe</th>
+                  <th>Pensjonsordning</th>
+                  <th class="num-col">Årsverk (FTE)</th>
+                  <th class="num-col col-budget">Snitt Grunnlønn 2024</th>
+                  <th class="num-col">Lønnsmasse 2024</th>
+                  <th class="num-col">Sosiale Kostnader 2024</th>
+                  <th class="num-col col-regnskap">Ny Årslønn 2025</th>
+                  <th class="num-col" style="font-weight:700;">Lønnsbudsjett 2025</th>
+                  <th class="num-col">Endring 2025</th>
+                </tr>
+              </thead>
+              <tbody id="salary-positions-table-body"></tbody>
+              <tfoot id="salary-positions-table-foot"></tfoot>
+            </table>
+          </div>
+        </div>
+
           <!-- Interaktiv Lønnssimulator -->
           <div class="panel">
             <h3 style="font-size:0.9rem; font-weight:700; color:var(--text-primary); margin-bottom:0.4rem;">
@@ -5017,6 +5121,155 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     ];
 
 // =========================================================================
+    const SALARY_POSITIONS_DATA = [
+      // Helse og Omsorg stillingstyper
+      {
+        id: "helse_avdleder",
+        title: "Avdelingsleder pleie / Omsorgsleder",
+        sektor: "Helse og Omsorg",
+        code: "7451",
+        tariff: "KS HTA Kap. 3.4 (Leder)",
+        pensionType: "KLP",
+        pensionPct: 14.8,
+        baseSalary2024: 820000,
+        fteByUnit: { "25310": 2.0, "25320": 1.0, "25710": 1.5, "25720": 1.5 }
+      },
+      {
+        id: "helse_spessyke",
+        title: "Spesialsykepleier / Jordmor / Videreutd.",
+        sektor: "Helse og Omsorg",
+        code: "7523",
+        tariff: "KS HTA Kap. 4 Gr. 2 (Videreutd.)",
+        pensionType: "KLP",
+        pensionPct: 14.8,
+        baseSalary2024: 615000,
+        fteByUnit: { "25310": 10.0, "25320": 6.0, "25710": 8.0, "25720": 8.0 }
+      },
+      {
+        id: "helse_sykepleier",
+        title: "Sykepleier / Vernepleier (3-årig bachelor)",
+        sektor: "Helse og Omsorg",
+        code: "7174",
+        tariff: "KS HTA Kap. 4 Gr. 2 (3-årig U/H)",
+        pensionType: "KLP",
+        pensionPct: 14.8,
+        baseSalary2024: 555000,
+        fteByUnit: { "25310": 14.0, "25320": 10.0, "25710": 12.0, "25720": 12.0 }
+      },
+      {
+        id: "helse_helsefagarb",
+        title: "Helsefagarbeider / Omsorgsarbeider",
+        sektor: "Helse og Omsorg",
+        code: "7076",
+        tariff: "KS HTA Kap. 4 (Fagarbeider)",
+        pensionType: "KLP",
+        pensionPct: 14.8,
+        baseSalary2024: 485000,
+        fteByUnit: { "25310": 15.0, "25320": 13.0, "25710": 13.0, "25720": 13.0 }
+      },
+      {
+        id: "helse_miljoter",
+        title: "Miljøterapeut / Fysio- / Ergoterapeut",
+        sektor: "Helse og Omsorg",
+        code: "6610",
+        tariff: "KS HTA Kap. 4 Gr. 2 (3-årig U/H)",
+        pensionType: "KLP",
+        pensionPct: 14.8,
+        baseSalary2024: 575000,
+        fteByUnit: { "25310": 2.0, "25320": 1.0, "25710": 2.5, "25720": 2.5 }
+      },
+      {
+        id: "helse_assistent",
+        title: "Pleiemedarbeider / Assistent",
+        sektor: "Helse og Omsorg",
+        code: "6583",
+        tariff: "KS HTA Kap. 4 (Uten særskilt krav)",
+        pensionType: "KLP",
+        pensionPct: 14.8,
+        baseSalary2024: 425000,
+        fteByUnit: { "25310": 5.0, "25320": 5.0, "25710": 5.0, "25720": 5.0 }
+      },
+
+      // Oppvekst og Skole stillingstyper
+      {
+        id: "skole_rektor",
+        title: "Rektor / Avdelingsleder skole",
+        sektor: "Oppvekst og Utdanning",
+        code: "7958",
+        tariff: "KS HTA Kap. 3.4 (Leder)",
+        pensionType: "SPK",
+        pensionPct: 11.2,
+        baseSalary2024: 910000,
+        fteByUnit: { "20210": 2.0, "20220": 2.0, "20230": 1.0, "21310": 0.5, "22110": 0.5 }
+      },
+      {
+        id: "skole_lektor",
+        title: "Lektor / Lektor med tilleggsutdanning",
+        sektor: "Oppvekst og Utdanning",
+        code: "7954",
+        tariff: "KS HTA Kap. 4 (Mastergrad/PPU)",
+        pensionType: "SPK",
+        pensionPct: 11.2,
+        baseSalary2024: 710000,
+        fteByUnit: { "20210": 12.0, "20220": 11.0, "20230": 9.0, "21310": 2.0, "22110": 2.0 }
+      },
+      {
+        id: "skole_adjunkt",
+        title: "Adjunkt / Adjunkt med opprykk",
+        sektor: "Oppvekst og Utdanning",
+        code: "7952",
+        tariff: "KS HTA Kap. 4 (4–5 år U/H)",
+        pensionType: "SPK",
+        pensionPct: 11.2,
+        baseSalary2024: 630000,
+        fteByUnit: { "20210": 18.0, "20220": 16.0, "20230": 13.0, "21310": 3.0, "22110": 2.0 }
+      },
+      {
+        id: "skole_larer",
+        title: "Lærer (grunnskolelærer 3–4 år)",
+        sektor: "Oppvekst og Utdanning",
+        code: "7951",
+        tariff: "KS HTA Kap. 4 (Lærer 3–4 år)",
+        pensionType: "SPK",
+        pensionPct: 11.2,
+        baseSalary2024: 555000,
+        fteByUnit: { "20210": 10.0, "20220": 8.0, "20230": 6.0, "21310": 1.5, "22110": 0.0 }
+      },
+      {
+        id: "skole_spesped",
+        title: "Spesialpedagog / PPT-rådgiver",
+        sektor: "Oppvekst og Utdanning",
+        code: "8530",
+        tariff: "KS HTA Kap. 4 (Spesialpedagog)",
+        pensionType: "SPK",
+        pensionPct: 11.2,
+        baseSalary2024: 670000,
+        fteByUnit: { "20210": 3.0, "20220": 2.0, "20230": 2.0, "21310": 1.0, "22110": 4.0 }
+      },
+      {
+        id: "skole_barneungdom",
+        title: "Barne- og ungdomsarbeider (skole/SFO)",
+        sektor: "Oppvekst og Utdanning",
+        code: "7517",
+        tariff: "KS HTA Kap. 4 (Fagarbeider)",
+        pensionType: "KLP",
+        pensionPct: 14.8,
+        baseSalary2024: 480000,
+        fteByUnit: { "20210": 6.0, "20220": 6.0, "20230": 4.0, "21310": 0.0, "22110": 2.0 }
+      },
+      {
+        id: "skole_assistent",
+        title: "Skoleassistent / SFO-assistent",
+        sektor: "Oppvekst og Utdanning",
+        code: "6583",
+        tariff: "KS HTA Kap. 4 (Uten særskilt krav)",
+        pensionType: "KLP",
+        pensionPct: 14.8,
+        baseSalary2024: 420000,
+        fteByUnit: { "20210": 3.0, "20220": 3.0, "20230": 3.0, "21310": 0.0, "22110": 1.5 }
+      }
+    ];
+
     const SALARY_UNITS_DATA = [
       { code: "20210", name: "20210 - Grunnskole A", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 54.0, fteBesatt: 52.5, vakans: 1.5, snittLonn: 642000, ytdReg: 5499740, status: "🟡 Vikarpress", statusClass: "rag-amber" },
       { code: "20220", name: "20220 - Grunnskole B", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 48.0, fteBesatt: 47.0, vakans: 1.0, snittLonn: 638000, ytdReg: 4920820, status: "🟡 Vikarpress", statusClass: "rag-amber" },
@@ -9111,6 +9364,177 @@ function renderRecommenderModule(ctx) {
     // DYNAMISK LØNNS- OG BEMANNINGSBUDSJETTMODUL (KOSTRA ART 1010-1099, 1270, 1710)
         // [SALARY_UNITS_DATA & BASE_KOSTRA_ARTS defined in Section 1 Data Constants]
 
+
+    // =========================================================================
+    // DYNAMISK STILLINGSSTRUKTUR & LØNNSBUDSJETTERING NESTE ÅR (FRAMSIKT)
+    // =========================================================================
+
+    function renderSalaryPositionsTable(ctx) {
+      if (!ctx) ctx = typeof getFilteredContext === "function" ? getFilteredContext() : { sektor: "ALL", ansvar: "ALL", funksjon: "ALL" };
+      const { sektor, ansvar, funksjon } = ctx;
+
+      const tbody = document.getElementById("salary-positions-table-body");
+      const tfoot = document.getElementById("salary-positions-table-foot");
+      if (!tbody) return;
+
+      const deflatorEl = document.getElementById("pos-sim-deflator");
+      const glidningEl = document.getElementById("pos-sim-glidning");
+      const klpEl = document.getElementById("pos-sim-klp");
+      const spkEl = document.getElementById("pos-sim-spk");
+
+      const deflator = deflatorEl ? parseFloat(deflatorEl.value) || 4.2 : 4.2;
+      const glidning = glidningEl ? parseFloat(glidningEl.value) || 0.6 : 0.6;
+      const klpPct = klpEl ? parseFloat(klpEl.value) || 14.8 : 14.8;
+      const spkPct = spkEl ? parseFloat(spkEl.value) || 11.2 : 11.2;
+      const agaRate = 0.141; // 14,1 % Arbeidsgiveravgift Sone 1
+
+      // Oppdater visning på slider-labels
+      const valDeflator = document.getElementById("pos-val-deflator");
+      if (valDeflator) valDeflator.textContent = `${deflator.toFixed(1).replace(".", ",")} %`;
+      const valGlidning = document.getElementById("pos-val-glidning");
+      if (valGlidning) valGlidning.textContent = `${glidning.toFixed(1).replace(".", ",")} %`;
+      const valKlp = document.getElementById("pos-val-klp");
+      if (valKlp) valKlp.textContent = `${klpPct.toFixed(1).replace(".", ",")} %`;
+      const valSpk = document.getElementById("pos-val-spk");
+      if (valSpk) valSpk.textContent = `${spkPct.toFixed(1).replace(".", ",")} %`;
+      const statDeflator = document.getElementById("pos-stat-deflator");
+      if (statDeflator) statDeflator.textContent = `${(deflator + glidning).toFixed(1).replace(".", ",")} %`;
+
+      // 1. Filtrer stillinger og beregn FTE for utvalget
+      const growthRate = (deflator + glidning) / 100.0;
+      let posList = [];
+
+      (typeof SALARY_POSITIONS_DATA !== "undefined" ? SALARY_POSITIONS_DATA : []).forEach(p => {
+        if (sektor !== "ALL" && p.sektor !== sektor) return;
+
+        let fte = 0;
+        if (ansvar === "ALL") {
+          // Summer over enheter i p.fteByUnit som matcher filteret
+          Object.entries(p.fteByUnit).forEach(([unitCode, unitFte]) => {
+            const uMeta = (typeof ANSVAR_UNITS !== "undefined" && ANSVAR_UNITS[unitCode]) || {};
+            if (sektor !== "ALL" && uMeta.sektor && uMeta.sektor !== sektor) return;
+            if (funksjon !== "ALL" && uMeta.fn && uMeta.fn !== funksjon) return;
+            fte += unitFte;
+          });
+        } else {
+          fte = p.fteByUnit[ansvar] || 0.0;
+        }
+
+        if (fte > 0) {
+          posList.push({ ...p, fte });
+        }
+      });
+
+      // 2. Oppdater filter-undertittel og FTE-badge
+      const subTitleEl = document.getElementById("positions-filter-subtitle");
+      const fteBadgeEl = document.getElementById("positions-fte-badge");
+      const totFte = posList.reduce((acc, p) => acc + p.fte, 0);
+
+      const sekLabel = sektor === "ALL" ? "Alle Sektorer (Helse og Skole)" : sektor;
+      const ansLabel = ansvar === "ALL" ? "Alle ansvarssteder" : (ANSVAR_UNITS[ansvar]?.name || ansvar);
+      if (subTitleEl) {
+        subTitleEl.textContent = `Stillingskategorier for ${sekLabel} (${ansLabel}) • KS HTA garantilønn, KLP/SPK pensjon og AGA 14,1 %`;
+      }
+      if (fteBadgeEl) {
+        fteBadgeEl.textContent = `${totFte.toFixed(1).replace(".", ",")} FTE i utvalg`;
+      }
+
+      if (posList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:1.2rem; color:var(--text-muted);">Ingen stillingskategorier funnet for dette filterutvalget.</td></tr>`;
+        if (tfoot) tfoot.innerHTML = "";
+        return;
+      }
+
+      // 3. Beregn summer og rader
+      let sumLonn2024 = 0;
+      let sumSosial2024 = 0;
+      let sumTotal2024 = 0;
+      let sumLonn2025 = 0;
+      let sumSosial2025 = 0;
+      let sumTotal2025 = 0;
+
+      tbody.innerHTML = posList.map(p => {
+        const pRate = p.pensionType === "SPK" ? (spkPct / 100.0) : (klpPct / 100.0);
+        
+        // 2024 tall
+        const lonn2024 = Math.round(p.fte * p.baseSalary2024);
+        const pensjon2024 = lonn2024 * pRate;
+        const aga2024 = (lonn2024 + pensjon2024) * agaRate;
+        const sosial2024 = Math.round(pensjon2024 + aga2024);
+        const total2024 = lonn2024 + sosial2024;
+
+        // 2025 framskriving
+        const nyLonnSnitt2025 = Math.round(p.baseSalary2024 * (1.0 + growthRate));
+        const lonn2025 = Math.round(p.fte * nyLonnSnitt2025);
+        const pensjon2025 = lonn2025 * pRate;
+        const aga2025 = (lonn2025 + pensjon2025) * agaRate;
+        const sosial2025 = Math.round(pensjon2025 + aga2025);
+        const total2025 = lonn2025 + sosial2025;
+
+        const endring = total2025 - total2024;
+        const endringPct = total2024 > 0 ? (endring / total2024) * 100 : 0;
+
+        sumLonn2024 += lonn2024;
+        sumSosial2024 += sosial2024;
+        sumTotal2024 += total2024;
+        sumLonn2025 += lonn2025;
+        sumSosial2025 += sosial2025;
+        sumTotal2025 += total2025;
+
+        return `
+          <tr>
+            <th scope="row" style="font-weight:600;">${p.title}</th>
+            <td style="font-family:var(--font-mono); font-size:0.7rem; color:var(--text-secondary);">${p.code} • ${p.tariff}</td>
+            <td><span class="rag-badge" style="background:#F1F5F9; color:var(--header-dark); font-size:0.67rem;">${p.pensionType} (${(pRate * 100).toFixed(1).replace(".", ",")} %)</span></td>
+            <td class="num-col" style="font-weight:700;">${p.fte.toFixed(1).replace(".", ",")}</td>
+            <td class="num-col col-budget">${fmtNum(p.baseSalary2024)} kr</td>
+            <td class="num-col">${fmtNum(lonn2024)} kr</td>
+            <td class="num-col" style="color:var(--text-secondary);">${fmtNum(sosial2024)} kr</td>
+            <td class="num-col col-regnskap" style="font-weight:600;">${fmtNum(nyLonnSnitt2025)} kr</td>
+            <td class="num-col" style="font-weight:700; color:var(--header-dark);">${fmtNum(total2025)} kr</td>
+            <td class="num-col rag-amber" style="font-weight:600;">+${fmtNum(endring)} kr <span style="font-size:0.66rem; font-weight:normal;">(+${endringPct.toFixed(1).replace(".", ",")} %)</span></td>
+          </tr>
+        `;
+      }).join("");
+
+      // 4. Oppdater tfoot
+      if (tfoot) {
+        const totEndring = sumTotal2025 - sumTotal2024;
+        const totEndringPct = sumTotal2024 > 0 ? (totEndring / sumTotal2024) * 100 : 0;
+        tfoot.innerHTML = `
+          <tr style="border-top:2px solid var(--border-light); font-weight:700;">
+            <th scope="row" colspan="3">Sum Stillingsstruktur &amp; Lønnsmasse</th>
+            <td class="num-col" style="font-weight:700;">${totFte.toFixed(1).replace(".", ",")}</td>
+            <td class="num-col col-budget">${fmtNum(totFte > 0 ? Math.round(sumLonn2024 / totFte) : 0)} kr</td>
+            <td class="num-col">${fmtNum(sumLonn2024)} kr</td>
+            <td class="num-col">${fmtNum(sumSosial2024)} kr</td>
+            <td class="num-col col-regnskap">${fmtNum(totFte > 0 ? Math.round(sumLonn2025 / totFte) : 0)} kr</td>
+            <td class="num-col" style="color:var(--header-dark);">${fmtNum(sumTotal2025)} kr</td>
+            <td class="num-col rag-amber">+${fmtNum(totEndring)} kr (+${totEndringPct.toFixed(1).replace(".", ",")} %)</td>
+          </tr>
+        `;
+      }
+
+      // 5. Oppdater de 4 sammendragskortene over tabellen
+      const sumBasisEl = document.getElementById("pos-sum-basis");
+      const sumVekstEl = document.getElementById("pos-sum-vekst");
+      const sumVekstPctEl = document.getElementById("pos-sum-vekst-pct");
+      const sumSosialEl = document.getElementById("pos-sum-sosial");
+      const sumTotal2025El = document.getElementById("pos-sum-total2025");
+      const sumDiffEl = document.getElementById("pos-sum-diff");
+
+      const vekstLonn = sumLonn2025 - sumLonn2024;
+      const vekstTotal = sumTotal2025 - sumTotal2024;
+      const vekstTotalPct = sumTotal2024 > 0 ? (vekstTotal / sumTotal2024) * 100 : 0;
+
+      if (sumBasisEl) sumBasisEl.textContent = `${fmtNum(sumLonn2024)} kr`;
+      if (sumVekstEl) sumVekstEl.textContent = `+${fmtNum(vekstLonn)} kr`;
+      if (sumVekstPctEl) sumVekstPctEl.textContent = `+${(growthRate * 100).toFixed(1).replace(".", ",")} % samlet lønnsvekst`;
+      if (sumSosialEl) sumSosialEl.textContent = `${fmtNum(sumSosial2025)} kr`;
+      if (sumTotal2025El) sumTotal2025El.textContent = `${fmtNum(sumTotal2025)} kr`;
+      if (sumDiffEl) sumDiffEl.textContent = `Endring vs 2024: +${fmtNum(vekstTotal)} kr (+${vekstTotalPct.toFixed(1).replace(".", ",")} %)`;
+    }
+    
 function renderSalaryBudgetModule(ctx) {
       if (!ctx) ctx = getFilteredContext();
       const { period, pMeta, sektor, ansvar, funksjon } = ctx;
@@ -9202,6 +9626,11 @@ function renderSalaryBudgetModule(ctx) {
 
       // 5. Render Bemanningsramme (FTE) Tabell
       renderFteTable(filteredUnits, totPlanFte, totBesattFte, totVakansFte, avgSnittLonn, totLonnYtd, sekLabel);
+
+      // 6. Render Stillingsstruktur & Lønnsbudsjettering Neste År (Framsikt)
+      if (typeof renderSalaryPositionsTable === "function") {
+        renderSalaryPositionsTable(ctx);
+      }
     }
 
     function renderKostraArtTable(artSnap, currentSektor) {
@@ -9366,6 +9795,13 @@ function renderSalaryBudgetModule(ctx) {
 
     ["salary-sim-ks", "salary-sim-vikar", "salary-sim-vakans", "salary-sim-klp"].forEach(id => {
       document.getElementById(id)?.addEventListener("input", updateSalaryBudgetSimulator);
+    });
+
+    ["pos-sim-deflator", "pos-sim-glidning", "pos-sim-klp", "pos-sim-spk"].forEach(id => {
+      document.getElementById(id)?.addEventListener("input", () => {
+        const ctx = typeof getFilteredContext === "function" ? getFilteredContext() : { sektor: "ALL", ansvar: "ALL", funksjon: "ALL" };
+        renderSalaryPositionsTable(ctx);
+      });
     });
 
 

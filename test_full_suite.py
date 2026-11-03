@@ -266,6 +266,40 @@ def run_all_tests():
                     "3 738 319 kr" in sosial_val and "40 098 215" not in sosial_val,
                     f"Sosial: {sosial_val}")
 
+        # Sjekk Stillingskategorier & Lønnsbudsjettering Neste År (Framsikt)
+        pos_rows = page.evaluate('''() => {
+            return document.querySelectorAll("#salary-positions-table-body tr").length;
+        }''')
+        record_test("Stillingskategori-tabell har 6 stillinger for Helse og Omsorg", pos_rows == 6, f"Stillinger: {pos_rows}")
+
+        pos_badge = page.inner_text("#positions-fte-badge")
+        record_test("Stillingskategori FTE-badge viser 168,0 FTE", "168,0 FTE" in pos_badge, f"Badge: {pos_badge}")
+
+        sum_basis = page.inner_text("#pos-sum-basis")
+        record_test("Basislønnsmasse 2024 er beregnet (90 530 000 kr)", "90 530 000 kr" in sum_basis, f"Basis: {sum_basis}")
+
+        # Test deflator slider interaksjon
+        page.evaluate('''() => {
+            const el = document.getElementById("pos-sim-deflator");
+            if (el) {
+                el.value = "5.0";
+                el.dispatchEvent(new Event("input"));
+            }
+        }''')
+        page.wait_for_timeout(100)
+        deflator_stat = page.inner_text("#pos-stat-deflator")
+        record_test("Deflator-slider oppdaterer samlet vekst til 5,6 %", "5,6 %" in deflator_stat, f"Stat: {deflator_stat}")
+
+        # Sett deflator tilbake til 4.2
+        page.evaluate('''() => {
+            const el = document.getElementById("pos-sim-deflator");
+            if (el) {
+                el.value = "4.2";
+                el.dispatchEvent(new Event("input"));
+            }
+        }''')
+        page.wait_for_timeout(100)
+
 
 
         # -------------------------------------------------------------
