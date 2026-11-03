@@ -2354,6 +2354,86 @@
           </div>
         </div>
 
+        <!-- Explainer: EOY-Prognose, Glidende Gjennomsnitt & Sesongvekting -->
+        <div class="panel-card" style="margin-bottom:0.75rem; border-left:4px solid var(--header-dark, #1E293B);">
+          <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="display:flex; align-items:center; gap:0.45rem; font-weight:700;">
+              <span>📊</span>
+              <span>Explainer: EOY-Prognose (EAC), Glidende 3M-Snitt &amp; Sesongvekting i KOSTRA AI Workbench</span>
+            </span>
+            <button type="button" id="btn-toggle-eac-explainer" class="cockpit-btn" style="font-size:0.72rem; padding:0.25rem 0.55rem;" aria-expanded="false" aria-controls="eac-explainer-body">
+              Vis Metodikk &amp; Formelverk ▼
+            </button>
+          </div>
+          <div id="eac-explainer-body" style="display:none; margin-top:0.75rem; border-top:1px solid var(--border-hairline); padding-top:0.75rem; font-size:0.8rem; line-height:1.55; color:var(--text-secondary);">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; margin-bottom:0.75rem;">
+              <div style="background:var(--bg-subtle); padding:0.75rem; border-radius:4px; border:1px solid var(--border-light);">
+                <h4 style="margin:0 0 0.35rem 0; font-size:0.82rem; color:var(--text-primary);">1. 🔄 Hva betyr "Glidende 3-måneders snitt" (Rolling 3M Run-Rate)?</h4>
+                <p style="margin:0 0 0.4rem 0;">I stedet for et enfoldig YTD-snitt måler det glidende gjennomsnittet den faktiske kostnadstakten i de tre nyeste lukkede månedene:</p>
+                <div style="background:var(--bg-surface); padding:0.4rem 0.6rem; border-radius:3px; font-family:monospace; font-size:0.75rem; border:1px solid var(--border-hairline); margin-bottom:0.4rem;">
+                  Rolling_3M_Avg = (Netto Regnskap<sub>M-2</sub> + Netto Regnskap<sub>M-1</sub> + Netto Regnskap<sub>M</sub>) / 3
+                </div>
+                <p style="margin:0; font-size:0.76rem; color:var(--text-muted);">
+                  <strong>Ved utgangen av august (M08):</strong> Snitt av juni, juli og august.<br>
+                  • <em>Fanger nyeste kostnadsbilde:</em> Nye vikar- og overtidsmønstre reflekteres umiddelbart.<br>
+                  • <em>Demper støy:</em> Enkeltstående etterslep og feilposter jevnes ut over 90 dager.
+                </p>
+              </div>
+
+              <div style="background:var(--bg-subtle); padding:0.75rem; border-radius:4px; border:1px solid var(--border-light);">
+                <h4 style="margin:0 0 0.35rem 0; font-size:0.82rem; color:var(--text-primary);">2. ⚖️ Er det vekting av periodene før oss? (Historisk Vekting)</h4>
+                <p style="margin:0 0 0.4rem 0;"><strong>JA!</strong> Systemet benytter en todelt vektingsmodell:</p>
+                <p style="margin:0 0 0.35rem 0; font-size:0.76rem;">
+                  <strong>A. Tidsvekting av historikken:</strong> Måneder før rullende 3M (M01–M05) gis 0 % direkte vekt i fremtidstakten. Nyeste 3 måneder gis 100 % vekt.<br>
+                  <strong>B. Sesongvekting for LOY (M09–M12):</strong> Multipliseres med erfaringsbaserte sesongfaktorer (<em>S<sub>m</sub></em>) for kommuneregnskapet:
+                </p>
+                <table style="width:100%; font-size:0.72rem; border-collapse:collapse; margin-top:0.35rem;">
+                  <thead>
+                    <tr style="border-bottom:1px solid var(--border-light); text-align:left;">
+                      <th>Måned</th>
+                      <th style="text-align:right;">Faktor (<em>S<sub>m</sub></em>)</th>
+                      <th style="padding-left:0.5rem;">Kjennetegn i regnskapet</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>September (M09)</td><td style="text-align:right; font-weight:600;">0,98</td><td style="padding-left:0.5rem;">Normalisering etter skolestart</td></tr>
+                    <tr><td>Oktober (M10)</td><td style="text-align:right; font-weight:600;">1,02</td><td style="padding-left:0.5rem;">Ordinær drift og høstaktivitet</td></tr>
+                    <tr><td>November (M11)</td><td style="text-align:right; font-weight:600;">1,05</td><td style="padding-left:0.5rem;">Økt fakturainngang mot årsslutt</td></tr>
+                    <tr><td>Desember (M12)</td><td style="text-align:right; font-weight:600;">1,12</td><td style="padding-left:0.5rem;">Årsavslutning, vaktbøker og tillegg</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div style="background:var(--bg-subtle); padding:0.75rem; border-radius:4px; border:1px solid var(--border-light); margin-bottom:0.75rem;">
+              <h4 style="margin:0 0 0.35rem 0; font-size:0.82rem; color:var(--text-primary);">3. 🧮 Trinnvis Beregning av EOY / EAC per 31.12</h4>
+              <div style="background:var(--bg-surface); padding:0.4rem 0.6rem; border-radius:3px; font-family:monospace; font-size:0.75rem; border:1px solid var(--border-hairline); margin-bottom:0.5rem;">
+                EAC<sub>År</sub> = YTD<sub>Regnskap (M01–M08)</sub> + ∑ (ETC<sub>m</sub> for m=9..12)<br>
+                ETC<sub>m</sub> = Rolling_3M_Avg × S<sub>m</sub> × (1 + Param_Lønnsvekst - Param_Effektivisering)
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:0.5rem; font-size:0.75rem;">
+                <div>
+                  <strong>Steg 1: Bokført YTD (M01–M08)</strong><br>
+                  Bokført fra DuckDB OLAP: <span style="font-weight:700; color:var(--text-primary);">31 524 851 kr</span>
+                </div>
+                <div>
+                  <strong>Steg 2: Projisert Q4 / LOY (ETC)</strong><br>
+                  Sesongjustert prognose M09–M12: <span style="font-weight:700; color:var(--text-primary);">15 727 975 kr</span>
+                </div>
+                <div>
+                  <strong>Steg 3: Estimert Årsregnskap (EAC)</strong><br>
+                  Sum 31.12: <span style="font-weight:700; color:var(--text-primary);">47 252 826 kr</span><br>
+                  Årsbudsjett: 43 942 856 kr | <span style="color:var(--clr-err-text); font-weight:700;">Avvik: -3 309 971 kr</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; background:var(--bg-surface); border:1px solid var(--border-light); padding:0.5rem 0.75rem; border-radius:4px; font-size:0.74rem;">
+              <span>💡 <strong>Oppsummering for Enhetsleder &amp; Controller:</strong> Glidende 3M-snitt viser hvor mye du reelt brenner i måneden nå, sesongvektingen sikrer at desember ikke undervurderes, og EAC forteller hvor du lander på nyttårsaften hvis kursen ikke korrigeres.</span>
+            </div>
+          </div>
+        </div>
+
         <div class="kpi-grid">
           <div class="kpi-card" id="kpi-card-ytd-m2">
             <span class="kpi-label">Bokført YTD (Mnd 1–8)</span>
@@ -9486,6 +9566,17 @@ function renderFavorableBarChart(report) {
     // Nullstill-knapper
     document.getElementById("btn-reset-filters")?.addEventListener("click", () => syncDynamicFilters("reset"));
     document.getElementById("btn-reset-filters-ts")?.addEventListener("click", () => syncDynamicFilters("reset"));
+
+    const btnToggleExplainer = document.getElementById("btn-toggle-eac-explainer");
+    const explainerBody = document.getElementById("eac-explainer-body");
+    if (btnToggleExplainer && explainerBody) {
+      btnToggleExplainer.addEventListener("click", () => {
+        const isHidden = explainerBody.style.display === "none";
+        explainerBody.style.display = isHidden ? "block" : "none";
+        btnToggleExplainer.textContent = isHidden ? "Skjul Metodikk ▲" : "Vis Metodikk & Formelverk ▼";
+        btnToggleExplainer.setAttribute("aria-expanded", isHidden ? "true" : "false");
+      });
+    }
 
     // Hurtigsøk i tabell
     document.getElementById("kostra-table-search")?.addEventListener("input", () => {

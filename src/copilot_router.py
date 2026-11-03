@@ -179,6 +179,21 @@ INITIAL_DOCS = [
         "legal_ref": "§ 14-6 / § 14-10",
         "kilde_type": "Lovverk",
         "sektor": "Bystyret"
+    },
+    {
+        "id": "doc_eoy_prognose_metodikk",
+        "content": (
+            "Metodikk for EOY-prognose (Estimate at Completion - EAC), Rullende 3M Snitt og Sesongvekting i KOSTRA AI Workbench.\n"
+            "1. Glidende 3-måneders snitt (Rolling 3M Run-Rate): Måler faktisk månedlig kostnadstakt i de tre nyeste lukkede månedene "
+            "(Netto Regnskap M-2 + M-1 + M) / 3 for å fange opp nyeste kostnadsbilde uten utvanning fra tidlige måneder.\n"
+            "2. Historisk sesongvekting (Sm) for gjenstående måneder (M09–M12 / LOY): September (0,98), Oktober (1,02), November (1,05), Desember (1,12).\n"
+            "3. Trinnvis EAC-formel: EAC_År = YTD_Regnskap (M01–M08) + SUM(ETC_m for m=9..12), der ETC_m = Rolling_3M_Avg * Sm * (1 + Param_Lonnsvekst - Param_Effektivisering).\n"
+            "4. Forventet årsavvik: Vedtatt helårsbudsjett minus EAC (31.12). Eksempel: 43 942 856 kr - 47 252 826 kr = -3 309 971 kr (Kritisk merforbruk)."
+        ),
+        "source": "Explainer: EOY-Prognose, Glidende Gjennomsnitt & Sesongvekting",
+        "legal_ref": "Metodikk for Kommunal Økonomistyring & LOY-beregning",
+        "kilde_type": "Prosess & Metodikk",
+        "sektor": "Økonomistyring"
     }
 ]
 
@@ -231,6 +246,13 @@ def query_chromadb_rag(query_text: str, top_k: int = 3) -> List[Dict[str, Any]]:
         }]
     if "bruttoprinsipp" in q_lower:
         d = INITIAL_DOCS[1]
+        return [{
+            "content": d["content"],
+            "source": d["source"],
+            "legal_ref": d["legal_ref"]
+        }]
+    if any(k in q_lower for k in ["eoy", "prognose", "glidende", "sesongvekt", "run-rate", "eac"]):
+        d = [doc for doc in INITIAL_DOCS if doc["id"] == "doc_eoy_prognose_metodikk"][0]
         return [{
             "content": d["content"],
             "source": d["source"],
@@ -346,6 +368,28 @@ async def copilot_query(req: QueryRequest):
                 "• **Kommunal praksis:** NAV-refusjoner (art 1710/1690) kan ikke trekkes direkte fra brutto personalkostnader (art 1010/1020) på samme konto eller ansvarssted, "
                 "men må regnskapsføres som inntekt og overføring på egen inntektsartskonto.\n"
                 "• **Revisjonskontroll:** Brudd på bruttoprinsippet vanskeliggjør kontroll av faktisk ressursbruk og vikarvolatilitet."
+            )
+        elif any(k in q_lower for k in ["eoy", "prognose", "glidende", "sesongvekt", "run-rate", "eac"]):
+            response_text = (
+                "📊 **[CONCEPTUAL_LEGAL / EOY-Prognose & Metodikk]**\n\n"
+                "**Beregning av EOY-prognose (Estimate at Completion – EAC), Rullende 3M-Snitt og Sesongvekting:**\n\n"
+                "1. **Rullende 3-måneders snitt (Rolling 3M Run-Rate):**\n"
+                "   Måler faktisk månedlig kostnadstakt i de 3 nyeste lukkede månedene (f.eks. juni, juli og august):\n"
+                "   $$\\text{Rolling_3M_Avg} = \\frac{\\text{Regnskap}_{M-2} + \\text{Regnskap}_{M-1} + \\text{Regnskap}_{M}}{3}$$\n"
+                "   *Formål:* Fanger opp ferske bemannings- og overtidstrender uten å vannes ut av gamle tall fra M01–M02.\n\n"
+                "2. **Todelt Vektingsmodell & Sesongfaktorer ($S_m$):**\n"
+                "   • Historikk før 3M (M01–M05) gis 0 % direkte vekt i fremtidstakten.\n"
+                "   • Gjenstående måneder (Left of Year M09–M12) multipliseres med erfaringsbaserte sesongfaktorer:\n"
+                "     - September (M09): **0,98** (normalisering etter skolestart)\n"
+                "     - Oktober (M10): **1,02** (ordinær høstaktivitet)\n"
+                "     - November (M11): **1,05** (høyere leverandørinngang)\n"
+                "     - Desember (M12): **1,12** (årsavslutning, vaktbøker og tillegg)\n\n"
+                "3. **Trinnvis Beregning (EAC per 31.12):**\n"
+                "   $$\\text{EAC} = \\text{YTD}_{\\text{Regnskap (M01–M08)}} + \\sum_{m=9}^{12} \\text{ETC}_m$$\n"
+                "   • **Bokført YTD (M01–M08):** 31 524 851 kr\n"
+                "   • **Projisert Q4 ETC (M09–M12):** 15 727 975 kr (sesongkorrigert 3M run-rate)\n"
+                "   • **Estimert Årsregnskap EAC:** 47 252 826 kr mot helårsbudsjett 43 942 856 kr\n"
+                "   • **Forventet Årsavvik:** **-3 309 971 kr** (🔴 KRITISK MERFORBRUK, Burn Rate 107,5 %)."
             )
         else:
             context_str = "\n---\n".join([f"[{hit['source']} - {hit['legal_ref']}]:\n{hit['content']}" for hit in rag_hits])

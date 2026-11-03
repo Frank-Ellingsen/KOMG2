@@ -420,6 +420,7 @@ Kom - G2/
 ├── docs/
 │   ├── COPILOT_PYTHON_IN_EXCEL_INSTRUCTIONS.md # Instruks for Copilot & Python in Excel (=PY())
 │   ├── INSTRUKS_EXCEL_DASHBOARD.md     # Instruks for Power Query & Power Pivot
+│   ├── EXPLAINER_EOY_PROGNOSE_OG_SESONGVEKTING.md # Matematisk og pedagogisk EOY- og EAC-forklaring
 │   └── kostra_okonomi_hub.md           # Rådgiver- og systeminstruks for KOSTRA-analyser
 ├── .env.example                        # Mal for miljøvariabler
 ├── .gitignore                          # Git-regler

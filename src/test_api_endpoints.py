@@ -430,6 +430,15 @@ def run_tests():
     assert "14-4" in cp_bp["response"]
     print("  OK: Copilot correctly explained bruttoprinsippet (Kommuneloven § 14-4 / GKRS)")
 
+    print("Testing /api/v1/copilot/query (Hvordan beregnes EOY-prognosen?)...")
+    res = client.post("/api/v1/copilot/query", json={"query": "Hvordan beregnes EOY-prognosen og rullende 3M snitt?"})
+    assert res.status_code == 200
+    cp_eoy = res.json()
+    assert cp_eoy["intent"] == "CONCEPTUAL_LEGAL"
+    assert "Rolling_3M_Avg" in cp_eoy["response"]
+    assert "Sesongfaktorer" in cp_eoy["response"]
+    print("  OK: Copilot correctly explained EOY prognosis, 3M rolling average and seasonal weighting")
+
     print("Testing /api/v1/copilot/query (DATA_ANALYTICS - Bokført lønn og avvik i august)...")
     res = client.post(
         "/api/v1/copilot/query",

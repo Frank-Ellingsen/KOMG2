@@ -412,5 +412,41 @@
     ],
     "tokens_used": 340,
     "reconciled_check_diff_nok": 0.0
+  },
+  {
+    "timestamp": "2026-11-03T18:53:24.076061+00:00",
+    "endpoint": "/api/v1/chat",
+    "user_id": "controller@kristiansand.kommune.no",
+    "query_anonymized": "Hva er styringsretten etter § 13-1 og fnr [REDACTED_FNR]?",
+    "pii_detected": true,
+    "redacted_entities": [
+      "NO_FODSELSNUMMER"
+    ],
+    "retrieved_sources": [
+      "child_veileder-til-kontoplanen-i-kostra-for-2026_pdf_1",
+      "child_veileder-til-kontoplanen-i-kostra-for-2026_pdf_1",
+      "child_veileder-til-kontoplanen-i-kostra-for-2026_pdf_1",
+      "child_lov_om_kommuner_og_fylkeskommuner__kommuneloven__-_lovdata_pdf_1"
+    ],
+    "tokens_used": 340,
+    "reconciled_check_diff_nok": 0.0
+  },
+  {
+    "timestamp": "2026-11-03T18:55:38.108458+00:00",
+    "endpoint": "/api/v1/chat",
+    "user_id": "controller@kristiansand.kommune.no",
+    "query_anonymized": "Hva er styringsretten etter § 13-1 og fnr [REDACTED_FNR]?",
+    "pii_detected": true,
+    "redacted_entities": [
+      "NO_FODSELSNUMMER"
+    ],
+    "retrieved_sources": [
+      "child_veileder-til-kontoplanen-i-kostra-for-2026_pdf_1",
+      "child_veileder-til-kontoplanen-i-kostra-for-2026_pdf_1",
+      "child_veileder-til-kontoplanen-i-kostra-for-2026_pdf_1",
+      "child_lov_om_kommuner_og_fylkeskommuner__kommuneloven__-_lovdata_pdf_1"
+    ],
+    "tokens_used": 340,
+    "reconciled_check_diff_nok": 0.0
   }
 ]
