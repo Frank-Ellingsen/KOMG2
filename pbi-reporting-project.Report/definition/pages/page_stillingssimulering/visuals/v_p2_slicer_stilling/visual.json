@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "v_p2_slicer_stilling",
+  "position": {
+    "x": 0,
+    "y": 110,
+    "z": 2000,
+    "height": 600,
+    "width": 380,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_stillinger"
+                    }
+                  },
+                  "Property": "Stillingstype"
+                }
+              },
+              "queryRef": "dim_stillinger.Stillingstype",
+              "nativeQueryRef": "Stillingstype",
+              "active": true
+            }
+          ]
+        }
+      }
+    }
+  }
+}

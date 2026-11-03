@@ -1,0 +1,68 @@
+table dim_selvkost_omraader
+	lineageTag: 4e5b10e4-0ed5-4c0b-9fb0-ca2c48d3abe4
+
+	column Omraade_Navn
+		dataType: string
+		lineageTag: c2c7a917-e774-4a6f-96ae-29e9f025c9ee
+		summarizeBy: none
+		sourceColumn: Omraade_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Kategori
+		dataType: string
+		lineageTag: 7d9a4cd8-1ff9-45c8-b84b-51f62b535549
+		summarizeBy: none
+		sourceColumn: Kategori
+
+		annotation SummarizationSetBy = Automatic
+
+	column Standard_Konto
+		dataType: string
+		lineageTag: 2eafee41-34bb-464c-9edc-96304a888630
+		summarizeBy: none
+		sourceColumn: Standard_Konto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Dekningsgrad_Mal_Pct
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 51680a73-31ac-4b86-8b19-7ed9ea50fd8e
+		summarizeBy: average
+		sourceColumn: Dekningsgrad_Mal_Pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column Standard_Sats_NOK
+		dataType: double
+		formatString: #,0 "kr"
+		lineageTag: 0997b116-74ca-4ace-a190-ce44038a1d84
+		summarizeBy: sum
+		sourceColumn: Standard_Sats_NOK
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_selvkost_omraader = m
+		mode: import
+		source =
+				let
+				    Source = #table(
+				        type table [Omraade_Navn = text, Kategori = text, Standard_Konto = text, Dekningsgrad_Mal_Pct = number, Standard_Sats_NOK = number],
+				        {
+				            {"Vann (VA)", "Lovbestemt Selvkost", "164000", 1.0, 9450},
+				            {"Avløp", "Lovbestemt Selvkost", "164010", 1.0, 11200},
+				            {"Renovasjon", "Lovbestemt Selvkost", "164020", 1.0, 4850},
+				            {"Byggesak", "Lovbestemt Selvkost", "162000", 1.0, 14200},
+				            {"Eierseksjonering / Oppmåling", "Lovbestemt Selvkost", "162010", 1.0, 18500},
+				            {"Feiing / Branntilsyn", "Lovbestemt Selvkost", "162020", 1.0, 780},
+				            {"Skole Utleie (Gymsal/Auditorium)", "Ad hoc Ekstern Utleie", "165000", 1.0, 650},
+				            {"Helse Utleie (Dagsenter/Møterom)", "Ad hoc Ekstern Utleie", "165010", 1.0, 750},
+				            {"Skole Intern Lønn / Undervisning", "Ad hoc Intern Fakturering", "178000", 1.0, 582},
+				            {"Helse Intern Personell / Veiledning", "Ad hoc Intern Fakturering", "178010", 1.0, 615}
+				        }
+				    )
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

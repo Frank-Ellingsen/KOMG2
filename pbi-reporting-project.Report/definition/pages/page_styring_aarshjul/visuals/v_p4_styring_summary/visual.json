@@ -1,0 +1,107 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "v_p4_styring_summary",
+  "position": {
+    "x": 0,
+    "y": 720,
+    "z": 3000,
+    "height": 340,
+    "width": 1900,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Framsikt_Reguleringer_Sum"
+                }
+              },
+              "queryRef": "_Measures.Framsikt_Reguleringer_Sum",
+              "nativeQueryRef": "Framsikt Reguleringer YTD"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Antall_Kritiske_Avviksenheter"
+                }
+              },
+              "queryRef": "_Measures.Antall_Kritiske_Avviksenheter",
+              "nativeQueryRef": "Enheter med Kritisk Avvik (> 200k)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Sum_Budsjett"
+                }
+              },
+              "queryRef": "_Measures.Sum_Budsjett",
+              "nativeQueryRef": "Samlet Budsjett YTD"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Sum_Regnskap"
+                }
+              },
+              "queryRef": "_Measures.Sum_Regnskap",
+              "nativeQueryRef": "Samlet Regnskap YTD"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Sum_Avvik"
+                }
+              },
+              "queryRef": "_Measures.Sum_Avvik",
+              "nativeQueryRef": "Samlet Netto Avvik"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "(Tekst & Emoji)Status_Indikator"
+                }
+              },
+              "queryRef": "_Measures.(Tekst & Emoji)Status_Indikator",
+              "nativeQueryRef": "Total Status"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

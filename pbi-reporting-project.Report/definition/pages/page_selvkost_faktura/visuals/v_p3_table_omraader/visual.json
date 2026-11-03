@@ -1,0 +1,93 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "v_p3_table_omraader",
+  "position": {
+    "x": 390,
+    "y": 110,
+    "z": 3000,
+    "height": 600,
+    "width": 1510,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_selvkost_omraader"
+                    }
+                  },
+                  "Property": "Omraade_Navn"
+                }
+              },
+              "queryRef": "dim_selvkost_omraader.Omraade_Navn",
+              "nativeQueryRef": "Selvkostområde"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_selvkost_omraader"
+                    }
+                  },
+                  "Property": "Kategori"
+                }
+              },
+              "queryRef": "dim_selvkost_omraader.Kategori",
+              "nativeQueryRef": "Kategori"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_selvkost_omraader"
+                    }
+                  },
+                  "Property": "Standard_Konto"
+                }
+              },
+              "queryRef": "dim_selvkost_omraader.Standard_Konto",
+              "nativeQueryRef": "Konto"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_selvkost_omraader"
+                    }
+                  },
+                  "Property": "Dekningsgrad_Mal_Pct"
+                }
+              },
+              "queryRef": "dim_selvkost_omraader.Dekningsgrad_Mal_Pct",
+              "nativeQueryRef": "Mål Dekningsgrad"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_selvkost_omraader"
+                    }
+                  },
+                  "Property": "Standard_Sats_NOK"
+                }
+              },
+              "queryRef": "dim_selvkost_omraader.Standard_Sats_NOK",
+              "nativeQueryRef": "Standard Gebyr / Timepris"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

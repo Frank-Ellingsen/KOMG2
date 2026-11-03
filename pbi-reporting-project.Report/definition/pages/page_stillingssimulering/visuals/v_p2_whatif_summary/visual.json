@@ -1,0 +1,163 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "v_p2_whatif_summary",
+  "position": {
+    "x": 0,
+    "y": 720,
+    "z": 4000,
+    "height": 340,
+    "width": 1900,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Basislonnsmasse_2024"
+                }
+              },
+              "queryRef": "_Measures.Basislonnsmasse_2024",
+              "nativeQueryRef": "Basislønnsmasse 2024"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "KS_Ramme_Pct"
+                }
+              },
+              "queryRef": "_Measures.KS_Ramme_Pct",
+              "nativeQueryRef": "KS Ramme %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Simulert_Lonnsvekst_2025"
+                }
+              },
+              "queryRef": "_Measures.Simulert_Lonnsvekst_2025",
+              "nativeQueryRef": "Lønnsvekst 2025"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "KLP_Pensjonspremie_Sats"
+                }
+              },
+              "queryRef": "_Measures.KLP_Pensjonspremie_Sats",
+              "nativeQueryRef": "KLP Sats %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "AGA_Sats"
+                }
+              },
+              "queryRef": "_Measures.AGA_Sats",
+              "nativeQueryRef": "AGA Sats %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Simulert_Sosiale_Kostnader_2025"
+                }
+              },
+              "queryRef": "_Measures.Simulert_Sosiale_Kostnader_2025",
+              "nativeQueryRef": "Sosiale Kostnader 2025"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Beregnet_Lonnsbudsjett_2025"
+                }
+              },
+              "queryRef": "_Measures.Beregnet_Lonnsbudsjett_2025",
+              "nativeQueryRef": "Beregnet Lønnsbudsjett 2025"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Lonnsbudsjett_Endring_2025"
+                }
+              },
+              "queryRef": "_Measures.Lonnsbudsjett_Endring_2025",
+              "nativeQueryRef": "Endring vs 2024"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Simulert_Vakanssparing"
+                }
+              },
+              "queryRef": "_Measures.Simulert_Vakanssparing",
+              "nativeQueryRef": "Vakanssparing (1,5 mnd)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Simulert_Vikardekning_Kostnad"
+                }
+              },
+              "queryRef": "_Measures.Simulert_Vikardekning_Kostnad",
+              "nativeQueryRef": "Vikardekning (80 %)"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

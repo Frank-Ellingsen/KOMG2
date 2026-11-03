@@ -9,7 +9,7 @@ model Model
 
 annotation __PBI_TimeIntelligenceEnabled = 1
 
-annotation PBI_QueryOrder = ["dim_ansvar","dim_date","dim_funksjon","dim_kontoplan","fact_modelready"]
+annotation PBI_QueryOrder = ["dim_ansvar","dim_date","dim_funksjon","dim_kontoplan","fact_modelready","dim_stillinger","dim_selvkost_omraader","dim_aarshjul"]
 
 annotation PBI_ProTooling = ["DevMode"]
 
@@ -19,6 +19,8 @@ ref table dim_funksjon
 ref table dim_kontoplan
 ref table fact_modelready
 ref table _Measures
+ref table dim_stillinger
+ref table dim_selvkost_omraader
+ref table dim_aarshjul
 
 ref cultureInfo en-US
-

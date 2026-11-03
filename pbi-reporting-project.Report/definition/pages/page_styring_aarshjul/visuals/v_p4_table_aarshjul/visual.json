@@ -1,0 +1,107 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "v_p4_table_aarshjul",
+  "position": {
+    "x": 0,
+    "y": 110,
+    "z": 2000,
+    "height": 600,
+    "width": 1900,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_aarshjul"
+                    }
+                  },
+                  "Property": "Maned_Nr"
+                }
+              },
+              "queryRef": "dim_aarshjul.Maned_Nr",
+              "nativeQueryRef": "Mnd"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_aarshjul"
+                    }
+                  },
+                  "Property": "Maned_Navn"
+                }
+              },
+              "queryRef": "dim_aarshjul.Maned_Navn",
+              "nativeQueryRef": "Måned"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_aarshjul"
+                    }
+                  },
+                  "Property": "Frist_Dato"
+                }
+              },
+              "queryRef": "dim_aarshjul.Frist_Dato",
+              "nativeQueryRef": "Frist"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_aarshjul"
+                    }
+                  },
+                  "Property": "Kontrollhandling"
+                }
+              },
+              "queryRef": "dim_aarshjul.Kontrollhandling",
+              "nativeQueryRef": "Kontrollhandling & Avstemming"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_aarshjul"
+                    }
+                  },
+                  "Property": "Framsikt_Aktivitet"
+                }
+              },
+              "queryRef": "dim_aarshjul.Framsikt_Aktivitet",
+              "nativeQueryRef": "Framsikt & Politisk Saksgang"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_aarshjul"
+                    }
+                  },
+                  "Property": "Status"
+                }
+              },
+              "queryRef": "dim_aarshjul.Status",
+              "nativeQueryRef": "Status"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "v_p3_selvkost_summary",
+  "position": {
+    "x": 0,
+    "y": 720,
+    "z": 4000,
+    "height": 340,
+    "width": 1900,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Selvkost_Direkte_Drift"
+                }
+              },
+              "queryRef": "_Measures.Selvkost_Direkte_Drift",
+              "nativeQueryRef": "Direkte Drift"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Selvkost_Indirekte_Stotte"
+                }
+              },
+              "queryRef": "_Measures.Selvkost_Indirekte_Stotte",
+              "nativeQueryRef": "Indirekte Støtte (12 %)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Selvkost_Avskrivninger"
+                }
+              },
+              "queryRef": "_Measures.Selvkost_Avskrivninger",
+              "nativeQueryRef": "Avskrivninger (8 %)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Selvkost_Kalkulatorisk_Rente"
+                }
+              },
+              "queryRef": "_Measures.Selvkost_Kalkulatorisk_Rente",
+              "nativeQueryRef": "Kalkulatorisk Rente (4,16 %)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Selvkost_Gebyrkrav"
+                }
+              },
+              "queryRef": "_Measures.Selvkost_Gebyrkrav",
+              "nativeQueryRef": "Beregnet Gebyrkrav"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Selvkost_Faktisk_Gebyrinntekt"
+                }
+              },
+              "queryRef": "_Measures.Selvkost_Faktisk_Gebyrinntekt",
+              "nativeQueryRef": "Faktisk Gebyrinntekt YTD"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Selvkost_Dekningsgrad_Pct"
+                }
+              },
+              "queryRef": "_Measures.Selvkost_Dekningsgrad_Pct",
+              "nativeQueryRef": "Selvkostgrad %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Selvkost_Fondsavsetning"
+                }
+              },
+              "queryRef": "_Measures.Selvkost_Fondsavsetning",
+              "nativeQueryRef": "Fondsavsetning (5-års fond)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Adhoc_Intern_Selvkost_Timesats"
+                }
+              },
+              "queryRef": "_Measures.Adhoc_Intern_Selvkost_Timesats",
+              "nativeQueryRef": "Ad hoc Intern Selvkost (1650 t)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Adhoc_Ekstern_Lokalleie_Standard"
+                }
+              },
+              "queryRef": "_Measures.Adhoc_Ekstern_Lokalleie_Standard",
+              "nativeQueryRef": "Lokalleie Art 1650 (kr/t)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Adhoc_Intern_Eliminering_Netto"
+                }
+              },
+              "queryRef": "_Measures.Adhoc_Intern_Eliminering_Netto",
+              "nativeQueryRef": "Intern Eliminering (Netto 0)"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

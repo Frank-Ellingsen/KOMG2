@@ -1,0 +1,93 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "v_p2_table_stillinger",
+  "position": {
+    "x": 390,
+    "y": 110,
+    "z": 3000,
+    "height": 600,
+    "width": 1510,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_stillinger"
+                    }
+                  },
+                  "Property": "Stillingstype"
+                }
+              },
+              "queryRef": "dim_stillinger.Stillingstype",
+              "nativeQueryRef": "Stillingstype"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_stillinger"
+                    }
+                  },
+                  "Property": "Stillingskode_Tariff"
+                }
+              },
+              "queryRef": "dim_stillinger.Stillingskode_Tariff",
+              "nativeQueryRef": "Stillingskode & Tariff"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_stillinger"
+                    }
+                  },
+                  "Property": "Pensjonsordning"
+                }
+              },
+              "queryRef": "dim_stillinger.Pensjonsordning",
+              "nativeQueryRef": "Pensjonsordning"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_stillinger"
+                    }
+                  },
+                  "Property": "Standard_FTE"
+                }
+              },
+              "queryRef": "dim_stillinger.Standard_FTE",
+              "nativeQueryRef": "Årsverk (FTE)"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_stillinger"
+                    }
+                  },
+                  "Property": "Snitt_Grunnlonn_2024"
+                }
+              },
+              "queryRef": "dim_stillinger.Snitt_Grunnlonn_2024",
+              "nativeQueryRef": "Snitt Grunnlønn 2024"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

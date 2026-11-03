@@ -1,0 +1,67 @@
+table dim_stillinger
+	lineageTag: 1520ae0a-946f-4fd0-ac29-45edc0249048
+
+	column Stillingstype
+		dataType: string
+		lineageTag: 52b6601e-1cc7-457a-9969-43787b6c6785
+		summarizeBy: none
+		sourceColumn: Stillingstype
+
+		annotation SummarizationSetBy = Automatic
+
+	column Stillingskode_Tariff
+		dataType: string
+		lineageTag: fe7a6622-c7f2-41b0-ad4c-75a6a5d65303
+		summarizeBy: none
+		sourceColumn: Stillingskode_Tariff
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pensjonsordning
+		dataType: string
+		lineageTag: 3fcf7609-7045-4c20-8525-5a9792c0396e
+		summarizeBy: none
+		sourceColumn: Pensjonsordning
+
+		annotation SummarizationSetBy = Automatic
+
+	column Standard_FTE
+		dataType: double
+		formatString: 0.0
+		lineageTag: 7a347e31-b294-4e65-9ada-25d52a310740
+		summarizeBy: sum
+		sourceColumn: Standard_FTE
+
+		annotation SummarizationSetBy = Automatic
+
+	column Snitt_Grunnlonn_2024
+		dataType: double
+		formatString: #,0 "kr"
+		lineageTag: 13ae3aa6-5847-4260-aa99-39947b043629
+		summarizeBy: average
+		sourceColumn: Snitt_Grunnlonn_2024
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_stillinger = m
+		mode: import
+		source =
+				let
+				    Source = #table(
+				        type table [Stillingstype = text, Stillingskode_Tariff = text, Pensjonsordning = text, Standard_FTE = number, Snitt_Grunnlonn_2024 = number],
+				        {
+				            {"Avdelingsleder pleie / Omsorgsleder", "7451 • KS HTA Kap. 3.4 (Leder)", "KLP (14,8 %)", 6.0, 820000},
+				            {"Spesialsykepleier / Jordmor / Videreutd.", "7523 • KS HTA Kap. 4 Gr. 2 (Videreutd.)", "KLP (14,8 %)", 32.0, 615000},
+				            {"Sykepleier / Vernepleier (3-årig bachelor)", "7174 • KS HTA Kap. 4 Gr. 2 (3-årig U/H)", "KLP (14,8 %)", 48.0, 555000},
+				            {"Helsefagarbeider / Omsorgsarbeider", "7076 • KS HTA Kap. 4 (Fagarbeider)", "KLP (14,8 %)", 54.0, 485000},
+				            {"Miljøterapeut / Fysio- / Ergoterapeut", "6610 • KS HTA Kap. 4 Gr. 2 (3-årig U/H)", "KLP (14,8 %)", 8.0, 575000},
+				            {"Pleiemedarbeider / Assistent", "6583 • KS HTA Kap. 4 (Uten særskilt krav)", "KLP (14,8 %)", 20.0, 425000},
+				            {"Lærer / Adjunkt (Grunnskole)", "7962 • KS HTA Kap. 4 Lærer", "SPK (11,2 %)", 40.0, 595000},
+				            {"Lektor / Fagleder (Grunnskole)", "7963 • KS HTA Kap. 4 Lektor", "SPK (11,2 %)", 15.0, 665000},
+				            {"Fagarbeider SFO / Skoleassistent", "7517 • KS HTA Kap. 4 Fagarbeider", "KLP (14,8 %)", 18.0, 465000}
+				        }
+				    )
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

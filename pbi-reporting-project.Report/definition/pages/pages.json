@@ -1,7 +1,10 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
   "pageOrder": [
-    "bc0b63aad7c646b1eab4"
+    "bc0b63aad7c646b1eab4",
+    "page_stillingssimulering",
+    "page_selvkost_faktura",
+    "page_styring_aarshjul"
   ],
   "activePageName": "bc0b63aad7c646b1eab4"
 }

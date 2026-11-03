@@ -1,0 +1,77 @@
+table dim_aarshjul
+	lineageTag: c46bc0f5-99b5-45a9-90cf-6f9a9b936141
+
+	column Maned_Nr
+		dataType: int64
+		formatString: 0
+		lineageTag: 7fd03fb9-bea6-41ff-b56a-b395150a2a60
+		summarizeBy: sum
+		sourceColumn: Maned_Nr
+
+		annotation SummarizationSetBy = Automatic
+
+	column Maned_Navn
+		dataType: string
+		lineageTag: a2c389bf-1227-4a26-a900-5b10b6b53379
+		summarizeBy: none
+		sourceColumn: Maned_Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Frist_Dato
+		dataType: string
+		lineageTag: 5090848e-5738-41b8-a3b6-be80900423b6
+		summarizeBy: none
+		sourceColumn: Frist_Dato
+
+		annotation SummarizationSetBy = Automatic
+
+	column Kontrollhandling
+		dataType: string
+		lineageTag: 60c88c48-e3d7-4139-95b9-f007e65f00b9
+		summarizeBy: none
+		sourceColumn: Kontrollhandling
+
+		annotation SummarizationSetBy = Automatic
+
+	column Framsikt_Aktivitet
+		dataType: string
+		lineageTag: 7b766eb1-c951-4728-af61-be484d2e36c2
+		summarizeBy: none
+		sourceColumn: Framsikt_Aktivitet
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 1133767f-adff-4902-a2fb-53eabb8ede2b
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_aarshjul = m
+		mode: import
+		source =
+				let
+				    Source = #table(
+				        type table [Maned_Nr = Int64.Type, Maned_Navn = text, Frist_Dato = text, Kontrollhandling = text, Framsikt_Aktivitet = text, Status = text],
+				        {
+				            {1, "Januar", "15.01", "Bokføring M12 avslutning", "Årsavslutning forberedelse", "Fullført"},
+				            {2, "Februar", "15.02", "Årsregnskap avstemming", "Overføring til revisjon", "Fullført"},
+				            {3, "Mars", "15.03", "Perioderapport M01–M02", "Rammejusteringer K1", "Fullført"},
+				            {4, "April", "15.04", "Tertialrapport T1", "Politisk 1. tertialbehandling", "Fullført"},
+				            {5, "Mai", "15.05", "KS Lønnsoppgjør implementering", "Lønnsjustering 5,2 % KS ramme", "Fullført"},
+				            {6, "Juni", "15.06", "Sommerprognose & ferieavvikling", "Feriepengeutbetaling & vikaravstemming", "Fullført"},
+				            {7, "Juli", "15.07", "M07 driftsoppfølging", "Sommerdrift & sykelønnsrefusjon", "Fullført"},
+				            {8, "August", "15.08", "Tertialrapport T2 (YTD M08)", "Politisk 2. tertialbehandling & EAC", "Gjeldende"},
+				            {9, "September", "15.09", "Budsjett 2025 førsteutkast", "Framsikt budsjettmodul åpnet", "Under arbeid"},
+				            {10, "Oktober", "15.10", "Budsjettkonferanse & rammer", "Kommunedirektørens budsjettforslag", "Planlagt"},
+				            {11, "November", "15.11", "Tertialrapport T3 (M10)", "Formannskapets innstilling", "Planlagt"},
+				            {12, "Desember", "15.12", "Kommunestyrets budsjettvedtak", "Vedtatt budsjett 2025 i Framsikt", "Planlagt"}
+				        }
+				    )
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
