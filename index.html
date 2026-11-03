@@ -769,8 +769,10 @@
       table.data-table td:nth-child(3)::before { content: var(--label-3, "Regnskap") ": "; font-weight: 600; }
       table.data-table td:nth-child(4)::before { content: var(--label-4, "Avvik") ": "; font-weight: 600; }
       table.data-table td:nth-child(5)::before { content: var(--label-5, "Burn Rate") ": "; font-weight: 600; }
-      table.data-table td:nth-child(6)::before { content: var(--label-6, "EAC Prognose") ": "; font-weight: 600; }
-      table.data-table td:nth-child(7)::before { content: var(--label-7, "Status") ": "; font-weight: 600; }
+      table.data-table td:nth-child(6)::before { content: var(--label-6, "Burn Rate %") ": "; font-weight: 600; }
+      table.data-table td:nth-child(7)::before { content: var(--label-7, "Prognose EOY") ": "; font-weight: 600; }
+      table.data-table td:nth-child(8)::before { content: var(--label-8, "Prognose Avvik EOY") ": "; font-weight: 600; }
+      table.data-table td:nth-child(9)::before { content: var(--label-9, "Status") ": "; font-weight: 600; }
     }
 
     /* Conditional variance cell colors (FAST / excel.md standard) */
@@ -2242,17 +2244,18 @@
           <div id="kostra-active-filter-badge" style="font-size:0.75rem; color:var(--text-muted); font-weight:600;"></div>
         </div>
         <div tabindex="0" role="region" aria-labelledby="kostra-table-caption" class="table-wrapper">
-          <table class="data-table" style="--label-2:'Budsjett'; --label-3:'Regnskap'; --label-4:'Netto Avvik'; --label-5:'Avvik %'; --label-6:'Burn Rate'; --label-7:'EAC Prognose'; --label-8:'Status';">
+          <table class="data-table" style="--label-2:'Budsjett YTD'; --label-3:'Regnskap YTD'; --label-4:'Avvik YTD'; --label-5:'Avvik %'; --label-6:'Burn Rate %'; --label-7:'Prognose EOY'; --label-8:'Prognose Avvik EOY'; --label-9:'Status';">
             <caption id="kostra-table-caption">📋 KOSTRA Funksjonsanalyse — CUBE &amp; Gold Layer Avvikstabell (NOK)</caption>
             <thead>
               <tr>
                 <th>KOSTRA Funksjon</th>
-                <th class="num-col col-budget">Budsjett (NOK)</th>
-                <th class="num-col col-regnskap">Regnskap (NOK)</th>
-                <th class="num-col">Netto Avvik (NOK)</th>
+                <th class="num-col col-budget">Budsjett YTD (NOK)</th>
+                <th class="num-col col-regnskap">Regnskap YTD (NOK)</th>
+                <th class="num-col">Avvik YTD (NOK)</th>
                 <th class="num-col">Avvik %</th>
                 <th class="num-col">Burn Rate %</th>
-                <th class="num-col">Fullårs EAC (NOK)</th>
+                <th class="num-col">Prognose EOY (EAC NOK)</th>
+                <th class="num-col">Prognose Avvik EOY (NOK)</th>
                 <th>Statusindikator</th>
               </tr>
             </thead>
@@ -6477,7 +6480,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       const tbody = document.getElementById("kostra-table-body");
       if (tbody) {
         if (filteredFns.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:1.25rem; color:var(--text-muted);">Ingen funksjoner matcher filterkriteriene. Tilbakestill filter for å se data.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:1.25rem; color:var(--text-muted);">Ingen funksjoner matcher filterkriteriene. Tilbakestill filter for å se data.</td></tr>`;
         } else {
           tbody.innerHTML = filteredFns.map(r => {
             const avvikCls = getAvvikRagClass(r.avvik, r.bud, isSingleMonth);
@@ -6490,7 +6493,8 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
               <td class="num-col ${avvikCls}">${fmtNum(r.avvik, true)}</td>
               <td class="num-col ${avvikCls}">${r.avvikPct >= 0 ? "+" : ""}${r.avvikPct.toFixed(1).replace(".", ",")}%</td>
               <td class="num-col ${burnCls}">${r.burnPct.toFixed(1).replace(".", ",")}%</td>
-              <td class="num-col ${eacCls}" title="Forventet årsavvik: ${fmtNOK(r.eac_avvik, true)}">${fmtNum(r.eac)}</td>
+              <td class="num-col" style="font-weight:600;">${fmtNum(r.eac)}</td>
+              <td class="num-col ${eacCls}" style="font-weight:600;">${fmtNum(r.eac_avvik, true)}</td>
               <td>${renderRagBadge(r.status)}</td>
             </tr>`;
           }).join("");
@@ -6499,14 +6503,16 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 
       const tfoot = document.getElementById("kostra-table-foot");
       if (tfoot) {
+        const totEacCls = totEacAvvik < -200000 ? "rag-red" : (totEacAvvik < 0 ? "rag-amber" : "rag-green");
         tfoot.innerHTML = `<tr>
           <th scope="row">Sum Valgt Utvalg (${filteredFns.length} funksjoner — ${pMeta.short})</th>
           <td class="num-col col-budget" style="font-weight:700;">${fmtNum(totBud)}</td>
           <td class="num-col col-regnskap" style="font-weight:700;">${fmtNum(totReg)}</td>
-          <td class="num-col ${avvikRagCls}">${fmtNum(totAvvik, true)}</td>
+          <td class="num-col ${avvikRagCls}" style="font-weight:700;">${fmtNum(totAvvik, true)}</td>
           <td class="num-col ${avvikRagCls}">${totAvvikPct >= 0 ? "+" : ""}${totAvvikPct.toFixed(1).replace(".", ",")}%</td>
           <td class="num-col ${burnRagCls}">${totBurn.toFixed(1).replace(".", ",")}%</td>
-          <td class="num-col ${eacRagKey === 'red' ? 'rag-red' : (eacRagKey === 'amber' ? 'rag-amber' : 'rag-green')}">${fmtNum(totEac)}</td>
+          <td class="num-col" style="font-weight:700;">${fmtNum(totEac)}</td>
+          <td class="num-col ${totEacCls}" style="font-weight:700;">${fmtNum(totEacAvvik, true)}</td>
           <td>${renderRagBadge(overallStatus)}</td>
         </tr>`;
       }
