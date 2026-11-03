@@ -74,3 +74,4 @@ $$\text{EAC (31.12)} = 31\,524\,851\text{ kr} + 15\,727\,975\text{ kr} = 47\,252
 * **Glidende gjennomsnitt:** Viser hvor mye enheten reelt bruker per måned akkurat nå (snitt av de 3 siste lukkede månedene).
 * **Vekting:** De nyeste 3 månedene bestemmer fremtidstakten, mens gjenstående måneder (Sep–Des) sesongjusteres fordi desember erfaringsmessig har høyere kostnadsbelastning enn september.
 * **EOY (EAC):** Forteller deg hvor regnskapet lander ved årsslutt dersom driftstakten fortsetter uten korrigerende tiltak, og gir et solid grunnlag for å dimensjonere LOY-tiltak (vikarstopp, overtidsbegrensning og vakansdekning).
+

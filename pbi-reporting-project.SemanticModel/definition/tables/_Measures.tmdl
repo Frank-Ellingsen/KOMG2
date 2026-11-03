@@ -1,19 +1,18 @@
 table _Measures
 	lineageTag: e53649f6-fb1c-483b-957c-2f9fbd0f35ed
 
-	// ==========================================
-	// 1. KJERNETALL & REGNSKAPSBANE (MIN HVERDAG)
-	// ==========================================
 
 	measure Sum_Regnskap =
 			
 			SUM(fact_modelready[ytd_regnskap_nok])
+		displayFolder: "1. Kjernetall & Regnskapsbane (Min Hverdag)"
 		formatString: #,0
 		lineageTag: dc00bea7-ca5c-46a3-b4db-fb87e9e1d03f
 
 	measure Sum_Budsjett =
 			
 			SUM(fact_modelready[ytd_budsjett_nok])
+		displayFolder: "1. Kjernetall & Regnskapsbane (Min Hverdag)"
 		formatString: #,0
 		lineageTag: 30f62255-b61f-4fbd-9f81-75fd6a5e3d7c
 
@@ -27,36 +26,42 @@ table _Measures
 	measure 'Budsjett YTD' =
 			
 			[Sum_Budsjett]
+		displayFolder: "1. Kjernetall & Regnskapsbane (Min Hverdag)"
 		formatString: #,0
 		lineageTag: 5bc6d1ec-c23e-450f-a275-734e51129b9f
 
 	measure 'Regnskap YTD' =
 			
 			[Sum_Regnskap]
+		displayFolder: "1. Kjernetall & Regnskapsbane (Min Hverdag)"
 		formatString: #,0
 		lineageTag: 697a1a8c-af0d-458e-a643-68e339636155
 
 	measure 'Avvik YTD' =
 			
 			[Sum_Regnskap] - [Sum_Budsjett]
+		displayFolder: "1. Kjernetall & Regnskapsbane (Min Hverdag)"
 		formatString: #,0
 		lineageTag: 40b33fbd-0019-442a-aa3b-3101b362fb6b
 
 	measure 'Avvik % YTD' =
 			
 			DIVIDE([Avvik YTD], [Budsjett YTD], 0)
+		displayFolder: "1. Kjernetall & Regnskapsbane (Min Hverdag)"
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 35243793-1486-4f7c-a461-71cd36cf1699
 
 	measure Burn_Rate_Pct =
 			
 			DIVIDE([Sum_Regnskap], [Sum_Budsjett], 0)
+		displayFolder: "1. Kjernetall & Regnskapsbane (Min Hverdag)"
 		formatString: 0.00
 		lineageTag: 44e34728-036f-40b8-ae35-6a5c8fd2169a
 
 	measure 'Burn_Rate_Pct YTD' =
 			
 			DIVIDE([Regnskap YTD], [Budsjett YTD], 0)
+		displayFolder: "1. Kjernetall & Regnskapsbane (Min Hverdag)"
 		formatString: 0.00
 		lineageTag: d8013487-87ce-41d1-b3a3-dd5990bf87a8
 
@@ -138,6 +143,7 @@ table _Measures
 			    [Sum_Regnskap],
 			    PREVIOUSMONTH(dim_date[Dato])
 			)
+		displayFolder: "1. Kjernetall & Regnskapsbane (Min Hverdag)"
 		formatString: #,0
 		lineageTag: 9c0fee90-d206-4ff4-8cb1-47edce051acb
 
@@ -148,12 +154,14 @@ table _Measures
 			    BLANK(),
 			    [Sum_Regnskap] - [Regnskap_MoM_Forrige]
 			)
+		displayFolder: "1. Kjernetall & Regnskapsbane (Min Hverdag)"
 		formatString: #,0
 		lineageTag: d572c6fb-4bfe-4a20-8685-0c867c3f5811
 
 	measure MoM_Endring_Pct =
 			
 			DIVIDE([MoM_Endring_Regnskap], [Regnskap_MoM_Forrige], 0)
+		displayFolder: "1. Kjernetall & Regnskapsbane (Min Hverdag)"
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 372ed3ca-8ffd-4b92-8890-9e0aeaad2022
 
@@ -199,6 +207,7 @@ table _Measures
 			    [Sum_Regnskap],
 			    DATESINPERIOD(dim_date[Dato], MAX(dim_date[Dato]), -3, MONTH)
 			)
+		displayFolder: "1. Kjernetall & Regnskapsbane (Min Hverdag)"
 		formatString: #,0
 		lineageTag: dba4fb97-da39-43b6-8adb-fd1ddd5a8219
 
@@ -224,49 +233,49 @@ table _Measures
 		formatString: #,0
 		lineageTag: 012607f5-174e-4c0d-a46e-7068132bd368
 
-	// ==========================================
-	// 2. TUFTE BULLET GRAPH MÅLTALL
-	// ==========================================
 
 	measure Bullet_Target_Budsjett =
 			
 			[Sum_Budsjett]
+		displayFolder: "2. Tufte Bullet Graph Måltall"
 		formatString: #,0
 		lineageTag: 69ad4e8c-12b2-4318-b4ba-6dd423e9ad67
 
 	measure Bullet_Actual_Regnskap =
 			
 			[Sum_Regnskap]
+		displayFolder: "2. Tufte Bullet Graph Måltall"
 		formatString: #,0
 		lineageTag: 7b42576e-602a-467e-808a-d178dee9b104
 
 	measure Bullet_Avvik_Søyle =
 			
 			[Sum_Avvik]
+		displayFolder: "2. Tufte Bullet Graph Måltall"
 		formatString: #,0
 		lineageTag: e7509840-5277-42cf-b661-456631f9b121
 
 	measure Bullet_Range_60 =
 			
 			[Sum_Budsjett] * 0.60
+		displayFolder: "2. Tufte Bullet Graph Måltall"
 		formatString: #,0
 		lineageTag: 3231c9e2-3c1c-44f8-9728-28d2f3c70f93
 
 	measure Bullet_Range_85 =
 			
 			[Sum_Budsjett] * 0.85
+		displayFolder: "2. Tufte Bullet Graph Måltall"
 		formatString: #,0
 		lineageTag: a236b3a5-7f0b-4bde-b77c-f96f83b6df7e
 
 	measure Bullet_Range_100 =
 			
 			[Sum_Budsjett] * 1.00
+		displayFolder: "2. Tufte Bullet Graph Måltall"
 		formatString: #,0
 		lineageTag: 4f4046d0-dc3b-48b4-9f95-7eca0acfefe4
 
-	// ==========================================
-	// 3. LØNN & NAV SYKELØNNSREFUSJON (KOSTRA 10xx, 127x, 1710)
-	// ==========================================
 
 	measure Lønn_Brutto_Regnskap =
 			
@@ -274,6 +283,7 @@ table _Measures
 			    [Sum_Regnskap],
 			    LEFT(fact_modelready[konto_code], 2) = "10" || LEFT(fact_modelready[konto_code], 3) = "127"
 			)
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: 54591873-dc65-4bb8-84fe-158795ced4ba
 
@@ -283,12 +293,14 @@ table _Measures
 			    [Sum_Budsjett],
 			    LEFT(fact_modelready[konto_code], 2) = "10" || LEFT(fact_modelready[konto_code], 3) = "127"
 			)
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: df893114-bb6c-4e27-9c9a-c79716e010fb
 
 	measure Lønn_Brutto_Avvik =
 			
 			[Lønn_Brutto_Regnskap] - [Lønn_Brutto_Budsjett]
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: c6a610df-5ba2-44f0-b4ea-d83b5718be7c
 
@@ -298,6 +310,7 @@ table _Measures
 			    ABS([Sum_Regnskap]),
 			    fact_modelready[konto_code] = "171000"
 			)
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: 7965babc-b53b-4077-a416-0d5a07fe4126
 
@@ -307,12 +320,14 @@ table _Measures
 			    ABS([Sum_Budsjett]),
 			    fact_modelready[konto_code] = "171000"
 			)
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: f0c033cc-5687-4c97-970c-7355bc97bcde
 
 	measure NAV_Sykelonn_Avvik =
 			
 			[NAV_Sykelonn_Regnskap] - [NAV_Sykelonn_Budsjett]
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: 771229b5-2df2-4a7a-9f0a-83ef11a00efd
 
@@ -322,6 +337,7 @@ table _Measures
 			    ABS([Sum_Regnskap]),
 			    fact_modelready[konto_code] = "171005"
 			)
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: 4847ddad-3d1b-438b-b40b-fb334ed8731d
 
@@ -331,58 +347,64 @@ table _Measures
 			    ABS([Sum_Budsjett]),
 			    fact_modelready[konto_code] = "171005"
 			)
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: 20b5b49e-074c-4688-9615-aacacad22aa8
 
 	measure NAV_Foreldrepenger_Avvik =
 			
 			[NAV_Foreldrepenger_Regnskap] - [NAV_Foreldrepenger_Budsjett]
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: 2c1b54ac-971d-465e-a001-81d77e7cab28
 
 	measure Sum_NAV_Refusjoner_Regnskap =
 			
 			[NAV_Sykelonn_Regnskap] + [NAV_Foreldrepenger_Regnskap]
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: 615cc806-c36d-41e7-b4f6-2e6232a0e68b
 
 	measure Sum_NAV_Refusjoner_Budsjett =
 			
 			[NAV_Sykelonn_Budsjett] + [NAV_Foreldrepenger_Budsjett]
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: 7f107e22-68c8-427a-8900-538cc6f0fea1
 
 	measure Netto_Personalkostnad_Regnskap =
 			
 			[Lønn_Brutto_Regnskap] - [Sum_NAV_Refusjoner_Regnskap]
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: 40855df2-4f77-439c-84d6-5a01f8f71a88
 
 	measure Netto_Personalkostnad_Budsjett =
 			
 			[Lønn_Brutto_Budsjett] - [Sum_NAV_Refusjoner_Budsjett]
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: af6f5448-5064-4c00-84d2-47c953507b18
 
 	measure Netto_Personalkostnad_Avvik =
 			
 			[Netto_Personalkostnad_Regnskap] - [Netto_Personalkostnad_Budsjett]
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: #,0
 		lineageTag: 1340844d-5e33-42ff-ad73-58cf00e683da
 
 	measure Refusjonsgrad_Sykelonn_Pct =
 			
 			DIVIDE([NAV_Sykelonn_Regnskap], [Lønn_Brutto_Regnskap], 0)
+		displayFolder: "3. Lønn & NAV Sykelønnsrefusjon"
 		formatString: 0.0%
 		lineageTag: 83a24a31-cc43-4909-905b-e51a3c8aa201
 
-	// ==========================================
-	// 4. MINDREFORBRUKSANALYSE & FORSIKTIGHETSPRINSIPP
-	// ==========================================
 
 	measure Mindreforbruk_Bokfort =
 			
 			IF([Sum_Avvik] < 0, ABS([Sum_Avvik]), 0)
+		displayFolder: "4. Mindreforbruksanalyse & Forsiktighetsprinsipp"
 		formatString: #,0
 		lineageTag: 64c41664-6d1c-4d81-a601-d64079c31330
 
@@ -392,19 +414,18 @@ table _Measures
 			    [Sum_Regnskap],
 			    fact_modelready[konto_code] = "112098"
 			)
+		displayFolder: "4. Mindreforbruksanalyse & Forsiktighetsprinsipp"
 		formatString: #,0
 		lineageTag: 3d534f72-c6d3-4399-8c1c-be61003a9c54
 
-	measure Forsiktighetsprinsipp_EAC_Justering =
+	measure Forsiktighetsprinsipp_EAC_Justering = ```
 			
 			// Offentlige tilskudd som lærlingetilskudd holdes til faktisk mottatt beløp i EAC-prognose
 			COALESCE([Konto_112098_Tilskudd_Laerlinger], 0)
+			```
 		formatString: #,0
 		lineageTag: 04477bde-1a4c-46ab-8c4e-4ffdfc6ae388
 
-	// ==========================================
-	// 5. BUDSJETT & STILLINGSSIMULERING (2024 -> 2025)
-	// ==========================================
 
 	measure Basislonnsmasse_2024 = ```
 			
@@ -419,54 +440,63 @@ table _Measures
 	measure KS_Ramme_Pct =
 			
 			0.052
+		displayFolder: "5. Budsjett & Stillingssimulering"
 		formatString: 0.0%
 		lineageTag: 105e6a7a-671d-405a-ab72-9789648e963c
 
 	measure Simulert_Lonnsvekst_2025 =
 			
 			[Basislonnsmasse_2024] * [KS_Ramme_Pct]
+		displayFolder: "5. Budsjett & Stillingssimulering"
 		formatString: #,0
 		lineageTag: c49a412c-00b3-472b-85b6-1a71dfd8ac8e
 
 	measure KLP_Pensjonspremie_Sats =
 			
 			0.148
+		displayFolder: "5. Budsjett & Stillingssimulering"
 		formatString: 0.0%
 		lineageTag: 8ebd8846-08fa-480c-ba3a-1a92ac9f679b
 
 	measure SPK_Pensjonspremie_Sats =
 			
 			0.112
+		displayFolder: "5. Budsjett & Stillingssimulering"
 		formatString: 0.0%
 		lineageTag: 599e658a-e066-4890-b462-6be477dc5da7
 
 	measure AGA_Sats =
 			
 			0.141
+		displayFolder: "5. Budsjett & Stillingssimulering"
 		formatString: 0.0%
 		lineageTag: 71b30662-ed28-4305-aec8-1efd8b7790ca
 
 	measure Simulert_Sosiale_Kostnader_2025 =
 			
 			([Basislonnsmasse_2024] + [Simulert_Lonnsvekst_2025]) * ([KLP_Pensjonspremie_Sats] + [AGA_Sats])
+		displayFolder: "5. Budsjett & Stillingssimulering"
 		formatString: #,0
 		lineageTag: c3624823-7c0f-41c4-8009-669868dcde88
 
 	measure Beregnet_Lonnsbudsjett_2025 =
 			
 			[Basislonnsmasse_2024] + [Simulert_Lonnsvekst_2025] + [Simulert_Sosiale_Kostnader_2025]
+		displayFolder: "5. Budsjett & Stillingssimulering"
 		formatString: #,0
 		lineageTag: 28698233-b918-421f-8a9d-d289c0fec751
 
 	measure Lonnsbudsjett_Endring_2025 =
 			
 			[Beregnet_Lonnsbudsjett_2025] - ([Basislonnsmasse_2024] * (1 + [KLP_Pensjonspremie_Sats] + [AGA_Sats]))
+		displayFolder: "5. Budsjett & Stillingssimulering"
 		formatString: #,0
 		lineageTag: 72617394-e879-45a1-911d-27f980e517a4
 
 	measure Lonnsbudsjett_Endring_Pct =
 			
 			[KS_Ramme_Pct]
+		displayFolder: "5. Budsjett & Stillingssimulering"
 		formatString: 0.0%
 		lineageTag: c62088f5-1f52-4da8-be74-adb27221c248
 
@@ -492,9 +522,6 @@ table _Measures
 		formatString: #,0
 		lineageTag: 29e7a05c-0a07-421e-bc86-29c153b6d834
 
-	// ==========================================
-	// 6. SELVKOST & FAKTURERING (FOR-2019-12-11-1738 & AD HOC)
-	// ==========================================
 
 	measure Selvkost_Direkte_Drift =
 			
@@ -502,30 +529,35 @@ table _Measures
 			    [Sum_Regnskap],
 			    fact_modelready[kostra_art_4siffer] IN {"1100", "1150", "1200", "1300", "1400"}
 			)
+		displayFolder: "6. Selvkost & Fakturering"
 		formatString: #,0
 		lineageTag: b9ede7e3-eb5c-480b-83bd-f5246b4f7b6b
 
 	measure Selvkost_Indirekte_Stotte =
 			
 			[Selvkost_Direkte_Drift] * 0.12
+		displayFolder: "6. Selvkost & Fakturering"
 		formatString: #,0
 		lineageTag: 39f912e0-f0d3-4a64-8146-a4802d74a84f
 
 	measure Selvkost_Avskrivninger =
 			
 			[Selvkost_Direkte_Drift] * 0.08
+		displayFolder: "6. Selvkost & Fakturering"
 		formatString: #,0
 		lineageTag: 0e0d957d-c133-419c-9d6b-c7abf30f8027
 
 	measure Selvkost_Kalkulatorisk_Rente =
 			
 			[Selvkost_Direkte_Drift] * 0.0416
+		displayFolder: "6. Selvkost & Fakturering"
 		formatString: #,0
 		lineageTag: b9d3d2d8-d53d-48ae-98d0-8053518001d6
 
 	measure Selvkost_Gebyrkrav =
 			
 			[Selvkost_Direkte_Drift] + [Selvkost_Indirekte_Stotte] + [Selvkost_Avskrivninger] + [Selvkost_Kalkulatorisk_Rente]
+		displayFolder: "6. Selvkost & Fakturering"
 		formatString: #,0
 		lineageTag: de1bc3a2-0f00-457d-bfe5-21c210df27d9
 
@@ -535,18 +567,21 @@ table _Measures
 			    ABS([Sum_Regnskap]),
 			    LEFT(fact_modelready[konto_code], 2) IN {"16", "17"}
 			)
+		displayFolder: "6. Selvkost & Fakturering"
 		formatString: #,0
 		lineageTag: bdc34d24-8041-43f7-8437-17af3d5fcef0
 
 	measure Selvkost_Dekningsgrad_Pct =
 			
 			DIVIDE([Selvkost_Faktisk_Gebyrinntekt], [Selvkost_Gebyrkrav], 0)
+		displayFolder: "6. Selvkost & Fakturering"
 		formatString: 0.0%
 		lineageTag: df837d28-930d-4447-8aff-9fa2274914dd
 
 	measure Selvkost_Fondsavsetning =
 			
 			[Selvkost_Faktisk_Gebyrinntekt] - [Selvkost_Gebyrkrav]
+		displayFolder: "6. Selvkost & Fakturering"
 		formatString: #,0
 		lineageTag: bc256c52-d079-41a1-97e0-6fa6f73489ba
 
@@ -565,18 +600,17 @@ table _Measures
 	measure Adhoc_Ekstern_Lokalleie_Standard =
 			
 			650.0
+		displayFolder: "6. Selvkost & Fakturering"
 		formatString: #,0 "kr"
 		lineageTag: c068e773-ae03-4ae4-89d1-5f7e28fd52ca
 
 	measure Adhoc_Intern_Eliminering_Netto =
 			
 			0.0
+		displayFolder: "6. Selvkost & Fakturering"
 		formatString: #,0 "kr"
 		lineageTag: f350a6b1-2a58-4e82-87e5-0d2b68154787
 
-	// ==========================================
-	// 7. STYRING & ÅRSHJUL
-	// ==========================================
 
 	measure Framsikt_Reguleringer_Sum =
 			
@@ -584,6 +618,7 @@ table _Measures
 			    SUM(fact_modelready[monthly_delta_budsjett_nok]),
 			    fact_modelready[monthly_delta_budsjett_nok] <> 0
 			)
+		displayFolder: "7. Styring & Årshjul"
 		formatString: #,0
 		lineageTag: b5538d8d-2b8b-4e89-9c4d-a919b192721c
 
