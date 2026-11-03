@@ -763,8 +763,14 @@ def get_monthly_report(
                 "kontonavn": row["kontonavn"],
                 "ytd_actual_nok": round(float(row["ytd_actual_nok"] or 0.0), 2),
                 "annual_budget_nok": round(float(row["annual_budget_nok"] or 0.0), 2),
-                "eoy_forecast_nok": round(float(row["eoy_forecast_nok"] or 0.0), 2),
-                "eoy_variance_nok": round(float(row["eoy_variance_nok"] or 0.0), 2),
+                "eoy_forecast_nok": round(float(row["ytd_actual_nok"] or 0.0), 2)
+                if float(row["ytd_actual_nok"] or 0.0) < 0
+                else round(float(row["eoy_forecast_nok"] or 0.0), 2),
+                "eoy_variance_nok": round(
+                    float(row["ytd_actual_nok"] or 0.0) - float(row["annual_budget_nok"] or 0.0), 2
+                )
+                if float(row["ytd_actual_nok"] or 0.0) < 0
+                else round(float(row["eoy_variance_nok"] or 0.0), 2),
             }
             for row in favorable_rows
         ],

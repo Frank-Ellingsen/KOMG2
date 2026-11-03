@@ -439,6 +439,28 @@ def run_all_tests():
                     fav_chart_info["rects"] == 5 and fav_chart_info["bulletLines"] >= 10)
         record_test("Mindreforbruk data-tabell har 5 rader", fav_chart_info["tableRows"] == 5, f"Rader: {fav_chart_info['tableRows']}")
 
+        # Sjekk forsiktighetsprinsipp for negative regnskapstall (inntekt/tilskudd ekstrapoleres ikke i prognose)
+        k112098_info = page.evaluate('''() => {
+            const trs = Array.from(document.querySelectorAll("#min-favorable-tbody tr"));
+            for (const tr of trs) {
+                const tds = Array.from(tr.querySelectorAll("td")).map(td => td.textContent.trim());
+                if (tds[0] === "112098") {
+                    return {
+                        code: tds[0],
+                        name: tds[1],
+                        ytdActual: tds[2],
+                        budget: tds[3],
+                        forecast: tds[4],
+                        variance: tds[5]
+                    };
+                }
+            }
+            return null;
+        }''')
+        record_test("Forsiktighetsprinsipp: Negative inntekts-/tilskuddstall (Konto 112098) ekstrapoleres ikke (Prognose = -160 447 kr)",
+                    k112098_info is not None and "-160 447 kr" in k112098_info["forecast"] and "-240 670 kr" not in k112098_info["forecast"],
+                    f"Konto 112098: {k112098_info}")
+
         # Sjekk Dynamisk AI-Tiltaksplan & Omdisponering mot Årsbalanse (EOY)
         turnaround_info = page.evaluate('''() => {
             const panel = document.getElementById("min-ai-turnaround-panel");
