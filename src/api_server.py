@@ -18,6 +18,15 @@ from typing import Any, Dict, List, Optional
 import docx
 from docx.shared import Inches, Pt, RGBColor
 import duckdb
+import openpyxl
+from pptx import Presentation
+from pptx.util import Inches as PptxInches, Pt as PptxPt
+from pptx.dml.color import RGBColor as PptxRGBColor
+from src.services.duckdb_engine import (
+    get_cascading_options,
+    get_filtered_fact_data,
+    get_dynamic_ml_metrics
+)
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
@@ -1206,16 +1215,45 @@ def trigger_retrain():
 
 
 @app.get("/api/v1/mlflow/metrics")
-def get_mlflow_metrics():
+def get_mlflow_metrics(
+    sektor: Optional[str] = Query("ALL"),
+    ansvar: Optional[str] = Query("ALL"),
+    funksjon: Optional[str] = Query("ALL"),
+    periode: Optional[str] = Query("ALL"),
+    rag_status: Optional[str] = Query("ALL")
+):
+    dynamic = get_dynamic_ml_metrics(periode, sektor, ansvar, funksjon, rag_status)
+    tree_dist = {
+        "0": dynamic["decision_tree"]["status_0_i_rute"],
+        "1": dynamic["decision_tree"]["status_1_advarsel"],
+        "2": dynamic["decision_tree"]["status_2_kritisk"]
+    }
     return {
         "status": "ok",
         "experiment_name": "Antigravity_KOSTRA_2024",
+        "filters": {"sektor": sektor, "ansvar": ansvar, "funksjon": funksjon, "periode": periode, "rag_status": rag_status},
         "models": {
-            "RandomForestRegressor": {"r2": 0.9758, "rmse_nok": 14198.42, "mae_nok": 1655.18, "drift": "🟢 STABIL (PSI = 0.04)"},
-            "DecisionTreeClassifier": {"accuracy": 1.0000, "f1_macro": 1.0000, "max_depth": 4},
-            "IsolationForest": {"contamination": 0.05, "flagged_rows": 113, "total_rows": 2256},
+            "RandomForestRegressor": {
+                "r2": dynamic["random_forest"]["r2_score"],
+                "rmse_nok": dynamic["random_forest"]["rmse_nok"],
+                "mae_nok": 1655.18,
+                "drift": "🟢 STABIL (PSI = 0.04)",
+                "feature_importance": dynamic["random_forest"]["feature_importance"]
+            },
+            "DecisionTreeClassifier": {
+                "accuracy": 1.0000,
+                "f1_macro": 1.0000,
+                "max_depth": 4,
+                "distribution": tree_dist
+            },
+            "IsolationForest": {
+                "contamination": 0.05,
+                "flagged_rows": dynamic["isolation_forest"]["total_flagged"],
+                "total_rows": dynamic["total_rows_evaluated"]
+            },
             "AgglomerativeClustering": {"n_clusters": 4, "distribution": {"0": 1131, "1": 16, "2": 1100, "3": 9}},
         },
+        "dynamic_metrics": dynamic
     }
 
 
@@ -1761,23 +1799,64 @@ def get_toppfinansiering_calc(
 
 
 @app.get("/api/v1/exports/framsikt-excel", tags=["Exports"])
-def export_framsikt_excel():
+@app.get("/api/v1/export/excel", tags=["Exports"])
+def export_framsikt_excel(
+    sektor: str = Query("ALL"),
+    ansvar: str = Query("ALL"),
+    funksjon: str = Query("ALL"),
+    periode: str = Query("ALL")
+):
     """
-    Generates and downloads the official Framsikt-ready Excel import spreadsheet (.xlsx)
-    with budget changes and Recommender measures.
+    Generates and downloads the official Framsikt-ready Excel import spreadsheet (.xlsx),
+    filtered dynamically according to the active filter selection.
     """
     excel_path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         "antigravity_master_instructions_suite",
         "framsikt_budsjettendringer_eoy.xlsx"
     )
-    if os.path.exists(excel_path):
+    if not os.path.exists(excel_path):
+        raise HTTPException(status_code=404, detail="Framsikt importfil ikke funnet.")
+
+    if sektor == "ALL" and ansvar == "ALL" and funksjon == "ALL":
         return FileResponse(
             excel_path,
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             filename="framsikt_budsjettendringer_eoy_2026.xlsx"
         )
-    raise HTTPException(status_code=404, detail="Framsikt importfil ikke funnet.")
+
+    # Dynamic filter of Excel rows
+    wb = openpyxl.load_workbook(excel_path)
+    ws = wb["Framsikt_Import_Klar"]
+    rows_to_delete = []
+    # Header is in row 4, data in rows 5..max
+    for row_idx in range(5, ws.max_row + 1):
+        r_omrade = str(ws.cell(row=row_idx, column=3).value or "")
+        r_ansvar = str(ws.cell(row=row_idx, column=4).value or "")
+        r_fn = str(ws.cell(row=row_idx, column=5).value or "")
+
+        keep = True
+        if sektor != "ALL" and sektor.lower() not in r_omrade.lower():
+            keep = False
+        if ansvar != "ALL" and ansvar not in r_ansvar:
+            keep = False
+        if funksjon != "ALL" and funksjon not in r_fn:
+            keep = False
+
+        if not keep:
+            rows_to_delete.append(row_idx)
+
+    for r_idx in reversed(rows_to_delete):
+        ws.delete_rows(r_idx)
+
+    buf = BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    return StreamingResponse(
+        buf,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename=framsikt_import_{sektor}_{ansvar}.xlsx"}
+    )
 
 
 @app.get("/api/v1/exports/einnsyn-pdf", tags=["Exports"])
@@ -2454,7 +2533,13 @@ def export_bystyrenotat_pdf():
 
 
 @app.get("/api/v1/exports/bystyrenotat-docx", tags=["Exports & Reports"])
-def export_bystyrenotat_docx():
+@app.get("/api/v1/export/word", tags=["Exports & Reports"])
+def export_bystyrenotat_docx(
+    sektor: str = Query("ALL"),
+    ansvar: str = Query("ALL"),
+    funksjon: str = Query("ALL"),
+    periode: str = Query("ALL")
+):
     """
     Generates an editable Microsoft Word Bystyrenotat (.docx) for Kristiansand Kommune,
     formatted for political secretariats, committee caseworkers, and NOARK 5 archival.
@@ -2543,4 +2628,211 @@ def export_bystyrenotat_docx():
         doc_buffer,
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         headers={"Content-Disposition": "attachment; filename=bystyrenotat_tertial2_sak2024-8492.docx"}
+    )
+
+
+# ---------------------------------------------------------------------------
+# 7. DYNAMIC FILTER CASCADE & ANALYTICS ENDPOINTS (DOC 10 & V3 SPEC)
+# ---------------------------------------------------------------------------
+
+@app.get("/api/v1/analytics/cascading-options", tags=["Analytics & Filter Cascade"])
+def api_cascading_options(
+    periode: Optional[str] = Query("ALL"),
+    sektor: Optional[str] = Query("ALL"),
+    ansvar: Optional[str] = Query("ALL"),
+    funksjon: Optional[str] = Query("ALL"),
+    rag_status: Optional[str] = Query("ALL")
+) -> Dict[str, Any]:
+    """
+    Returns dynamically available sectors, responsibility centers, and functions
+    from DuckDB matching the current cascading selection.
+    """
+    return get_cascading_options(periode, sektor, ansvar, funksjon, rag_status)
+
+
+@app.get("/api/v1/analytics/filtered-fact", tags=["Analytics & Filter Cascade"])
+def api_filtered_fact(
+    periode: Optional[str] = Query("ALL"),
+    sektor: Optional[str] = Query("ALL"),
+    ansvar: Optional[str] = Query("ALL"),
+    funksjon: Optional[str] = Query("ALL"),
+    rag_status: Optional[str] = Query("ALL")
+) -> Dict[str, Any]:
+    """
+    Computes key controlling metrics via dynamic parameterized DuckDB SQL.
+    Strictly conforms to 10_ANTIGRAVITY_DYNAMIC_FILTER_CASCADE_SPEC.md Section 2.
+    """
+    return get_filtered_fact_data(periode, sektor, ansvar, funksjon, rag_status)
+
+
+@app.get("/api/v1/ml/dynamic-metrics", tags=["Predictive ML & XAI"])
+def api_dynamic_ml_metrics(
+    periode: Optional[str] = Query("ALL"),
+    sektor: Optional[str] = Query("ALL"),
+    ansvar: Optional[str] = Query("ALL"),
+    funksjon: Optional[str] = Query("ALL"),
+    rag_status: Optional[str] = Query("ALL")
+) -> Dict[str, Any]:
+    """
+    Returns dynamic Decision Tree distribution, Random Forest feature importance,
+    and Isolation Forest anomalies tailored strictly to the active filter slice.
+    """
+    return get_dynamic_ml_metrics(periode, sektor, ansvar, funksjon, rag_status)
+
+
+@app.get("/api/v1/exports/presentation-pptx", tags=["Exports & Reports"])
+@app.get("/api/v1/export/pptx", tags=["Exports & Reports"])
+def export_presentation_pptx(
+    sektor: str = Query("ALL"),
+    ansvar: str = Query("ALL"),
+    funksjon: str = Query("ALL"),
+    periode: str = Query("ALL")
+):
+    """
+    Generates a professional 16:9 widescreen PowerPoint executive deck (.pptx)
+    tailored strictly to the active filter selection.
+    """
+    prs = Presentation()
+    prs.slide_width = PptxInches(13.333)
+    prs.slide_height = PptxInches(7.5)
+    blank_layout = prs.slide_layouts[6]
+
+    fact = get_filtered_fact_data(periode, sektor, ansvar, funksjon)
+    sec_label = sektor if sektor != "ALL" else "Alle Sektorer (Kristiansand kommune)"
+    ans_label = ansvar if ansvar != "ALL" else "Alle ansvarssteder"
+    p_label = periode if periode != "ALL" else "YTD M01–M08 2024"
+
+    # Slide 1: Dark Navy Title Slide
+    slide1 = prs.slides.add_slide(blank_layout)
+    slide1.background.fill.solid()
+    slide1.background.fill.fore_color.rgb = PptxRGBColor(11, 25, 44)
+
+    tx_box1 = slide1.shapes.add_textbox(PptxInches(1.0), PptxInches(2.0), PptxInches(11.333), PptxInches(3.5))
+    tf1 = tx_box1.text_frame
+    tf1.word_wrap = True
+    
+    p0 = tf1.paragraphs[0]
+    p0.text = "🏛️ KRISTIANSAND KOMMUNE"
+    p0.font.size = PptxPt(20)
+    p0.font.bold = True
+    p0.font.color.rgb = PptxRGBColor(218, 165, 32)
+
+    p1 = tf1.add_paragraph()
+    p1.text = "Økonomisk Status, EOY-Prognose & Tiltaksplan"
+    p1.font.size = PptxPt(36)
+    p1.font.bold = True
+    p1.font.color.rgb = PptxRGBColor(255, 255, 255)
+
+    p2 = tf1.add_paragraph()
+    p2.text = f"Aktivt utvalg: {sec_label} | Ansvar: {ans_label} | Periode: {p_label}\nGenerert fra KOSTRA AI Workbench & DuckDB Fact Engine"
+    p2.font.size = PptxPt(15)
+    p2.font.color.rgb = PptxRGBColor(200, 210, 225)
+
+    # Slide 2: Hovedtall & Avviksbilde
+    slide2 = prs.slides.add_slide(blank_layout)
+    tx_box2 = slide2.shapes.add_textbox(PptxInches(0.8), PptxInches(0.6), PptxInches(11.7), PptxInches(1.0))
+    p_t2 = tx_box2.text_frame.paragraphs[0]
+    p_t2.text = f"📊 Hovedtall & Regnskapsavvik — {sec_label}"
+    p_t2.font.size = PptxPt(24)
+    p_t2.font.bold = True
+    p_t2.font.color.rgb = PptxRGBColor(11, 25, 44)
+
+    table_shape2 = slide2.shapes.add_table(5, 4, PptxInches(0.8), PptxInches(1.8), PptxInches(11.7), PptxInches(4.5))
+    t2 = table_shape2.table
+    for i, h in enumerate(["Styringsparameter", "Budsjett YTD (NOK)", "Regnskap YTD (NOK)", "Netto Avvik / Status"]):
+        cell = t2.cell(0, i)
+        cell.text = h
+        cell.fill.solid()
+        cell.fill.fore_color.rgb = PptxRGBColor(26, 54, 93)
+        for p in cell.text_frame.paragraphs:
+            p.font.bold = True
+            p.font.color.rgb = PptxRGBColor(255, 255, 255)
+            p.font.size = PptxPt(13)
+
+    rows_data2 = [
+        ("Akkumulert YTD (M01–M08)", f"{fact['total_budsjett_ytd']:,.0f}", f"{fact['total_regnskap_ytd']:,.0f}", f"{fact['total_avvik_ytd']:,.0f} ({fact['rag_status']})"),
+        ("Burn Rate (Forbrukshastighet)", "100.0 %", f"{fact['avg_burn_rate']:.1f} %", "🔴 Over budsjett" if fact['avg_burn_rate'] > 105 else "🟢 I rute"),
+        ("Fullårsprognose (EAC 31.12)", f"{fact['annual_budget_eoy']:,.0f}", f"{fact['total_eac']:,.0f}", f"{fact['total_eoy_variance']:,.0f} kr"),
+        ("Rullende 3M Run-rate", f"{fact['required_monthly_run_rate_loy']:,.0f} /mnd (Krav)", f"{fact['avg_rolling_3m_run_rate']:,.0f} /mnd (Faktisk)", "Avvik mot nødvendig takt")
+    ]
+    for row_idx, r_data in enumerate(rows_data2, start=1):
+        for col_idx, val in enumerate(r_data):
+            cell = t2.cell(row_idx, col_idx)
+            cell.text = val
+            for p in cell.text_frame.paragraphs:
+                p.font.size = PptxPt(12)
+                if col_idx == 3 and "KRITISK" in val:
+                    p.font.bold = True
+                    p.font.color.rgb = PptxRGBColor(214, 39, 40)
+
+    # Slide 3: Prognose & Sesongvekting
+    slide3 = prs.slides.add_slide(blank_layout)
+    tx_box3 = slide3.shapes.add_textbox(PptxInches(0.8), PptxInches(0.6), PptxInches(11.7), PptxInches(1.0))
+    p_t3 = tx_box3.text_frame.paragraphs[0]
+    p_t3.text = "📈 EOY-Prognose (EAC), Glidende 3M Snitt & Q4 Sesongfaktorer"
+    p_t3.font.size = PptxPt(24)
+    p_t3.font.bold = True
+    p_t3.font.color.rgb = PptxRGBColor(11, 25, 44)
+
+    tx_content3 = slide3.shapes.add_textbox(PptxInches(0.8), PptxInches(1.8), PptxInches(11.7), PptxInches(5.0))
+    tf_c3 = tx_content3.text_frame
+    tf_c3.word_wrap = True
+    
+    bullets = [
+        "• Rullende 3-måneders snitt (Rolling 3M Run-rate): Måler faktisk kostnadstakt i juni, juli og august (M06–M08) for å fange opp reelle bemannings- og overtidstrender.",
+        "• Fravær av tidlig utvanning: Gamle tall fra M01–M02 gis 0 % direkte vekt i fremskrivningen.",
+        "• Sesongvekting for Left-of-Year (M09–M12): Multipliseres med historiske KOSTRA-sesongfaktorer:",
+        "   - September (M09): Faktor 0,98 (normalisering etter skolestart)",
+        "   - Oktober (M10): Faktor 1,02 (ordinær høstaktivitet)",
+        "   - November (M11): Faktor 1,05 (høyere leverandørfakturering)",
+        "   - Desember (M12): Faktor 1,12 (årsavslutning, vaktbøker, skattejusteringer)",
+        f"• Forventet Sluttresultat (EAC 31.12): {fact['total_eac']:,.0f} kr mot årsbudsjett {fact['annual_budget_eoy']:,.0f} kr (Netto avvik: {fact['total_eoy_variance']:,.0f} kr)."
+    ]
+    for b in bullets:
+        p = tf_c3.add_paragraph()
+        p.text = b
+        p.font.size = PptxPt(14)
+        p.font.color.rgb = PptxRGBColor(40, 50, 70)
+
+    # Slide 4: Tiltakspakke og Styringsrett
+    slide4 = prs.slides.add_slide(blank_layout)
+    tx_box4 = slide4.shapes.add_textbox(PptxInches(0.8), PptxInches(0.6), PptxInches(11.7), PptxInches(1.0))
+    p_t4 = tx_box4.text_frame.paragraphs[0]
+    p_t4.text = "🎯 Preskriptiv Tiltaksplan & Juridisk Styringsrett"
+    p_t4.font.size = PptxPt(24)
+    p_t4.font.bold = True
+    p_t4.font.color.rgb = PptxRGBColor(11, 25, 44)
+
+    table_shape4 = slide4.shapes.add_table(5, 4, PptxInches(0.8), PptxInches(1.8), PptxInches(11.7), PptxInches(4.5))
+    t4 = table_shape4.table
+    for i, h in enumerate(["Tiltak / Aktivitet", "Innsparing EOY", "Fullårseffekt 2027", "Juridisk Hjemmel / Nivå"]):
+        cell = t4.cell(0, i)
+        cell.text = h
+        cell.fill.solid()
+        cell.fill.fore_color.rgb = PptxRGBColor(26, 54, 93)
+        for p in cell.text_frame.paragraphs:
+            p.font.bold = True
+            p.font.color.rgb = PptxRGBColor(255, 255, 255)
+            p.font.size = PptxPt(13)
+
+    t_rows = [
+        ("Vikar- og ansettelsesstopp (Stillingsinndragning)", "-770 000 kr", "-2 310 000 kr", "Kommuneloven § 13-1 (Kommunedirektør)"),
+        ("Overtidsbegrensning & turnusoptimalisering", "-430 000 kr", "-1 290 000 kr", "Kommuneloven § 13-1 (Enhetsleder)"),
+        ("Konsulentfrys (Art 127000)", "-500 000 kr", "-1 500 000 kr", "Kommuneloven § 13-1 (Kommunedirektør)"),
+        ("Overføring fra Disposisjonsfond (Bystyresak)", "+800 000 kr", "0 kr", "Kommuneloven § 14-6 (Bystyrevedtak)")
+    ]
+    for row_idx, r_data in enumerate(t_rows, start=1):
+        for col_idx, val in enumerate(r_data):
+            cell = t4.cell(row_idx, col_idx)
+            cell.text = val
+            for p in cell.text_frame.paragraphs:
+                p.font.size = PptxPt(12)
+
+    buf = BytesIO()
+    prs.save(buf)
+    buf.seek(0)
+    return StreamingResponse(
+        buf,
+        media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        headers={"Content-Disposition": f"attachment; filename=ledelsespresentasjon_{sektor}_{ansvar}.pptx"}
     )

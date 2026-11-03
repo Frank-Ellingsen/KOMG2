@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-FastAPI Copilot & RAG Router (v2.0)
-Optimering og Maksimalt Utbytte av RAG-Data, DuckDB og Localblob / Vektordatabase (v2.0)
+FastAPI Copilot & RAG Router (v3.0 Dynamic Edition)
+Optimering og Maksimalt Utbytte av RAG-Data, DuckDB og Localblob / Vektordatabase
+Implements:
+  - 06_ANTIGRAVITY_MASTER_DEVELOPER_PROMPT_ULTIMATE_V3.md
+  - 10_ANTIGRAVITY_DYNAMIC_FILTER_CASCADE_SPEC.md
+  - 08_OPTIMERING_OG_MAKS_UTBYTTE_AV_RAG_OG_LOCALBLOB_V2.md
 
 Features:
 - Intent Router v2 med syntaktisk HV-mønstergjenkjenning (PROCESS_HV_PATTERNS)
+- 100 % Dynamisk synkronisering mot aktive filtervalg (periode, sektor, ansvar, funksjon, rag_status)
 - ChromaDB persistent vektorbase (kostra_knowledge_base) med Parent-Child indeksering
 - DuckDB OLAP (modelready_fact) for regnskapstall og avvik
-- Faglig kildemapping for "Hvordan budsjettere lønn?" og "Hva er bruttoprinsippet?"
-- 3 standardiserte ruter: CONCEPTUAL_LEGAL, DATA_ANALYTICS, HYBRID (samt EXTERNAL_LOOKUP)
+- Faglig kildemapping for "Hvordan budsjettere lønn?", "Hva er bruttoprinsippet?" og "EOY-prognose"
+- 4 standardiserte ruter: CONCEPTUAL_LEGAL, DATA_ANALYTICS, HYBRID, EXTERNAL_LOOKUP
 """
 import os
 import re
@@ -18,6 +23,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import chromadb
 import duckdb
+
+from src.services.duckdb_engine import get_filtered_fact_data
 
 router = APIRouter(prefix="/api/v1/copilot", tags=["Copilot & RAG"])
 
@@ -36,6 +43,7 @@ knowledge_collection = chroma_client.get_or_create_collection("kostra_knowledge_
 class QueryRequest(BaseModel):
     query: str
     user_area_filter: Optional[str] = None  # e.g., "Helse og Omsorg", "Oppvekst og Utdanning", "25310"
+    active_filters: Optional[Dict[str, Any]] = None  # { periode, sektor, ansvar, funksjon, rag_status }
 
 
 # ===========================================================================
@@ -105,15 +113,12 @@ def classify_intent(user_query: str) -> str:
         return "HYBRID"
 
     # TRINN 2: Sjekk om spørringen eksplisitt ber om konkrete regnskapstall
-    # (f.eks. "Hva er bokført lønn og avvik på pleie og omsorg funksjon 254 i august?")
     if has_data_explicit:
         specific_financial_tokens = ["bokført", "avvik", "ytd", "eac", "hvor mye", "august", "funksjon 254", "forbruk"]
         if any(tok in query_clean for tok in specific_financial_tokens):
             return "DATA_ANALYTICS"
 
     # TRINN 3: Prosess-, regelverks- og fagspørsmål ("HV-spørsmål")
-    # Selv om spørringen inneholder ord som "budsjett" eller "lønn",
-    # betyr "hvordan / hva er" at brukeren ønsker faglig forklaring!
     if has_process_hv:
         return "CONCEPTUAL_LEGAL"
 
@@ -230,9 +235,13 @@ _seed_chroma_if_needed()
 
 
 # ===========================================================================
-# 3. RAG RETRIEVAL FROM CHROMADB
+# 3. RAG RETRIEVAL FROM CHROMADB WITH DYNAMIC FILTERING
 # ===========================================================================
-def query_chromadb_rag(query_text: str, top_k: int = 3) -> List[Dict[str, Any]]:
+def query_chromadb_rag(
+    query_text: str,
+    top_k: int = 3,
+    filter_metadata: Optional[Dict[str, Any]] = None
+) -> List[Dict[str, Any]]:
     """Henter semantisk relevante utdrag fra ChromaDB med fallback til innebygde kilder."""
     q_lower = query_text.lower()
 
@@ -260,10 +269,14 @@ def query_chromadb_rag(query_text: str, top_k: int = 3) -> List[Dict[str, Any]]:
         }]
 
     try:
-        results = knowledge_collection.query(
-            query_texts=[query_text],
-            n_results=top_k
-        )
+        query_kwargs: Dict[str, Any] = {
+            "query_texts": [query_text],
+            "n_results": top_k
+        }
+        if filter_metadata:
+            query_kwargs["where"] = filter_metadata
+
+        results = knowledge_collection.query(**query_kwargs)
         docs = []
         if results and "documents" in results and results["documents"]:
             for i, doc in enumerate(results["documents"][0]):
@@ -339,14 +352,46 @@ def query_duckdb_analytics(user_query: str, area_filter: Optional[str] = None) -
 
 
 # ===========================================================================
-# 5. FASTAPI ENDPOINT WITH INTENT ROUTER v2 LOGIC
+# 5. FASTAPI ENDPOINT WITH DYNAMIC FILTER INJECTION (SPEC V3 & DOC 10)
 # ===========================================================================
 @router.post("/query")
 async def copilot_query(req: QueryRequest):
     intent = classify_intent(req.query)
 
+    # 1. Resolve Active Filter State
+    active_filters = req.active_filters or {}
+    periode = str(active_filters.get("periode") or "ALL")
+    sektor = str(active_filters.get("sektor") or req.user_area_filter or "ALL")
+    ansvar = str(active_filters.get("ansvar") or "ALL")
+    funksjon = str(active_filters.get("funksjon") or "ALL")
+    rag_status = str(active_filters.get("rag_status") or "ALL")
+
+    if req.user_area_filter and req.user_area_filter.upper() != "ALL" and sektor == "ALL":
+        if req.user_area_filter.isdigit():
+            ansvar = req.user_area_filter
+        else:
+            sektor = req.user_area_filter
+
+    # 2. Dynamic Fact Slice Calculation via DuckDB Engine
+    fact_slice = get_filtered_fact_data(periode, sektor, ansvar, funksjon, rag_status)
+
+    # 3. Dynamic Filter Banner formatting (Doc 10 Section 4)
+    filter_banner = (
+        f"[AKTIV FILTERTILSTAND]:\n"
+        f"• Periode: {fact_slice['filters']['periode']}\n"
+        f"• Sektor: {fact_slice['filters']['sektor']}\n"
+        f"• Ansvarssted: {fact_slice['filters']['ansvar']} ({fact_slice['total_linjer']} linjer)\n"
+        f"• KOSTRA-Funksjon: {fact_slice['filters']['funksjon']}\n"
+        f"• Avvik i utvalg: {fact_slice['total_avvik_ytd']:,.0f} kr ({fact_slice['rag_status']})\n\n"
+    )
+
+    # 4. Optional ChromaDB filter
+    chroma_filter = None
+    if funksjon != "ALL":
+        chroma_filter = {"funksjon_kode": funksjon}
+
     if intent == "CONCEPTUAL_LEGAL":
-        rag_hits = query_chromadb_rag(req.query)
+        rag_hits = query_chromadb_rag(req.query, filter_metadata=chroma_filter)
         
         # Build structured response
         q_lower = req.query.lower()
@@ -398,28 +443,40 @@ async def copilot_query(req: QueryRequest):
                 f"Her er veiledningen hentet fra reglement og KOSTRA-kunnskapsbasen:\n\n{context_str}"
             )
 
+        if req.active_filters:
+            response_text = f"> {filter_banner}" + response_text
+
         return {
             "intent": intent,
             "response": response_text,
-            "sources": rag_hits
+            "sources": rag_hits,
+            "filter_context": fact_slice
         }
 
     elif intent == "DATA_ANALYTICS":
-        data = query_duckdb_analytics(req.query, req.user_area_filter)
-        
-        sign = "+" if data["avvik_ytd"] > 0 else ""
+        sign = "+" if fact_slice["total_avvik_ytd"] > 0 else ""
         response_text = (
             f"📊 **[DATA_ANALYTICS / Regnskapstall fra DuckDB]**\n\n"
-            f"• **Budsjett YTD:** {data['budsjett_ytd']:,.0f} kr\n"
-            f"• **Bokført Regnskap YTD:** {data['regnskap_ytd']:,.0f} kr\n"
-            f"• **Netto Avvik YTD:** **{sign}{data['avvik_ytd']:,.0f} kr**\n"
-            f"• **Forventet Helårsregnskap (EAC):** {data['eac']:,.0f} kr\n\n"
-            f"*(Tallgrunnlag hentet direkte fra DuckDB modelready_fact)*"
+            f"> {filter_banner}"
+            f"• **Budsjett YTD:** {fact_slice['total_budsjett_ytd']:,.0f} kr\n"
+            f"• **Bokført Regnskap YTD:** {fact_slice['total_regnskap_ytd']:,.0f} kr\n"
+            f"• **Netto Avvik YTD:** **{sign}{fact_slice['total_avvik_ytd']:,.0f} kr** ({fact_slice['rag_status']})\n"
+            f"• **Burn Rate:** {fact_slice['avg_burn_rate']:.1f} %\n"
+            f"• **Forventet Helårsregnskap (EAC):** {fact_slice['total_eac']:,.0f} kr\n"
+            f"• **Rullende 3M Run-rate:** {fact_slice['avg_rolling_3m_run_rate']:,.0f} kr/mnd\n\n"
+            f"*(Tallgrunnlag beregnet dynamisk med DuckDB parameterized engine mot modelready_fact)*"
         )
         return {
             "intent": intent,
             "response": response_text,
-            "data": data
+            "data": {
+                "budsjett_ytd": fact_slice["total_budsjett_ytd"],
+                "regnskap_ytd": fact_slice["total_regnskap_ytd"],
+                "avvik_ytd": fact_slice["total_avvik_ytd"],
+                "eac": fact_slice["total_eac"],
+                "burn_rate": fact_slice["avg_burn_rate"]
+            },
+            "filter_context": fact_slice
         }
 
     elif intent == "EXTERNAL_LOOKUP":
@@ -433,17 +490,18 @@ async def copilot_query(req: QueryRequest):
                 "• **Bærekraftskrav (LOA § 5):** Minimum 30 % klima- og miljøvekting i alle anbud over 500k kr.\n"
                 "*(Kilde: DFØ Anskaffelsesforskriften 2026 / Lovdata)*"
             ),
-            "sources": [{"source": "DFØ / Lovdata", "legal_ref": "Anskaffelsesforskriften 2026"}]
+            "sources": [{"source": "DFØ / Lovdata", "legal_ref": "Anskaffelsesforskriften 2026"}],
+            "filter_context": fact_slice
         }
 
     else:  # HYBRID / PRESCRIPTIVE_HYBRID
-        rag_hits = query_chromadb_rag(req.query, top_k=2)
-        data = query_duckdb_analytics(req.query, req.user_area_filter)
-        sign = "+" if data["avvik_ytd"] > 0 else ""
+        rag_hits = query_chromadb_rag(req.query, top_k=2, filter_metadata=chroma_filter)
+        sign = "+" if fact_slice["total_avvik_ytd"] > 0 else ""
         
         response_text = (
             f"🔄 **[PRESCRIPTIVE_HYBRID / Tall & Regelverk]**\n\n"
-            f"**Regnskapsstatus (DuckDB):** Avvik YTD er **{sign}{data['avvik_ytd']:,.0f} kr** (Helårsprognose EAC: {data['eac']:,.0f} kr).\n\n"
+            f"> {filter_banner}"
+            f"**Regnskapsstatus for valgt utvalg (DuckDB):** Avvik YTD er **{sign}{fact_slice['total_avvik_ytd']:,.0f} kr** (Helårsprognose EAC: {fact_slice['total_eac']:,.0f} kr).\n\n"
             f"**Relevante retningslinjer og administrative tiltak (Kommuneloven § 13-1):**\n" +
             "\n".join([f"• {hit['content'][:220]}..." for hit in rag_hits]) + "\n\n"
             f"**Tiltak:** Iverksett administrativ vikarstopp (art 102000), overtidsbegrensning (art 104000) og vurder behov for bystyresak jf. § 14-6 dersom avviket ikke salderes innen 31.12."
@@ -452,6 +510,11 @@ async def copilot_query(req: QueryRequest):
             "intent": intent,
             "response": response_text,
             "sources": rag_hits,
-            "data": data
+            "data": {
+                "budsjett_ytd": fact_slice["total_budsjett_ytd"],
+                "regnskap_ytd": fact_slice["total_regnskap_ytd"],
+                "avvik_ytd": fact_slice["total_avvik_ytd"],
+                "eac": fact_slice["total_eac"]
+            },
+            "filter_context": fact_slice
         }
-

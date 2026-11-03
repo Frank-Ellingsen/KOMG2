@@ -1461,7 +1461,7 @@
         <span>📊</span> <span>Avviksoversikt &amp; Månedstall</span>
       </button>
       <button type="button" class="nav-btn" data-target="view-tidsserie" data-role-category="budsjett">
-        <span>📈</span> <span>Prognosebane &amp; Budsjettsimulator</span>
+        <span>📈</span> <span>Budsjettsimulator ("Hva skjer hvis...")</span>
       </button>
       <button type="button" class="nav-btn" data-target="view-eda" data-role-category="budsjett">
         <span>📊</span> <span>Datautforskning (FT Visual Guide)</span>
@@ -1470,10 +1470,10 @@
         <span>🌲</span> <span>Tidlig Varsling &amp; Forbruksmønster</span>
       </button>
       <button type="button" class="nav-btn" data-target="view-anomaly" data-role-category="budsjett,hverdag">
-        <span>🚨</span> <span>Avviksvarsel &amp; Hendelser</span>
+        <span>🚨</span> <span>Avviksvarsel &amp; Viktige Hendelser</span>
       </button>
       <button type="button" class="nav-btn" data-target="view-recommender" data-role-category="hverdag,budsjett">
-        <span>🎯</span> <span>Tiltakskort &amp; Styringsrett (§ 13-1)</span>
+        <span>🎯</span> <span>Tiltakskort &amp; Automatisk Lovsjekk (AML § 10-8)</span>
       </button>
       <button type="button" class="nav-btn" data-target="view-chatbot" data-role-category="hverdag,politikk">
         <span>💬</span> <span>Søk i Lovverk &amp; Reglement</span>
@@ -4350,10 +4350,13 @@
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
               <button type="button" class="cockpit-btn" id="btn-download-framsikt-csv" style="font-size:0.73rem; padding:0.35rem 0.75rem; background:var(--clr-ok-bg); color:var(--clr-ok-text); border:1px solid var(--clr-ok-text); font-weight:700;">
-                📥 Last ned Framsikt CSV (Importklar)
+                📥 Last ned klar fil til Framsikt (CSV)
               </button>
-              <button type="button" class="cockpit-btn" id="btn-download-framsikt-excel" style="font-size:0.73rem; padding:0.35rem 0.75rem; font-weight:700;">
-                📊 Last ned Framsikt Excel (.xlsx)
+              <button type="button" class="cockpit-btn" id="btn-download-framsikt-excel" style="font-size:0.73rem; padding:0.35rem 0.75rem; font-weight:700;" title="Last ned Framsikt-importfil (.xlsx) filtrert på aktivt utvalg">
+                📊 Last ned klar fil til Framsikt (Excel .xlsx)
+              </button>
+              <button type="button" class="cockpit-btn" id="btn-download-presentation-pptx" style="font-size:0.73rem; padding:0.35rem 0.75rem; font-weight:700; background:var(--header-dark); color:#fff; border-color:var(--header-dark);" title="Generer 16:9 PowerPoint ledelsespresentasjon (.pptx) med gjeldende filter">
+                📑 Ledelsespresentasjon (.pptx)
               </button>
               <button type="button" class="cockpit-btn" id="btn-copy-framsikt-text" style="font-size:0.73rem; padding:0.35rem 0.75rem;">
                 📋 Kopier Tertialnotat
@@ -7862,6 +7865,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       if (key === "intent_data") {
         const ctx = getFilteredContext();
         return `<strong>🤖 Antigravity KOSTRA AI Copilot <span class='rag-badge rag-blue'>📊 [DATA_ANALYTICS]</span>:</strong><br/>
+<div class='filter-state-chip' style='font-size:0.71rem; color:var(--text-secondary); background:rgba(0,0,0,0.03); padding:0.3rem 0.55rem; border-radius:4px; margin:0.35rem 0; border-left:3px solid var(--clr-fig-regnskap);'>
+  <strong>[AKTIV FILTERTILSTAND]:</strong> 📅 Periode: ${ctx.pMeta.short} | 🏛️ Sektor: ${ctx.sektor === "ALL" ? "Alle Sektorer" : ctx.sektor} | 📍 Ansvar: ${ctx.ansvar === "ALL" ? "Alle Enheter" : ctx.ansvar} | 🚦 Avvik i utvalg: ${fmtNOK(ctx.totAvvik, true)} (${ctx.overallStatus})
+</div>
 • <strong>Regnskapstall (${ctx.pMeta.short} | ${ctx.sektor === "ALL" ? "Alle Sektorer" : ctx.sektor} | Ansvar ${ctx.ansvar === "ALL" ? "Alle" : ctx.ansvar}):</strong><br/>
   - Budsjett YTD: <code>${fmtNOK(ctx.totBud)}</code><br/>
   - Bokført Regnskap YTD: <code>${fmtNOK(ctx.totReg)}</code><br/>
@@ -7872,6 +7878,9 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       if (key === "intent_hybrid") {
         const ctx = getFilteredContext();
         return `<strong>🤖 Antigravity KOSTRA AI Copilot <span class='rag-badge rag-amber'>🔀 [PRESCRIPTIVE_HYBRID]</span>:</strong><br/>
+<div class='filter-state-chip' style='font-size:0.71rem; color:var(--text-secondary); background:rgba(0,0,0,0.03); padding:0.3rem 0.55rem; border-radius:4px; margin:0.35rem 0; border-left:3px solid var(--clr-amber-text);'>
+  <strong>[AKTIV FILTERTILSTAND]:</strong> 📅 Periode: ${ctx.pMeta.short} | 🏛️ Sektor: ${ctx.sektor === "ALL" ? "Alle Sektorer" : ctx.sektor} | 📍 Ansvar: ${ctx.ansvar === "ALL" ? "Alle Enheter" : ctx.ansvar} | 🚦 Avvik i utvalg: ${fmtNOK(ctx.totAvvik, true)} (${ctx.overallStatus})
+</div>
 • <strong>Avvikskontekst (DuckDB):</strong> Ansvarssted 25310 Omsorgssenter har et akkumulert merforbruk på personell (art 102000 vikarlønn og 104000 overtid) med forventet årsavvik på <strong>${fmtNOK(ctx.totEacAvvik, true)}</strong>.<br/>
 • <strong>Administrative Strakstiltak (Kommuneloven § 13-1 &amp; § 14-2):</strong><br/>
   1. <strong>Innstramming i Visma Gat:</strong> 25 % kutt i vikarinnleie og skjerpet ledergodkjenning på art 104000 overtid.<br/>
@@ -12253,6 +12262,7 @@ function getEdaDataset(sektorFilter = "ALL") {
 
       btnDownloadCsv?.addEventListener("click", downloadFramsiktCsv);
       btnDownloadExcel?.addEventListener("click", downloadFramsiktExcel);
+      document.getElementById("btn-download-presentation-pptx")?.addEventListener("click", downloadPresentationPptx);
       btnCopyText?.addEventListener("click", copyFramsiktText);
 
       // Last første mal ved start
@@ -12409,8 +12419,21 @@ function getEdaDataset(sektorFilter = "ALL") {
     }
 
     function downloadFramsiktExcel() {
-      // Lenker til den offisielle importfilen eller trigget nedlasting
-      window.open("antigravity_master_instructions_suite/framsikt_budsjettendringer_eoy.xlsx", "_blank");
+      const curPeriod = document.getElementById("flt-period")?.value || "ALL";
+      const curSektor = document.getElementById("flt-sektor")?.value || "ALL";
+      const curAnsvar = document.getElementById("flt-ansvar")?.value || "ALL";
+      const curFn = document.getElementById("flt-funksjon")?.value || "ALL";
+      const url = `/api/v1/exports/framsikt-excel?sektor=${encodeURIComponent(curSektor)}&ansvar=${encodeURIComponent(curAnsvar)}&funksjon=${encodeURIComponent(curFn)}&periode=${encodeURIComponent(curPeriod)}`;
+      window.open(url, "_blank");
+    }
+
+    function downloadPresentationPptx() {
+      const curPeriod = document.getElementById("flt-period")?.value || "ALL";
+      const curSektor = document.getElementById("flt-sektor")?.value || "ALL";
+      const curAnsvar = document.getElementById("flt-ansvar")?.value || "ALL";
+      const curFn = document.getElementById("flt-funksjon")?.value || "ALL";
+      const url = `/api/v1/exports/presentation-pptx?sektor=${encodeURIComponent(curSektor)}&ansvar=${encodeURIComponent(curAnsvar)}&funksjon=${encodeURIComponent(curFn)}&periode=${encodeURIComponent(curPeriod)}`;
+      window.open(url, "_blank");
     }
 
     function copyFramsiktText() {

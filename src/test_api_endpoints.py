@@ -463,8 +463,60 @@ def run_tests():
     assert "sources" in cp_hyb
     print("  OK: Copilot correctly generated hybrid prescriptive response (RAG + DuckDB)")
 
+    # -------------------------------------------------------------------------
+    # DYNAMIC FILTER CASCADE & EXPORTS SUITE (Doc 10 & v3 Spec)
+    # -------------------------------------------------------------------------
+    print("Testing /api/v1/analytics/cascading-options (Dynamic Cascade)...")
+    res = client.get("/api/v1/analytics/cascading-options?sektor=Helse og Omsorg")
+    assert res.status_code == 200
+    c_opts = res.json()
+    assert len(c_opts["sektorer"]) >= 2
+    assert len(c_opts["ansvarssteder"]) == 4
+    print(f"  OK: Cascading options returned {len(c_opts['ansvarssteder'])} health units")
+
+    print("Testing /api/v1/analytics/filtered-fact (Parameterized DuckDB Fact)...")
+    res = client.get("/api/v1/analytics/filtered-fact?sektor=Helse og Omsorg&ansvar=25310")
+    assert res.status_code == 200
+    ff_data = res.json()
+    assert ff_data["total_linjer"] > 0
+    assert ff_data["total_regnskap_ytd"] > 0
+    assert "rag_status" in ff_data
+    print(f"  OK: Filtered fact data computed: {ff_data['total_linjer']} lines, Regnskap {ff_data['total_regnskap_ytd']} NOK")
+
+    print("Testing /api/v1/ml/dynamic-metrics (Dynamic XAI & Tree Distribution)...")
+    res = client.get("/api/v1/ml/dynamic-metrics?sektor=Helse og Omsorg")
+    assert res.status_code == 200
+    ml_dyn = res.json()
+    assert "decision_tree" in ml_dyn
+    assert ml_dyn["decision_tree"]["status_2_kritisk"] > 0
+    assert len(ml_dyn["random_forest"]["feature_importance"]) >= 4
+    print(f"  OK: Dynamic ML returned Decision Tree status distribution and feature importance")
+
+    print("Testing /api/v1/exports/presentation-pptx (16:9 Executive PowerPoint)...")
+    res = client.get("/api/v1/exports/presentation-pptx?sektor=Helse og Omsorg&ansvar=25310")
+    assert res.status_code == 200
+    assert len(res.content) > 10000
+    print(f"  OK: 16:9 Executive PowerPoint deck generated ({len(res.content)} bytes)")
+
+    print("Testing /api/v1/copilot/query with active_filters (Filter Banner Injection)...")
+    res = client.post("/api/v1/copilot/query", json={
+        "query": "Hva er regnskapstallene for valgt filter?",
+        "active_filters": {
+            "periode": "ALL",
+            "sektor": "Helse og Omsorg",
+            "ansvar": "25310",
+            "funksjon": "254",
+            "rag_status": "ALL"
+        }
+    })
+    assert res.status_code == 200
+    cp_resp = res.json()
+    assert "[AKTIV FILTERTILSTAND]" in cp_resp["response"]
+    assert "Helse og Omsorg" in cp_resp["response"]
+    print("  OK: Copilot injected active filter state banner into response")
+
     print("\n==================================================")
-    print("ALL 34 ENDPOINTS (100% SUITE, ULTIMATE & COPILOT v2) PASSED WITH ZERO ERRORS!")
+    print("ALL 39 ENDPOINTS (100% SUITE, ULTIMATE & DYNAMIC CASCADE v3) PASSED WITH ZERO ERRORS!")
     print("==================================================")
 
 
