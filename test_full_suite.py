@@ -328,6 +328,31 @@ def run_all_tests():
         record_test("Kolonnetittel til høyre for MoM er 'Avvikssøyle'", bool(sparkline_info["hasAvvikHeader"]))
         record_test("Fjernet overflødig 'kr kr' i MoM trend-kolonne", not sparkline_info["hasDoubleKr"])
 
+        # Sjekk Avviksfordeling pr ansvarssted i valgt sektor (Horisontal bar length)
+        unit_variance_info = page.evaluate('''() => {
+            const box = document.getElementById("min-unit-variance-box");
+            const title = document.getElementById("min-unit-variance-title")?.textContent || "";
+            const kpi = document.getElementById("min-unit-variance-kpi")?.textContent || "";
+            const rows = document.querySelectorAll("#min-unit-variance-tbody tr").length;
+            const rects = document.querySelectorAll("#min-unit-variance-tbody svg rect").length;
+            const has25310 = (document.getElementById("min-unit-variance-tbody")?.innerText || "").includes("25310");
+            return {
+                boxVisible: box && getComputedStyle(box).display !== "none",
+                title,
+                kpi,
+                rows,
+                rects,
+                has25310
+            };
+        }''')
+        record_test("Avviksfordeling pr ansvarssted-boks er synlig under månedstabellen", bool(unit_variance_info["boxVisible"]))
+        record_test("Avviksfordeling viser 4 ansvarssteder for Helse og Omsorg",
+                    unit_variance_info["rows"] == 4 and unit_variance_info["rects"] == 4 and unit_variance_info["has25310"],
+                    f"Rader: {unit_variance_info['rows']}, Søyler: {unit_variance_info['rects']}")
+        record_test("Avviksfordeling KPI viser samlet YTD avvik (+1 285 614 kr)",
+                    "1 285 614" in unit_variance_info["kpi"] or "1285614" in unit_variance_info["kpi"],
+                    f"KPI: {unit_variance_info['kpi']}")
+
         # Sjekk Lønns- og Refusjonsprofil (Brutto vs. Netto & NAV sykelønnsrefusjon)
         sal_refund_info = page.evaluate('''() => {
             const panel = document.getElementById("min-salary-refund-panel");

@@ -1706,6 +1706,17 @@
                   <tbody id="min-trend-body"></tbody>
                 </table>
               </div>
+
+              <!-- Avviksfordeling pr ansvarssted i valgt sektor (Horisontal bar length) -->
+              <div id="min-unit-variance-box" style="margin-top:0.85rem; padding-top:0.75rem; border-top:1px solid var(--border-light, #E2E8F0);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.45rem; flex-wrap:wrap; gap:0.4rem;">
+                  <span style="font-size:0.72rem; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:0.35rem;">
+                    <span>📊</span> <span id="min-unit-variance-title">Avviksfordeling pr. ansvarssted i valgt sektor</span>
+                  </span>
+                  <span id="min-unit-variance-kpi" style="font-size:0.68rem; font-weight:600; color:var(--text-secondary);"></span>
+                </div>
+                <div id="min-unit-variance-chart-wrap" style="width:100%;"></div>
+              </div>
             </div>
             <div class="panel-card">
               <div class="panel-title">
@@ -6898,6 +6909,138 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       });
     }
 
+    function selectUnitFromVarianceBar(unitCode) {
+      const minAnsvar = document.getElementById("min-ansvar");
+      const fltAnsvar = document.getElementById("flt-ansvar");
+      if (minAnsvar) minAnsvar.value = unitCode;
+      if (fltAnsvar) {
+        fltAnsvar.value = unitCode;
+        fltAnsvar.dispatchEvent(new Event("change", { bubbles: true }));
+      } else if (typeof refreshMonthlyReport === "function") {
+        refreshMonthlyReport();
+      }
+    }
+
+    function renderUnitVarianceBars(report) {
+      const container = document.getElementById("min-unit-variance-chart-wrap");
+      const titleEl = document.getElementById("min-unit-variance-title");
+      const kpiEl = document.getElementById("min-unit-variance-kpi");
+      if (!container) return;
+
+      const curSektor = report.source_sector || document.getElementById("flt-sektor")?.value || "ALL";
+      const curAnsvar = report.responsibility || document.getElementById("flt-ansvar")?.value || "ALL";
+
+      // Filter active responsibility units (excluding 'ALL')
+      const units = Object.entries(ANSVAR_UNITS).filter(([code, u]) => {
+        if (code === "ALL") return false;
+        if (curSektor === "ALL") return true;
+        return u.sektor === curSektor;
+      });
+
+      const sectorTitle = curSektor === "ALL" ? "Kristiansand Kommune (alle sektorer)" : curSektor;
+      if (titleEl) {
+        titleEl.textContent = `Avviksfordeling pr. ansvarssted (${sectorTitle})`;
+      }
+
+      if (units.length === 0) {
+        container.innerHTML = `<div style="font-size:0.72rem; color:var(--text-muted); padding:0.6rem; text-align:center;">Ingen ansvarssteder funnet for ${escapeHtml(curSektor)}.</div>`;
+        if (kpiEl) kpiEl.textContent = "";
+        return;
+      }
+
+      // Compute metrics per unit
+      const unitData = units.map(([code, u]) => {
+        const ytdBud = u.ytdBud || 0;
+        const ytdReg = u.ytdReg || 0;
+        const ytdAvvik = ytdReg - ytdBud;
+        const ytdAvvikPct = ytdBud > 0 ? (ytdAvvik / ytdBud) * 100 : 0;
+        const isSelected = curAnsvar === code;
+
+        return {
+          code,
+          name: u.name,
+          sektor: u.sektor,
+          fn: u.fn,
+          ytdBud,
+          ytdReg,
+          ytdAvvik,
+          ytdAvvikPct,
+          isSelected
+        };
+      });
+
+      // Sort descending by YTD avvik (størst merforbruk øverst)
+      unitData.sort((a, b) => b.ytdAvvik - a.ytdAvvik);
+
+      const totAvvik = unitData.reduce((acc, u) => acc + u.ytdAvvik, 0);
+      const totBud = unitData.reduce((acc, u) => acc + u.ytdBud, 0);
+      const totPct = totBud > 0 ? (totAvvik / totBud) * 100 : 0;
+      if (kpiEl) {
+        kpiEl.textContent = `Samlet YTD avvik: ${totAvvik >= 0 ? '+' : ''}${fmtNOK(totAvvik)} (${totPct >= 0 ? '+' : ''}${totPct.toFixed(1).replace(".", ",")} %) • ${unitData.length} enheter`;
+      }
+
+      const maxVal = Math.max(...unitData.map(u => Math.abs(u.ytdAvvik)), 1.0);
+      const barTrackWidth = 110;
+
+      // Render Edward Tufte compliant clean table with horizontal bar column
+      const rowsHtml = unitData.map(u => {
+        const valAbs = Math.abs(u.ytdAvvik);
+        const barW = Math.max(4, Math.round((valAbs / maxVal) * barTrackWidth));
+        const isOverrun = u.ytdAvvik > 0;
+        const isUnderrun = u.ytdAvvik < 0;
+        const barColor = isOverrun ? "#D62728" : (isUnderrun ? "#16A34A" : "#94A3B8");
+        const valClass = isOverrun ? "rag-red" : (isUnderrun ? "rag-green" : "");
+        const sign = u.ytdAvvik > 0 ? "+" : "";
+        const avvikStr = `${sign}${fmtNOK(u.ytdAvvik)}`;
+        const pctStr = `${sign}${u.ytdAvvikPct.toFixed(1).replace(".", ",")}&nbsp;%`;
+        const rowHighlight = u.isSelected ? "background:rgba(37, 99, 235, 0.08); font-weight:600;" : "";
+        const cleanName = u.name.replace(/^[0-9]+\s*[-–]\s*/, "");
+
+        const barSvg = `
+          <svg width="${barTrackWidth}" height="14" viewBox="0 0 ${barTrackWidth} 14" style="vertical-align:middle; display:inline-block;" aria-label="Avvik: ${avvikStr}">
+            <title>${escapeHtml(u.name)}: Avvik ${avvikStr} (${pctStr})</title>
+            <rect x="0" y="1" width="${barW}" height="12" rx="2" fill="${barColor}" opacity="${u.isSelected ? '1.0' : '0.88'}" />
+          </svg>
+        `;
+
+        return `
+          <tr style="${rowHighlight}; cursor:pointer;" onclick="selectUnitFromVarianceBar('${escapeHtml(u.code)}')" title="Klikk for å filtrere på ${escapeHtml(u.name)}">
+            <td style="font-weight:600; font-family:var(--font-mono, monospace); font-size:0.7rem; white-space:nowrap;">
+              ${escapeHtml(u.code)}
+              ${u.isSelected ? '<span style="font-size:0.6rem; padding:1px 4px; border-radius:3px; background:#2563EB; color:#fff; margin-left:3px; font-weight:700;">VALGT</span>' : ''}
+            </td>
+            <td style="font-size:0.71rem;">${escapeHtml(cleanName)}</td>
+            <td class="num-col" style="font-size:0.71rem; color:var(--text-secondary);">${fmtNOK(u.ytdBud)}</td>
+            <td class="num-col" style="font-size:0.71rem; font-weight:600;">${fmtNOK(u.ytdReg)}</td>
+            <td class="num-col ${valClass}" style="font-size:0.71rem; font-weight:700;">
+              ${avvikStr} <span style="font-size:0.65rem; font-weight:500; opacity:0.85;">(${pctStr})</span>
+            </td>
+            <td style="text-align:left; padding-left:0.5rem; width:${barTrackWidth + 10}px;">${barSvg}</td>
+          </tr>
+        `;
+      }).join("");
+
+      container.innerHTML = `
+        <div class="table-wrapper" style="margin-top:0.3rem;">
+          <table class="data-table" style="font-size:0.72rem; width:100%; border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="width:55px;">Ansvar</th>
+                <th>Enhetsnavn</th>
+                <th class="num-col">Budsjett YTD</th>
+                <th class="num-col">Regnskap YTD</th>
+                <th class="num-col">Avvik YTD</th>
+                <th style="text-align:left; padding-left:0.5rem; width:${barTrackWidth + 10}px;" title="Horisontal avvikssøyle (Rød = Merforbruk, Grønn = Mindreforbruk)">Avvikssøyle</th>
+              </tr>
+            </thead>
+            <tbody id="min-unit-variance-tbody">
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
 function renderFavorableBarChart(report) {
       const tbody = document.getElementById("min-favorable-tbody");
       const kpiEl = document.getElementById("min-favorable-kpi");
@@ -7076,6 +7219,7 @@ function renderFavorableBarChart(report) {
 
       // Render dynamic sparkline micro-chart
       renderTrendSparkline(report.monthly_trend);
+      renderUnitVarianceBars(report);
       renderFavorableBarChart(report);
       renderAiTurnaroundPlan(report);
 
@@ -7332,6 +7476,7 @@ function renderFavorableBarChart(report) {
         .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = "—"; });
       document.getElementById("min-trend-body").replaceChildren();
       renderTrendSparkline([]);
+      document.getElementById("min-unit-variance-chart-wrap")?.replaceChildren();
       document.getElementById("min-drivers-body").replaceChildren();
       document.getElementById("min-favorable-chart-wrap")?.replaceChildren();
       document.getElementById("min-favorable-tbody")?.replaceChildren();
