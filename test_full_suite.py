@@ -395,6 +395,21 @@ def run_all_tests():
         has_ytd_col = page.evaluate('() => (document.querySelector("#min-drivers-caption")?.closest("table")?.querySelector("thead")?.innerText || "").includes("Regnskap YTD")')
         record_test("Kostnadsdriver-tabell inneholder kolonnen Regnskap YTD", bool(has_ytd_col))
 
+        driver_layout_info = page.evaluate('''() => {
+            const wrapper = document.getElementById("min-drivers-wrapper");
+            const panel = document.getElementById("min-drivers-panel");
+            const style = wrapper ? window.getComputedStyle(wrapper) : {};
+            const isNoScroll = wrapper ? (wrapper.scrollHeight <= wrapper.clientHeight + 2) : false;
+            const overflowY = style.overflowY || "";
+            return {
+                wrapperExists: !!wrapper,
+                isNoScroll,
+                overflowY
+            };
+        }''')
+        record_test("Kostnadsdriver-tabell er tilpasset uten rullegardin (uten vertikal scrollbar)",
+                    driver_layout_info["wrapperExists"] and (driver_layout_info["overflowY"] == "visible" or driver_layout_info["isNoScroll"]))
+
         # Sjekk Mindreforbruksanalyse (Horisontal bar chart til høyre for TOP 5 konti med mindreforbruk)
         fav_chart_info = page.evaluate('''() => {
             const panel = document.getElementById("min-favorable-panel");

@@ -1657,7 +1657,7 @@
 
           <!-- Månedlig trend og kostnadsdrivere -->
           <div class="grid-2col" style="margin-bottom:0.75rem;">
-            <div class="panel-card">
+            <div class="panel-card" id="min-trend-panel" style="display:flex; flex-direction:column;">
               <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem;">
                 <div>
                   <span>Utvikling hittil i år &amp; MoM-takt</span>
@@ -1718,21 +1718,32 @@
                 <div id="min-unit-variance-chart-wrap" style="width:100%;"></div>
               </div>
             </div>
-            <div class="panel-card">
-              <div class="panel-title">
-                <span>Hva driver avviket i enheten?</span>
-                <span class="panel-subtitle">Kontoer med størst merforbruk</span>
+            <div class="panel-card" id="min-drivers-panel" style="display:flex; flex-direction:column;">
+              <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem;">
+                <div>
+                  <span>Hva driver avviket i enheten?</span>
+                  <span class="panel-subtitle">Kontoer med størst merforbruk</span>
+                </div>
+                <div id="min-drivers-kpi" style="font-size:0.7rem; color:var(--text-secondary); text-align:right;"></div>
               </div>
-              <div class="table-wrapper">
-                <table class="data-table" style="font-size:0.74rem;">
+              <div class="table-wrapper" id="min-drivers-wrapper" style="max-block-size:none; max-height:none; overflow-y:visible; overflow-x:auto; flex:1;">
+                <table class="data-table" style="font-size:0.70rem; width:100%; border-collapse:collapse;">
                   <caption id="min-drivers-caption">Største prognosedrivere</caption>
                   <thead>
-                    <tr><th>Rammeområde</th><th>Funksjon</th><th>Konto</th><th class="num-col">Regnskap YTD</th><th class="num-col">Prognose</th><th class="num-col">Årsbudsjett</th><th class="num-col">Avvik</th></tr>
+                    <tr>
+                      <th style="padding:3.5px 5px;">Rammeområde</th>
+                      <th style="padding:3.5px 5px;">Funksjon</th>
+                      <th style="padding:3.5px 5px;">Konto</th>
+                      <th class="num-col" style="padding:3.5px 5px;">Regnskap YTD</th>
+                      <th class="num-col" style="padding:3.5px 5px;">Prognose</th>
+                      <th class="num-col" style="padding:3.5px 5px;">Årsbudsjett</th>
+                      <th class="num-col" style="padding:3.5px 5px;">Avvik</th>
+                    </tr>
                   </thead>
                   <tbody id="min-drivers-body"></tbody>
                 </table>
               </div>
-              <div style="font-size:0.69rem; color:var(--text-muted); margin-top:0.4rem; font-style:italic;">
+              <div style="font-size:0.68rem; color:var(--text-muted); margin-top:0.45rem; font-style:italic; border-top:1px solid var(--border-light, #E2E8F0); padding-top:0.35rem;">
                 * Merforbruk på vikarer ved fravær (konto 102000 og vikarbyrå 127040) motregnes mot sykepengerefusjon fra NAV på konto 171000. Se Lønns- og Refusjonsprofilen ovenfor for netto avviksbilde.
               </div>
             </div>
@@ -7296,6 +7307,12 @@ function renderFavorableBarChart(report) {
       }
 
       const driversBody = document.getElementById("min-drivers-body");
+      const driversKpi = document.getElementById("min-drivers-kpi");
+      if (driversKpi) {
+        const sumDriversVar = (report.drivers || []).reduce((acc, r) => acc + (r.eoy_variance_nok || 0), 0);
+        driversKpi.innerHTML = `<span style="font-variant-numeric:tabular-nums;">Topp <strong>${(report.drivers || []).length}</strong> drivere: <strong class="rag-red">+${fmtNOK(sumDriversVar)}</strong></span>`;
+      }
+
       driversBody.innerHTML = report.drivers.length
         ? report.drivers.map(row => {
             let badge = "";
@@ -7330,36 +7347,36 @@ function renderFavorableBarChart(report) {
 
               extraSubrows = `
             <tr class="driver-subrow-art1710" style="background:rgba(22, 163, 74, 0.06); border-left:3px solid #16A34A;">
-              <td style="color:var(--text-secondary); font-size:0.7rem;">${escapeHtml(row.sektor_navn)}</td>
-              <th scope="row" style="font-weight:normal; color:var(--text-secondary); font-size:0.7rem;">${escapeHtml(row.funksjon_code)} – ${escapeHtml(row.funksjon_navn)}</th>
-              <td style="padding-left:1.25rem; font-weight:600; color:#15803D;">
+              <td style="color:var(--text-secondary); font-size:0.69rem; padding:3px 5px;">${escapeHtml(row.sektor_navn)}</td>
+              <th scope="row" style="font-weight:normal; color:var(--text-secondary); font-size:0.69rem; padding:3px 5px;">${escapeHtml(row.funksjon_code)} – ${escapeHtml(row.funksjon_navn)}</th>
+              <td style="padding-left:1.1rem; font-weight:600; color:#15803D; font-size:0.69rem; padding-top:3px; padding-bottom:3px;">
                 ↳ Art 1710: 171000 – Refusjon sykepenger
-                <span class="badge" style="background:#DCFCE7; color:#15803D; font-size:0.6rem; padding:1px 4px; border:1px solid #BBF7D0; margin-left:4px;">${noteLabel}</span>
+                <span class="badge" style="background:#DCFCE7; color:#15803D; font-size:0.59rem; padding:1px 3px; border:1px solid #BBF7D0; margin-left:3px;">${noteLabel}</span>
               </td>
-              <td class="num-col" style="color:#15803D; font-weight:600;">${fmtNOK(art1710_ytd)}</td>
-              <td class="num-col" style="color:#15803D; font-weight:600;">${fmtNOK(art1710_fc)}</td>
-              <td class="num-col" style="color:var(--text-secondary);">${fmtNOK(art1710_bud)}</td>
-              <td class="num-col rag-green" style="font-weight:600;">${fmtNOK(art1710_var, true)}</td>
+              <td class="num-col" style="color:#15803D; font-weight:600; padding:3px 5px; font-size:0.69rem; white-space:nowrap;">${fmtNOK(art1710_ytd)}</td>
+              <td class="num-col" style="color:#15803D; font-weight:600; padding:3px 5px; font-size:0.69rem; white-space:nowrap;">${fmtNOK(art1710_fc)}</td>
+              <td class="num-col" style="color:var(--text-secondary); padding:3px 5px; font-size:0.69rem; white-space:nowrap;">${fmtNOK(art1710_bud)}</td>
+              <td class="num-col rag-green" style="font-weight:600; padding:3px 5px; font-size:0.69rem; white-space:nowrap;">${fmtNOK(art1710_var, true)}</td>
             </tr>
-            <tr class="driver-subrow-netto" style="background:var(--bg-subtle, #F8FAFC); border-left:3px solid #64748B; font-weight:700; font-size:0.72rem;">
-              <td colspan="2" style="text-align:right; color:var(--text-muted); font-size:0.68rem; padding-right:0.5rem;">Netto fraværsbelastning:</td>
-              <td style="padding-left:1.25rem; color:var(--text-primary);">= Netto personalkostnad sykefravær (102000 motregnet Art 1710)</td>
-              <td class="num-col">${fmtNOK(net_ytd)}</td>
-              <td class="num-col">${fmtNOK(net_fc)}</td>
-              <td class="num-col">${fmtNOK(net_bud)}</td>
-              <td class="num-col ${netClass}">${fmtNOK(net_var, true)}</td>
+            <tr class="driver-subrow-netto" style="background:var(--bg-subtle, #F8FAFC); border-left:3px solid #64748B; font-weight:700; font-size:0.70rem;">
+              <td colspan="2" style="text-align:right; color:var(--text-muted); font-size:0.67rem; padding:3px 5px;">Netto fraværsbelastning:</td>
+              <td style="padding-left:1.1rem; color:var(--text-primary); font-size:0.69rem; padding-top:3px; padding-bottom:3px;">= Netto personalkostnad sykefravær (102000 motregnet Art 1710)</td>
+              <td class="num-col" style="padding:3px 5px; font-size:0.69rem; white-space:nowrap;">${fmtNOK(net_ytd)}</td>
+              <td class="num-col" style="padding:3px 5px; font-size:0.69rem; white-space:nowrap;">${fmtNOK(net_fc)}</td>
+              <td class="num-col" style="padding:3px 5px; font-size:0.69rem; white-space:nowrap;">${fmtNOK(net_bud)}</td>
+              <td class="num-col ${netClass}" style="padding:3px 5px; font-size:0.69rem; white-space:nowrap;">${fmtNOK(net_var, true)}</td>
             </tr>`;
             }
 
             return `
             <tr>
-              <td>${escapeHtml(row.sektor_navn)}</td>
-              <th scope="row">${escapeHtml(row.funksjon_code)} – ${escapeHtml(row.funksjon_navn)}</th>
-              <td>${escapeHtml(row.konto_code)} – ${escapeHtml(row.kontonavn)}${badge}</td>
-              <td class="num-col" style="font-weight:600;">${fmtNOK(row.ytd_actual_nok)}</td>
-              <td class="num-col">${fmtNOK(row.eoy_forecast_nok)}</td>
-              <td class="num-col">${fmtNOK(row.annual_budget_nok)}</td>
-              <td class="num-col rag-red">${fmtNOK(row.eoy_variance_nok, true)}</td>
+              <td style="padding:3px 5px; font-size:0.69rem;">${escapeHtml(row.sektor_navn)}</td>
+              <th scope="row" style="padding:3px 5px; font-size:0.69rem; font-weight:normal;">${escapeHtml(row.funksjon_code)} – ${escapeHtml(row.funksjon_navn)}</th>
+              <td style="padding:3px 5px; font-size:0.69rem; font-weight:600;">${escapeHtml(row.konto_code)} – ${escapeHtml(row.kontonavn)}${badge}</td>
+              <td class="num-col" style="font-weight:600; padding:3px 5px; font-size:0.69rem; white-space:nowrap;">${fmtNOK(row.ytd_actual_nok)}</td>
+              <td class="num-col" style="padding:3px 5px; font-size:0.69rem; white-space:nowrap;">${fmtNOK(row.eoy_forecast_nok)}</td>
+              <td class="num-col" style="padding:3px 5px; font-size:0.69rem; white-space:nowrap;">${fmtNOK(row.annual_budget_nok)}</td>
+              <td class="num-col rag-red" style="font-weight:700; padding:3px 5px; font-size:0.69rem; white-space:nowrap;">${fmtNOK(row.eoy_variance_nok, true)}</td>
             </tr>` + extraSubrows;
           }).join("")
         : '<tr><td colspan="7">Ingen kontoer har forventet merforbruk i dette utvalget.</td></tr>';
@@ -7478,6 +7495,8 @@ function renderFavorableBarChart(report) {
       renderTrendSparkline([]);
       document.getElementById("min-unit-variance-chart-wrap")?.replaceChildren();
       document.getElementById("min-drivers-body").replaceChildren();
+      const fallbackDriversKpi = document.getElementById("min-drivers-kpi");
+      if (fallbackDriversKpi) fallbackDriversKpi.textContent = "";
       document.getElementById("min-favorable-chart-wrap")?.replaceChildren();
       document.getElementById("min-favorable-tbody")?.replaceChildren();
       setMonthlyReportStatus("Data ikke tilgjengelig", true);
