@@ -3684,7 +3684,7 @@
             <div style="background:#fff; border:1px solid var(--border-light); padding:0.55rem 0.75rem; border-radius:4px;">
               <span style="font-size:0.7rem; color:var(--text-secondary); display:block;">Sosiale Kostnader 2025</span>
               <strong id="pos-sum-sosial" style="font-size:0.95rem; color:var(--text-primary); font-family:var(--font-mono);">0 kr</strong>
-              <span style="font-size:0.66rem; color:var(--text-muted); display:block;">Pensjon (KLP/SPK) + AGA 14,1 %</span>
+              <span style="font-size:0.66rem; color:var(--text-muted); display:block;" id="pos-sum-sosial-sub">Pensjon (KLP/SPK) + AGA 14,1 %</span>
             </div>
             <div style="background:#fff; border:1px solid var(--border-light); border-left:3px solid var(--clr-fig-budsjett); padding:0.55rem 0.75rem; border-radius:4px;">
               <span style="font-size:0.7rem; color:var(--clr-fig-budsjett); font-weight:700; display:block;">Beregnet Lønnsbudsjett 2025</span>
@@ -3775,7 +3775,7 @@
                 <strong id="salary-res-vakans" class="rag-green">-657 000 kr</strong>
               </div>
               <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
-                <span>Sosiale kostnader (KLP + AGA 14,1 %):</span>
+                <span>Sosiale kostnader (KLP/SPK + AGA 14,1 %):</span>
                 <strong id="salary-res-sosial">82 140 000 kr</strong>
               </div>
               <div style="border-top:1px solid var(--border-light); padding-top:0.35rem; margin-top:0.35rem; display:flex; justify-content:space-between; font-weight:700;">
@@ -5272,15 +5272,15 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
     ];
 
     const SALARY_UNITS_DATA = [
-      { code: "20210", name: "20210 - Grunnskole A", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 54.0, fteBesatt: 52.5, vakans: 1.5, snittLonn: 642000, ytdReg: 5499740, status: "🟡 Vikarpress", statusClass: "rag-amber" },
-      { code: "20220", name: "20220 - Grunnskole B", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 48.0, fteBesatt: 47.0, vakans: 1.0, snittLonn: 638000, ytdReg: 4920820, status: "🟡 Vikarpress", statusClass: "rag-amber" },
-      { code: "20230", name: "20230 - Grunnskole C", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 38.0, fteBesatt: 37.0, vakans: 1.0, snittLonn: 635000, ytdReg: 4052440, status: "🟢 I rute", statusClass: "rag-green" },
-      { code: "21310", name: "21310 - Voksenopplæring", sektor: "Oppvekst og Utdanning", fn: "213", ftePlan: 8.0, fteBesatt: 8.0, vakans: 0.0, snittLonn: 613700, ytdReg: 490960, status: "🟢 I rute", statusClass: "rag-green" },
-      { code: "22110", name: "22110 - PPT og veiledning", sektor: "Oppvekst og Utdanning", fn: "221", ftePlan: 12.0, fteBesatt: 11.0, vakans: 1.0, snittLonn: 677500, ytdReg: 983000, status: "🟡 Merforbruk", statusClass: "rag-amber" },
-      { code: "25310", name: "25310 - Omsorgssenter A", sektor: "Helse og Omsorg", fn: "254", ftePlan: 48.0, fteBesatt: 46.0, vakans: 2.0, snittLonn: 595000, ytdReg: 3534398, status: "🔴 Overtid/vikar", statusClass: "rag-red" },
-      { code: "25320", name: "25320 - Omsorgssenter B", sektor: "Helse og Omsorg", fn: "254", ftePlan: 36.0, fteBesatt: 35.0, vakans: 1.0, snittLonn: 592000, ytdReg: 2777027, status: "🔴 Vikarbruk", statusClass: "rag-red" },
-      { code: "25710", name: "25710 - Hjemmetjeneste Nord", sektor: "Helse og Omsorg", fn: "254", ftePlan: 42.0, fteBesatt: 41.5, vakans: 0.5, snittLonn: 588000, ytdReg: 3155713, status: "🔴 Overtid", statusClass: "rag-red" },
-      { code: "25720", name: "25720 - Hjemmetjeneste Sør", sektor: "Helse og Omsorg", fn: "254", ftePlan: 42.0, fteBesatt: 41.5, vakans: 0.5, snittLonn: 588000, ytdReg: 3155713, status: "🔴 Overtid", statusClass: "rag-red" }
+      { code: "20210", name: "20210 - Grunnskole A", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 54.0, fteBesatt: 52.5, vakans: 1.5, snittLonn: 618148, ytdReg: 5499740, status: "🟡 Vikarpress", statusClass: "rag-amber" },
+      { code: "20220", name: "20220 - Grunnskole B", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 48.0, fteBesatt: 47.0, vakans: 1.0, snittLonn: 617292, ytdReg: 4920820, status: "🟡 Vikarpress", statusClass: "rag-amber" },
+      { code: "20230", name: "20230 - Grunnskole C", sektor: "Oppvekst og Utdanning", fn: "202", ftePlan: 38.0, fteBesatt: 37.0, vakans: 1.0, snittLonn: 614211, ytdReg: 4052440, status: "🟢 I rute", statusClass: "rag-green" },
+      { code: "21310", name: "21310 - Voksenopplæring", sektor: "Oppvekst og Utdanning", fn: "213", ftePlan: 8.0, fteBesatt: 8.0, vakans: 0.0, snittLonn: 658438, ytdReg: 490960, status: "🟢 I rute", statusClass: "rag-green" },
+      { code: "22110", name: "22110 - PPT og veiledning", sektor: "Oppvekst og Utdanning", fn: "221", ftePlan: 12.0, fteBesatt: 11.0, vakans: 1.0, snittLonn: 617083, ytdReg: 983000, status: "🟡 Merforbruk", statusClass: "rag-amber" },
+      { code: "25310", name: "25310 - Omsorgssenter A", sektor: "Helse og Omsorg", fn: "254", ftePlan: 48.0, fteBesatt: 46.0, vakans: 2.0, snittLonn: 543958, ytdReg: 3534398, status: "🔴 Overtid/vikar", statusClass: "rag-red" },
+      { code: "25320", name: "25320 - Omsorgssenter B", sektor: "Helse og Omsorg", fn: "254", ftePlan: 36.0, fteBesatt: 35.0, vakans: 1.0, snittLonn: 529583, ytdReg: 2777027, status: "🔴 Vikarbruk", statusClass: "rag-red" },
+      { code: "25710", name: "25710 - Hjemmetjeneste Nord", sektor: "Helse og Omsorg", fn: "254", ftePlan: 42.0, fteBesatt: 41.5, vakans: 0.5, snittLonn: 539940, ytdReg: 3155713, status: "🔴 Overtid", statusClass: "rag-red" },
+      { code: "25720", name: "25720 - Hjemmetjeneste Sør", sektor: "Helse og Omsorg", fn: "254", ftePlan: 42.0, fteBesatt: 41.5, vakans: 0.5, snittLonn: 539940, ytdReg: 3155713, status: "🔴 Overtid", statusClass: "rag-red" }
     ];
 
     const BASE_KOSTRA_ARTS = [
@@ -9524,20 +9524,25 @@ function renderRecommenderModule(ctx) {
       const sumVekstEl = document.getElementById("pos-sum-vekst");
       const sumVekstPctEl = document.getElementById("pos-sum-vekst-pct");
       const sumSosialEl = document.getElementById("pos-sum-sosial");
+      const sumSosialSubEl = document.getElementById("pos-sum-sosial-sub");
       const sumTotal2025El = document.getElementById("pos-sum-total2025");
       const sumDiffEl = document.getElementById("pos-sum-diff");
 
       const vekstLonn = sumLonn2025 - sumLonn2024;
+      const vekstSosial = sumSosial2025 - sumSosial2024;
       const vekstTotal = sumTotal2025 - sumTotal2024;
       const vekstTotalPct = sumTotal2024 > 0 ? (vekstTotal / sumTotal2024) * 100 : 0;
+      const vekstLonnPct = sumLonn2024 > 0 ? (vekstLonn / sumLonn2024) * 100 : 0;
+      const vekstSosialPct = sumSosial2024 > 0 ? (vekstSosial / sumSosial2024) * 100 : 0;
 
       if (sumBasisEl) sumBasisEl.textContent = `${fmtNum(sumLonn2024)} kr`;
-      if (sumBasisSubEl) sumBasisSubEl.textContent = `Totalt 2024 inkl. sosiale: ${fmtNum(sumTotal2024)} kr`;
+      if (sumBasisSubEl) sumBasisSubEl.textContent = `Totalt 2024 inkl. sosiale (${(sumSosial2024 / 1000000).toFixed(2).replace(".", ",")} M): ${fmtNum(sumTotal2024)} kr`;
       if (sumVekstEl) sumVekstEl.textContent = `+${fmtNum(vekstLonn)} kr`;
-      if (sumVekstPctEl) sumVekstPctEl.textContent = `+${(growthRate * 100).toFixed(1).replace(".", ",")} % samlet lønnsvekst`;
+      if (sumVekstPctEl) sumVekstPctEl.textContent = `+${vekstLonnPct.toFixed(1).replace(".", ",")} % vekst (Ny grunnlønn: ${fmtNum(sumLonn2025)} kr)`;
       if (sumSosialEl) sumSosialEl.textContent = `${fmtNum(sumSosial2025)} kr`;
+      if (sumSosialSubEl) sumSosialSubEl.textContent = `Vekst vs 2024 (${(sumSosial2024 / 1000000).toFixed(2).replace(".", ",")} M): +${fmtNum(vekstSosial)} kr (+${vekstSosialPct.toFixed(1).replace(".", ",")} %)`;
       if (sumTotal2025El) sumTotal2025El.textContent = `${fmtNum(sumTotal2025)} kr`;
-      if (sumDiffEl) sumDiffEl.textContent = `Endring vs 2024 (${(sumTotal2024 / 1000000).toFixed(2).replace(".", ",")} M): +${fmtNum(vekstTotal)} kr (+${vekstTotalPct.toFixed(1).replace(".", ",")} %)`;
+      if (sumDiffEl) sumDiffEl.textContent = `Samlet budsjettvekst: +${fmtNum(vekstTotal)} kr (+${vekstTotalPct.toFixed(1).replace(".", ",")} %) • Lønn +${(vekstLonn / 1000000).toFixed(2).replace(".", ",")}M / Sos +${(vekstSosial / 1000000).toFixed(2).replace(".", ",")}M`;
     }
     
 function renderSalaryBudgetModule(ctx) {
@@ -9773,6 +9778,8 @@ function renderSalaryBudgetModule(ctx) {
       const vikarPct = parseFloat(vikarEl.value) || 80;
       const vakansMnd = parseFloat(vakansEl.value) || 1.5;
       const klpPct = parseFloat(klpEl.value) || 14.8;
+      const spkEl = document.getElementById("pos-sim-spk");
+      const spkPct = spkEl ? (parseFloat(spkEl.value) || 11.2) : 11.2;
 
       document.getElementById("salary-val-ks").textContent = `${ksPct.toFixed(1).replace(".", ",")} %`;
       document.getElementById("salary-val-vikar").textContent = `${vikarPct} %`;
@@ -9783,6 +9790,38 @@ function renderSalaryBudgetModule(ctx) {
       const ctx = typeof getFilteredContext === "function" ? getFilteredContext() : { sektor: "ALL", ansvar: "ALL", funksjon: "ALL" };
       const { sektor, ansvar, funksjon } = ctx;
 
+      // Beregn utvalgets basis og veide sosiale kostnader direkte fra stillingsstrukturen (SALARY_POSITIONS_DATA)
+      let baseFastlonn = 0;
+      let totPlanFte = 0;
+      let weightedSosialBasis2024 = 0;
+
+      (typeof SALARY_POSITIONS_DATA !== "undefined" ? SALARY_POSITIONS_DATA : []).forEach(p => {
+        if (sektor !== "ALL" && p.sektor !== sektor) return;
+
+        let fte = 0;
+        if (ansvar === "ALL") {
+          Object.entries(p.fteByUnit).forEach(([unitCode, unitFte]) => {
+            const uMeta = (typeof ANSVAR_UNITS !== "undefined" && ANSVAR_UNITS[unitCode]) || {};
+            if (sektor !== "ALL" && uMeta.sektor && uMeta.sektor !== sektor) return;
+            if (funksjon !== "ALL" && uMeta.fn && uMeta.fn !== funksjon) return;
+            fte += unitFte;
+          });
+        } else {
+          fte = p.fteByUnit[ansvar] || 0.0;
+        }
+
+        if (fte > 0) {
+          totPlanFte += fte;
+          const posLonn = Math.round(fte * p.baseSalary2024);
+          baseFastlonn += posLonn;
+          const pRate = p.pensionType === "SPK" ? (spkPct / 100.0) : (klpPct / 100.0);
+          const pens = posLonn * pRate;
+          const aga = (posLonn + pens) * 0.141;
+          weightedSosialBasis2024 += Math.round(pens + aga);
+        }
+      });
+
+      // Hent vakanser fra aktive enheter
       const filteredUnits = (typeof SALARY_UNITS_DATA !== "undefined" ? SALARY_UNITS_DATA : []).filter(u => {
         if (sektor !== "ALL" && u.sektor !== sektor) return false;
         if (ansvar !== "ALL" && u.code !== ansvar) return false;
@@ -9790,25 +9829,22 @@ function renderSalaryBudgetModule(ctx) {
         return true;
       });
 
-      let totPlanFte = 0;
       let totVakansFte = 0;
-      let weightedLonnSum = 0;
       filteredUnits.forEach(u => {
-        totPlanFte += u.ftePlan;
         totVakansFte += u.vakans;
-        weightedLonnSum += u.snittLonn * u.ftePlan;
       });
-      const avgSnittLonn = totPlanFte > 0 ? (weightedLonnSum / totPlanFte) : 538869;
-      const baseFastlonn = weightedLonnSum > 0 ? weightedLonnSum : 90530000;
+
+      const avgSnittLonn = totPlanFte > 0 ? (baseFastlonn / totPlanFte) : 577904;
+      const effectiveSosialRate = baseFastlonn > 0 ? (weightedSosialBasis2024 / baseFastlonn) : 0.291238;
 
       const ksVirkning = Math.round(baseFastlonn * (ksPct / 100.0) * (8 / 12));
       const vikarRest4M = Math.round(baseFastlonn * 0.046);
       const vikarSaving = Math.round(vikarRest4M * (1.0 - vikarPct / 100.0));
       const snittLonnMnd = avgSnittLonn / 12;
       const vakansSaving = Math.round(totVakansFte * snittLonnMnd * Math.min(4, vakansMnd));
-      const totalSosialPct = klpPct + (1.0 + klpPct / 100.0) * 14.1; // KLP pensjon + AGA 14,1 % på lønn og pensjon
+
       const totalLonnSim = baseFastlonn + ksVirkning;
-      const totalSosial = Math.round(totalLonnSim * (totalSosialPct / 100.0));
+      const totalSosial = Math.round(totalLonnSim * effectiveSosialRate);
       const ksDiff = ksVirkning - Math.round(baseFastlonn * 0.052 * (8 / 12));
 
       // Hent netto avvik fra snapshot for aktiv enhet/sektor
