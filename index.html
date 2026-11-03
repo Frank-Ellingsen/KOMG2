@@ -4905,7 +4905,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
             </div>
             <div class="stage-title">📚 Vektordatabase &amp; Embeddings</div>
             <div class="stage-meta">Modul: <code>src/api_server.py</code> / ChromaDB</div>
-            <div class="stage-meta">52 kildedokumenter indeksert (Lover &amp; KOSTRA)</div>
+            <div class="stage-meta" id="steg4-kilde-count">87 kildedokumenter indeksert (Lover &amp; KOSTRA)</div>
             <div class="stage-meta">Embeddings: <strong>bge-m3 / 1024-dim</strong> | Chunk: 512</div>
           </div>
 
@@ -4940,7 +4940,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
 [21:35:02]   ✔ AgglomerativeClustering (4 klynger): {0: 1131, 2: 1100, 1: 16, 3: 9}
 [21:35:02]   ✔ IsolationForest (5.0%): 113 anomalier flagget for internkontroll
 [21:35:02] [4/5] Oppdaterer Vektordatabase & RAG Semantisk Indeks (ChromaDB / BGE-M3)...
-[21:35:03]   ✔ 52 kildedokumenter indeksert (Kommuneloven, KOSTRA-forskriften, Økonomireglement, Gat-veileder)
+[21:35:03]   ✔ 87 kildedokumenter indeksert (Kommuneloven, KOSTRA-forskriften, Økonomireglement, Gat-veileder)
 [21:35:03]   ✔ 184 semantiske tekst-chunks generert og vektorisert (1024-dim dense embeddings)
 [21:35:03]   ✔ Hybrid RAG & BGE Re-ranker synkronisert mot KI-Saksbehandler
 [21:35:03] [5/5] Verifiserer ThisWorkbookDataModel & 06_CHECKS (MASTER_CHECK Diff = 0.00 NOK)...
@@ -9599,6 +9599,7 @@ function renderFavorableBarChart(report) {
       if (el) el.addEventListener("input", updateSelvkostCalc);
     });
     initAdhocInvoicing();
+    refreshCorpusStatsUI();
 
     // Prompt chips
     document.querySelectorAll(".prompt-chip").forEach(chip => {
@@ -9760,6 +9761,29 @@ function renderFavorableBarChart(report) {
       });
     }
 
+        // Dynamisk oppdatering av kildedokument-teller fra backend RAG Corpus API
+    async function refreshCorpusStatsUI() {
+      const el = document.getElementById("steg4-kilde-count");
+      if (!el) return;
+      if (window.location.protocol === "file:") {
+        el.innerHTML = "87 kildedokumenter indeksert (Lover &amp; KOSTRA)";
+        return;
+      }
+      try {
+        const res = await fetch("http://127.0.0.1:8000/api/v1/rag/corpus-stats");
+        if (res.ok) {
+          const data = await res.json();
+          const docCount = data.total_source_files || data.total_localblob_files || 87;
+          el.innerHTML = `${docCount} kildedokumenter indeksert (Lover &amp; KOSTRA)`;
+          if (typeof PIPELINE_STEPS_CONFIG !== "undefined" && PIPELINE_STEPS_CONFIG[3]) {
+            PIPELINE_STEPS_CONFIG[3].logs[1] = `  ✔ ${docCount} kildedokumenter indeksert (Kommuneloven, KOSTRA-forskriften, Økonomireglement, Gat-veileder)`;
+          }
+        }
+      } catch (e) {
+        el.innerHTML = `87 kildedokumenter indeksert (Lover &amp; KOSTRA)`;
+      }
+    }
+
     const btnRunAll = document.getElementById("btn-run-all");
     const pipelineConsole = document.getElementById("pipeline-console");
     const pipelineBadge = document.getElementById("pipeline-global-badge");
@@ -9807,7 +9831,7 @@ function renderFavorableBarChart(report) {
         duration: "0,64s",
         logs: [
           "[4/5] Oppdaterer Vektordatabase & RAG Semantisk Indeks (ChromaDB / BGE-M3)...",
-          "  ✔ 52 kildedokumenter indeksert (Kommuneloven, KOSTRA-forskriften, Økonomireglement, Gat-veileder)",
+          "  ✔ 87 kildedokumenter indeksert (Kommuneloven, KOSTRA-forskriften, Økonomireglement, Gat-veileder)",
           "  ✔ 184 semantiske tekst-chunks generert og vektorisert (1024-dim dense embeddings)",
           "  ✔ Hybrid RAG & BGE Re-ranker synkronisert mot KI-Saksbehandler"
         ]

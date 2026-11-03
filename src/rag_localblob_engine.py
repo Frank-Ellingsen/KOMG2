@@ -359,19 +359,23 @@ class LocalblobIngestionPipeline:
         self.load_or_ingest()
 
     def load_or_ingest(self):
-        """Loads cached corpus if exists, otherwise scans localblob."""
+        """Loads cached corpus if exists, and automatically indexes any new documents in localblob."""
         if os.path.exists(CORPUS_CACHE_FILE):
             try:
                 with open(CORPUS_CACHE_FILE, "r", encoding="utf-8") as f:
-                    cached_data = json.load(f)
-                    if len(cached_data) >= len(STATIC_CORPUS):
-                        self.corpus = cached_data
-                        return
+                    self.corpus = json.load(f)
+                    self.indexed_files = list(set(c["source_file"] for c in self.corpus))
             except Exception:
-                pass
+                self.corpus = list(STATIC_CORPUS)
+        else:
+            self.corpus = list(STATIC_CORPUS)
 
-        # Ingest files from localblob
-        self.run_ingestion()
+        if os.path.exists(LOCALBLOB_DIR):
+            indexed_sources = set(c.get("source_file", "") for c in self.corpus)
+            current_files = [f for f in os.listdir(LOCALBLOB_DIR) if not f.startswith(".")]
+            has_new = any(f"localblob/{f}" not in indexed_sources for f in current_files)
+            if has_new:
+                self.run_ingestion()
 
     def run_ingestion(self) -> Dict[str, Any]:
         """Scans localblob and extracts Parent-Child chunks from documents."""

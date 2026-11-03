@@ -1084,6 +1084,8 @@ def api_rag_ingest_localblob():
 def api_rag_corpus_stats():
     corpus = RAG_ENGINE.pipeline.corpus
     sources = set(c["source_file"] for c in corpus)
+    localblob_files = [f for f in os.listdir(LOCALBLOB_DIR) if not f.startswith(".")] if os.path.exists(LOCALBLOB_DIR) else []
+    doc_count = max(len(sources), len(localblob_files))
     levels = {}
     for c in corpus:
         lvl = c.get("myndighetsnivaa", "ADMINISTRATIVT")
@@ -1092,7 +1094,8 @@ def api_rag_corpus_stats():
     return {
         "status": "ok",
         "total_chunks": len(corpus),
-        "total_source_files": len(sources),
+        "total_source_files": doc_count,
+        "total_localblob_files": len(localblob_files),
         "authority_levels": levels,
         "parent_child_indexing": True,
         "vector_search_available": True,

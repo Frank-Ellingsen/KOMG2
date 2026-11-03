@@ -358,5 +358,41 @@
     ],
     "tokens_used": 340,
     "reconciled_check_diff_nok": 0.0
+  },
+  {
+    "timestamp": "2026-11-03T17:43:27.795421+00:00",
+    "endpoint": "/api/v1/chat",
+    "user_id": "controller@kristiansand.kommune.no",
+    "query_anonymized": "Hva er styringsretten etter § 13-1 og fnr [REDACTED_FNR]?",
+    "pii_detected": true,
+    "redacted_entities": [
+      "NO_FODSELSNUMMER"
+    ],
+    "retrieved_sources": [
+      "lov_om_kommunale_helse-_og_omsorgstjenester_m_m___helse-_og_omsorgstjenesteloven__-_lovdata_pdf",
+      "terskelverdier_for_offentlige_anskaffelser___anskaffelser_no_pdf",
+      "forskrift_om_digital_sikkerhet__digitalsikkerhetsforskriften__-_lovdata_pdf",
+      "forskrift_om_garantier_og_finans-_og_gjeldsforvaltning_i_kommuner_og_fylkeskommuner_-_lovdata_pdf"
+    ],
+    "tokens_used": 340,
+    "reconciled_check_diff_nok": 0.0
+  },
+  {
+    "timestamp": "2026-11-03T17:47:02.719258+00:00",
+    "endpoint": "/api/v1/chat",
+    "user_id": "controller@kristiansand.kommune.no",
+    "query_anonymized": "Hva er styringsretten etter § 13-1 og fnr [REDACTED_FNR]?",
+    "pii_detected": true,
+    "redacted_entities": [
+      "NO_FODSELSNUMMER"
+    ],
+    "retrieved_sources": [
+      "lov_om_kommunale_helse-_og_omsorgstjenester_m_m___helse-_og_omsorgstjenesteloven__-_lovdata_pdf",
+      "forskrift_om_digital_sikkerhet__digitalsikkerhetsforskriften__-_lovdata_pdf",
+      "forskrift_om_garantier_og_finans-_og_gjeldsforvaltning_i_kommuner_og_fylkeskommuner_-_lovdata_pdf",
+      "terskelverdier_for_offentlige_anskaffelser___anskaffelser_no_pdf"
+    ],
+    "tokens_used": 340,
+    "reconciled_check_diff_nok": 0.0
   }
 ]
