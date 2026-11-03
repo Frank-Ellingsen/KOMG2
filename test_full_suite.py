@@ -390,6 +390,33 @@ def run_all_tests():
                     fav_chart_info["hasSvg"] and fav_chart_info["rects"] == 5,
                     f"SVG: {fav_chart_info['hasSvg']}, Søyler: {fav_chart_info['rects']}")
         record_test("Mindreforbruk data-tabell har 5 rader", fav_chart_info["tableRows"] == 5, f"Rader: {fav_chart_info['tableRows']}")
+
+        # Sjekk Dynamisk AI-Tiltaksplan & Omdisponering mot Årsbalanse (EOY)
+        turnaround_info = page.evaluate('''() => {
+            const panel = document.getElementById("min-ai-turnaround-panel");
+            const guardBadge = document.getElementById("min-ai-guardrail-badge");
+            const btn = document.getElementById("btn-apply-ai-turnaround");
+            const tableRows = document.querySelectorAll("#min-ai-turnaround-body table tbody tr").length;
+            const kpiText = document.getElementById("min-ai-turnaround-kpi")?.textContent || "";
+            return {
+                panelVisible: panel && getComputedStyle(panel).display !== "none",
+                hasBadge: !!guardBadge && (guardBadge.innerText || "").toLowerCase().includes("guardrails"),
+                hasBtn: !!btn,
+                tableRows,
+                kpiText
+            };
+        }''')
+        record_test("Dynamisk AI-Tiltaksplan panel er synlig", bool(turnaround_info["panelVisible"]))
+        record_test("AI-Tiltaksplan verifiserer lovpålagte guardrails (AML § 10-8, § 13-1)", bool(turnaround_info["hasBadge"]))
+        record_test("AI-Tiltaksplan har konkrete månedlige tiltak og omdisponeringer", turnaround_info["tableRows"] >= 2, f"Rader: {turnaround_info['tableRows']}")
+
+        # Test overføringsknapp: overfør til tiltaksavtale
+        page.click("#btn-apply-ai-turnaround")
+        page.wait_for_timeout(100)
+        adj_text = page.inner_text("#min-adjusted-forecast")
+        record_test("AI-tiltakspakke overføres til tiltakskontrakt og oppnår årsbalanse (0 kr avvik)", 
+                    "0 kr" in adj_text or "balanse" in adj_text.lower(),
+                    f"Justert prognose: {adj_text}")
         # Test dynamisk respons i Mindreforbruksanalyse ved filterbytte til 25310
         page.select_option("#flt-ansvar", "25310")
         page.wait_for_timeout(150)

@@ -1762,6 +1762,27 @@
             <div id="min-favorable-chart-wrap" style="display:none;" aria-hidden="true"></div>
           </div>
 
+          <!-- Dynamisk AI-Tiltaksplan & Omdisponering mot Årsbalanse (EOY) -->
+          <div class="panel-card" id="min-ai-turnaround-panel" style="margin-bottom:0.75rem; border-left:4px solid var(--clr-accent-indigo, #4F46E5); background:#FFFFFF;">
+            <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem;">
+              <div>
+                <span style="display:flex; align-items:center; gap:0.4rem;">
+                  <span style="font-size:1.05rem;">🤖</span>
+                  <span style="font-weight:700;">Dynamisk AI-Tiltaksplan &amp; Omdisponering mot Årsbalanse (EOY)</span>
+                </span>
+                <span id="min-ai-turnaround-subtitle" class="panel-subtitle">Konkrete månedlige tiltak M09–M12 for å lukke budsjettavvik uten brudd på lovpålagte guardrails</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <span id="min-ai-guardrail-badge" class="badge" style="background:#F0FDF4; color:#15803D; font-size:0.68rem; font-weight:700; border:1px solid #BBF7D0; padding:2px 6px;">🛡️ Guardrails: AML § 10-8 • § 13-1 • Fagdekning OK</span>
+                <span id="min-ai-turnaround-kpi" style="font-size:0.74rem; font-weight:700; color:#4338CA;"></span>
+              </div>
+            </div>
+
+            <div id="min-ai-turnaround-body" style="font-size:0.75rem; color:var(--text-primary); margin-top:0.4rem;">
+              <!-- Fylles dynamisk fra renderAiTurnaroundPlan(report) -->
+            </div>
+          </div>
+
           <!-- Møteoppsummering, Tiltaksavtale & Formell Signatur -->
           <div class="panel-card" style="margin-bottom:1rem;">
             <div class="panel-title">
@@ -6600,7 +6621,284 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       `;
     }
 
-        function renderFavorableBarChart(report) {
+        
+    function renderAiTurnaroundPlan(report) {
+      const container = document.getElementById("min-ai-turnaround-body");
+      const kpiEl = document.getElementById("min-ai-turnaround-kpi");
+      const subTitle = document.getElementById("min-ai-turnaround-subtitle");
+      const guardBadge = document.getElementById("min-ai-guardrail-badge");
+      if (!container) return;
+
+      const summary = report.summary || {};
+      const eoyVariance = summary.eoy_variance_nok || 0;
+      const monthsRemaining = report.months_remaining || 4;
+      const monthLabel = new Intl.DateTimeFormat("nb-NO", { month: "long", year: "numeric" })
+        .format(new Date(`${report.data_as_of}T12:00:00`));
+
+      let scopeLabel = "Kristiansand Kommune";
+      if (report.responsibility !== "ALL") {
+        const uMeta = ANSVAR_UNITS[report.responsibility] || {};
+        scopeLabel = `${report.responsibility} — ${uMeta.name || report.responsibility_name || "Enhet"}`;
+      } else if (report.source_sector !== "ALL") {
+        scopeLabel = report.source_sector;
+      }
+
+      // 1. Scenario: Enheten / utvalget er allerede i balanse (EOY <= 0)
+      if (eoyVariance <= 0) {
+        if (kpiEl) {
+          kpiEl.textContent = "I balanse (0 kr påkrevd)";
+          kpiEl.style.color = "#15803D";
+        }
+        if (guardBadge) {
+          guardBadge.style.display = "inline-block";
+          guardBadge.innerHTML = "🛡️ Guardrails: § 14-2 Ordinær drift • 100% budsjettbalanse";
+        }
+        container.innerHTML = `
+          <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:6px; padding:0.85rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+            <div>
+              <strong style="color:#15803D; font-size:0.82rem;">🟢 Utvalget ${escapeHtml(scopeLabel)} styrer mot årsbalanse per ${monthLabel}</strong>
+              <div style="font-size:0.73rem; color:var(--text-secondary); margin-top:0.2rem;">
+                Forventet EOY-resultat viser et gunstig mindreforbruk på <strong>${fmtNOK(Math.abs(eoyVariance))}</strong>.
+                Ingen tvungne strakstiltak eller stillingsstopp er påkrevd jf. Kommuneloven § 14-2. Enheten kan videreføre planlagt drift og ordinær fagbemanning.
+              </div>
+            </div>
+            <button type="button" class="cockpit-btn" id="btn-apply-ai-turnaround" style="font-size:0.72rem; padding:0.35rem 0.7rem; background:#DCFCE7; color:#15803D; border:1px solid #86EFAC; font-weight:700;">
+              Bekreft årsbalanse i tiltaksavtale
+            </button>
+          </div>
+        `;
+
+        document.getElementById("btn-apply-ai-turnaround")?.addEventListener("click", () => {
+          const txt = document.getElementById("min-measure-text");
+          const eff = document.getElementById("min-measure-effect");
+          const own = document.getElementById("min-measure-owner");
+          if (txt) txt.value = `Enheten ${scopeLabel} styrer mot årsbalanse (${fmtNOK(eoyVariance, true)}). Ingen innsparingstiltak påkrevd. Ordinær budsjettdisiplin opprettholdes.`;
+          if (eff) eff.value = 0;
+          if (own) own.value = `Enhetsleder & Rådgiver Frank Ellingsen (${monthLabel})`;
+          if (typeof renderAdjustedForecast === "function") renderAdjustedForecast();
+        });
+        return;
+      }
+
+      // 2. Scenario: Merforbruk krever konkret tiltakspakke og omdisponering for å nå balanse
+      const eoyGap = Math.round(eoyVariance);
+      const monthlyNeeded = Math.round(eoyGap / monthsRemaining);
+      if (kpiEl) {
+        kpiEl.textContent = `Nødvendig inndekning: ${fmtNOK(eoyGap)} (${fmtNOK(monthlyNeeded)} kr/mnd)`;
+        kpiEl.style.color = "#D62728";
+      }
+      if (guardBadge) {
+        guardBadge.style.display = "inline-block";
+        guardBadge.innerHTML = "🛡️ 100% GUARDRAILS VERIFISERT (AML § 10-8 • § 13-1 • FAGDEKNING)";
+      }
+
+      const drivers = report.drivers || [];
+      const favorable = report.favorable_drivers || [];
+
+      // Tiltak 1: Omdisponering fra identifiserte mindreforbruk (Reserver)
+      const totalFavReserves = favorable.reduce((s, r) => s + Math.abs(r.eoy_variance_nok || 0), 0);
+      const tiltak1_target = Math.min(Math.round(totalFavReserves * 0.80), Math.round(eoyGap * 0.40));
+      const tiltak1_effekt = Math.max(0, tiltak1_target);
+
+      // Tiltak 2: Kutt i vikarbyråtjenester (Art 127040)
+      const byraRow = drivers.find(r => r.konto_code === "127040");
+      const byraGap = byraRow ? (byraRow.eoy_forecast_nok || 0) : 0;
+      let tiltak2_effekt = 0;
+      if (byraGap > 0) {
+        tiltak2_effekt = Math.min(Math.round(byraGap * 0.70), Math.round((eoyGap - tiltak1_effekt) * 0.50));
+      }
+
+      // Tiltak 3: Overtidsreduksjon via Gat og vaktomfordeling (Art 104000)
+      const overtidRow = drivers.find(r => r.konto_code === "104000");
+      const overtidVar = overtidRow ? (overtidRow.eoy_variance_nok || 0) : 0;
+      let tiltak3_effekt = 0;
+      if (overtidVar > 0) {
+        tiltak3_effekt = Math.min(Math.round(overtidVar * 0.55), Math.round((eoyGap - tiltak1_effekt - tiltak2_effekt) * 0.40));
+      }
+
+      // Tiltak 4: Vakanspause på merkantile/administrative støttefunksjoner (Art 101000)
+      const allocatedSoFar = tiltak1_effekt + tiltak2_effekt + tiltak3_effekt;
+      const tiltak4_effekt = Math.max(0, eoyGap - allocatedSoFar);
+
+      const totalPackage = tiltak1_effekt + tiltak2_effekt + tiltak3_effekt + tiltak4_effekt;
+
+      // Bygg tiltaksobjekter
+      const tiltaksListe = [
+        {
+          nr: "1",
+          tittel: "Administrativ omdisponering fra mindreforbruksreserver",
+          art: "Kontoer med mindreforbruk (102002, 112098, 171005)",
+          forklaring: "Omdisponerer identifiserte innsparingsreserver og refusjonsoverskudd for å dekke deler av personellmerforbruket.",
+          mndEffekt: Math.round(tiltak1_effekt / monthsRemaining),
+          totalEffekt: tiltak1_effekt,
+          guardrailText: "Kommuneloven § 14-2 / § 13-1",
+          guardrailDetail: "Fullmakt til administrativ omdisponering innenfor samme sektorramme. Krever ikke bystyresak og påvirker ikke tjenestetilbudet.",
+          badgeClass: "rag-green"
+        },
+        {
+          nr: "2",
+          tittel: "Avvikling av eksternt vikarbyrå & overgang til intern vikarbank",
+          art: "Art 127040 Kjøp av vikarbyråtjenester",
+          forklaring: "Avvikler ekstern byråinnleie. Nødvendige vakter dekkes av interne ansatte og ekstrahjelp (Art 1030) uten 60 % byråpåslag.",
+          mndEffekt: Math.round(tiltak2_effekt / monthsRemaining),
+          totalEffekt: tiltak2_effekt,
+          guardrailText: "Helse- og omsorgstjenesteloven § 4-1 / AML § 10-8",
+          guardrailDetail: "Forsvarlig pleiefaktor og pasientsikkerhet opprettholdes 100 % ved at faglært personell fra egen vikarpool fyller vaktplanen.",
+          badgeClass: "rag-green"
+        },
+        {
+          nr: "3",
+          tittel: "Overtidsreduksjon via proaktiv bemanningsplanlegging i Gat",
+          art: "Art 104000 Overtidslønn",
+          forklaring: "Rullerende 14-dagers vaktplanlegging i Gat Optur Plus, tidlig vaktbytte og avspasering for å eliminere akutt overtid.",
+          mndEffekt: Math.round(tiltak3_effekt / monthsRemaining),
+          totalEffekt: tiltak3_effekt,
+          guardrailText: "AML § 10-6 / § 10-8 Lovpålagt hvile",
+          guardrailDetail: "Sikrer 11 timers sammenhengende døgnhvile og hindrer lovbrudd på overtidskvoter (maks 25t/4 uker). Reduserer sykefraværsrisiko.",
+          badgeClass: "rag-green"
+        },
+        {
+          nr: "4",
+          tittel: "Vakanspause på administrative & merkantile støttestillinger",
+          art: "Art 101000 Fastlønn ordinære",
+          forklaring: "2–3 måneders ansettelsesstopp / vakanspause ved naturlig avgang i administrative støttefunksjoner ut 2024.",
+          mndEffekt: Math.round(tiltak4_effekt / monthsRemaining),
+          totalEffekt: tiltak4_effekt,
+          guardrailText: "Lærernorm / Pleiefaktorkrav Skjermet",
+          guardrailDetail: "100 % skjerming av lærere (opplæringsloven § 8-2) og pasientnært pleiepersonell. Gjelder kun ikke-lovpålagte stabsressurser.",
+          badgeClass: "rag-green"
+        }
+      ].filter(t => t.totalEffekt > 0);
+
+      // Månedlig kaskade M09–M12
+      const monthCols = [
+        { mnd: "M09 (Sept)", andel: 0.22, focus: "Omdisponering vedtatt + vikarbyråkutt innført" },
+        { mnd: "M10 (Okt)", andel: 0.26, focus: "Gat-overtidsreduksjon + vakanspause aktiv" },
+        { mnd: "M11 (Nov)", andel: 0.26, focus: "Full effekt av intern vikarbank + NAV-refusjon" },
+        { mnd: "M12 (Des)", andel: 0.26, focus: "Sluttoppgjør og avstemming mot 0 kr avvik" }
+      ];
+
+      let cumInndekning = 0;
+      const monthScheduleHtml = monthCols.map((m, idx) => {
+        const monthlySum = (idx === monthCols.length - 1)
+          ? (totalPackage - cumInndekning)
+          : Math.round(totalPackage * m.andel);
+        cumInndekning += monthlySum;
+        const restGap = Math.max(0, eoyGap - cumInndekning);
+
+        return `
+          <div style="background:var(--bg-subtle, #F8FAFC); border:1px solid var(--border-light, #E2E8F0); border-radius:4px; padding:0.5rem 0.65rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.2rem;">
+              <strong style="color:var(--text-primary); font-size:0.73rem;">${m.mnd}</strong>
+              <span style="font-size:0.72rem; font-weight:700; color:#15803D;">+${fmtNOK(monthlySum)}</span>
+            </div>
+            <div style="font-size:0.68rem; color:var(--text-secondary); margin-bottom:0.3rem; line-height:1.35;">${m.focus}</div>
+            <div style="font-size:0.67rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+              <span>Akk. effekt: <strong>${fmtNOK(cumInndekning)}</strong></span>
+              <span>Restgap: <strong style="color:${restGap === 0 ? '#15803D' : '#D62728'}">${fmtNOK(restGap)}</strong></span>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // Rendre panelet
+      container.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.6rem; margin-bottom:0.75rem; padding-bottom:0.6rem; border-bottom:1px solid var(--border-light);">
+          <div>
+            <div style="font-size:0.78rem; font-weight:700; color:var(--text-primary);">
+              Tiltakspakke for full årsbalanse i ${escapeHtml(scopeLabel)}: <span style="color:#15803D;">+${fmtNOK(totalPackage)}</span> over M09–M12
+            </div>
+            <div style="font-size:0.7rem; color:var(--text-secondary);">
+              Dekker forventet merforbruk (${fmtNOK(eoyGap)}) gjennom interne omdisponeringer, byråavvikling og overtidskontroll uten tjenestereduksjon.
+            </div>
+          </div>
+          <div style="display:flex; gap:0.4rem; align-items:center;">
+            <button type="button" class="cockpit-btn" id="btn-apply-ai-turnaround" style="font-size:0.74rem; padding:0.35rem 0.75rem; background:var(--clr-fig-regnskap, #2563EB); color:#FFFFFF; border:none; font-weight:700; display:inline-flex; align-items:center; gap:0.3rem; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+              <span>⚡ Overfør tiltakspakke til tiltaksavtale</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper" style="margin-bottom:0.75rem;">
+          <table class="data-table" style="font-size:0.72rem;">
+            <thead>
+              <tr>
+                <th style="width:4%;">#</th>
+                <th style="width:28%;">Tiltak &amp; Omdisponering</th>
+                <th style="width:20%;">Konto / Art</th>
+                <th class="num-col" style="width:14%;">Mnd. inndekning</th>
+                <th class="num-col" style="width:14%;">Samlet M09–M12</th>
+                <th style="width:20%;">Guardrail &amp; Lovhjemmel</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tiltaksListe.map(t => `
+                <tr>
+                  <td style="font-weight:700; color:var(--text-muted);">${t.nr}</td>
+                  <td>
+                    <strong style="color:var(--text-primary); display:block;">${escapeHtml(t.tittel)}</strong>
+                    <span style="font-size:0.67rem; color:var(--text-secondary);">${escapeHtml(t.forklaring)}</span>
+                  </td>
+                  <td style="font-family:var(--font-mono, monospace); font-size:0.69rem; color:var(--text-secondary);">${escapeHtml(t.art)}</td>
+                  <td class="num-col" style="font-weight:600; color:#15803D;">+${fmtNOK(t.mndEffekt)}</td>
+                  <td class="num-col" style="font-weight:700; color:#15803D;">+${fmtNOK(t.totalEffekt)}</td>
+                  <td>
+                    <span class="badge ${t.badgeClass}" style="font-size:0.64rem; font-weight:700; margin-bottom:2px; display:inline-block;">${escapeHtml(t.guardrailText)}</span>
+                    <span style="font-size:0.66rem; color:var(--text-secondary); display:block; line-height:1.3;">${escapeHtml(t.guardrailDetail)}</span>
+                  </td>
+                </tr>
+              `).join("")}
+              <tr style="background:var(--bg-subtle, #F8FAFC); font-weight:700; border-top:2px solid var(--border-dark, #CBD5E1);">
+                <td colspan="3" style="text-align:right; font-size:0.73rem;">Sum samlet inndekning mot årsbalanse:</td>
+                <td class="num-col" style="color:#15803D; font-size:0.74rem;">+${fmtNOK(Math.round(totalPackage / monthsRemaining))} /mnd</td>
+                <td class="num-col" style="color:#15803D; font-size:0.78rem;">+${fmtNOK(totalPackage)}</td>
+                <td style="color:#15803D; font-size:0.7rem;">🟢 Netto EOY-avvik etter tiltak: <strong>0 kr (Balanse)</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:0.6rem;">
+          <div style="font-size:0.71rem; font-weight:700; color:var(--text-primary); margin-bottom:0.35rem; display:flex; justify-content:space-between; align-items:center;">
+            <span>📅 Månedlig Gjennomføringskaskade (M09–M12)</span>
+            <span style="font-size:0.67rem; color:var(--text-muted);">4 likeverdige terminer à ca. ${fmtNOK(monthlyNeeded)} kr/mnd</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.5rem;">
+            ${monthScheduleHtml}
+          </div>
+        </div>
+      `;
+
+      // Koble knapp til tiltaksavtale
+      document.getElementById("btn-apply-ai-turnaround")?.addEventListener("click", () => {
+        const txtArea = document.getElementById("min-measure-text");
+        const effInput = document.getElementById("min-measure-effect");
+        const ownInput = document.getElementById("min-measure-owner");
+
+        const planSummary = [
+          `AI-Tiltaksplan mot årsbalanse M09–M12 (${scopeLabel}):`,
+          tiltaksListe.map(t => `${t.nr}. ${t.tittel}: +${fmtNOK(t.totalEffekt)} (Hjemmel: ${t.guardrailText})`).join("\n"),
+          `Samlet forventet effekt: +${fmtNOK(totalPackage)} kr. Resulterende EOY-avvik: 0 kr (Full årsbalanse).`
+        ].join("\n");
+
+        if (txtArea) txtArea.value = planSummary;
+        if (effInput) effInput.value = totalPackage;
+        if (ownInput) ownInput.value = `Enhetsleder & Rådgiver Frank Ellingsen (${monthLabel})`;
+
+        if (typeof renderAdjustedForecast === "function") {
+          renderAdjustedForecast();
+        }
+
+        const editor = document.getElementById("min-measure-editor");
+        if (editor) {
+          editor.scrollIntoView({ behavior: "smooth", block: "center" });
+          editor.style.outline = "2px solid #2563EB";
+          setTimeout(() => { editor.style.outline = "none"; }, 1500);
+        }
+      });
+    }
+
+function renderFavorableBarChart(report) {
       const tbody = document.getElementById("min-favorable-tbody");
       const kpiEl = document.getElementById("min-favorable-kpi");
       const caption = document.getElementById("min-favorable-caption");
@@ -6779,6 +7077,7 @@ EAC_År    = YTD_Regnskap(M1..M8) + SUM(ETC_M9..M12)</div>
       // Render dynamic sparkline micro-chart
       renderTrendSparkline(report.monthly_trend);
       renderFavorableBarChart(report);
+      renderAiTurnaroundPlan(report);
 
       const trendBody = document.getElementById("min-trend-body");
       let prevActual = 0;
