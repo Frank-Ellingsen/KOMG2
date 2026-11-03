@@ -412,11 +412,15 @@ Alle beregninger, notatmaler og saksdokumenter er forankret i gjeldende norsk lo
 Kom - G2/
 ├── index.html                          # Frittstående Executive Web Cockpit (15 moduler, 5 700+ linjer)
 ├── README.md                           # Komplett dokumentasjon (forretningsverdi + teknisk)
+├── notebooks/
+│   ├── explore_duckdb.ipynb            # Interaktiv DuckDB-utforsking og SQL-analyser
+│   └── pycaret_rapid_bencmarking.ipynb # ML-modellering og tidsserie-benchmarking
 ├── templates/
 │   └── index.html                      # Dedikert EOY & LOY Rådgivningscockpit med Chart.js
 ├── docs/
 │   ├── COPILOT_PYTHON_IN_EXCEL_INSTRUCTIONS.md # Instruks for Copilot & Python in Excel (=PY())
-│   └── INSTRUKS_EXCEL_DASHBOARD.md     # Instruks for Power Query & Power Pivot
+│   ├── INSTRUKS_EXCEL_DASHBOARD.md     # Instruks for Power Query & Power Pivot
+│   └── kostra_okonomi_hub.md           # Rådgiver- og systeminstruks for KOSTRA-analyser
 ├── .env.example                        # Mal for miljøvariabler
 ├── .gitignore                          # Git-regler
 ├── Dockerfile                          # Multi-stage containerdefinisjon
