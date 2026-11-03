@@ -3674,7 +3674,7 @@
             <div style="background:#fff; border:1px solid var(--border-light); padding:0.55rem 0.75rem; border-radius:4px;">
               <span style="font-size:0.7rem; color:var(--text-secondary); display:block;">Basislønnsmasse 2024</span>
               <strong id="pos-sum-basis" style="font-size:0.95rem; color:var(--header-dark); font-family:var(--font-mono);">0 kr</strong>
-              <span style="font-size:0.66rem; color:var(--text-muted); display:block;">Ordinær grunnlønn før sosiale</span>
+              <span style="font-size:0.66rem; color:var(--text-muted); display:block;" id="pos-sum-basis-sub">Totalt 2024 inkl. sosiale: 0 kr</span>
             </div>
             <div style="background:#fff; border:1px solid var(--border-light); padding:0.55rem 0.75rem; border-radius:4px;">
               <span style="font-size:0.7rem; color:var(--text-secondary); display:block;">Lønnsvekst &amp; Glidning 2025</span>
@@ -3704,9 +3704,10 @@
                   <th class="num-col">Årsverk (FTE)</th>
                   <th class="num-col col-budget">Snitt Grunnlønn 2024</th>
                   <th class="num-col">Lønnsmasse 2024</th>
-                  <th class="num-col">Sosiale Kostnader 2024</th>
+                  <th class="num-col">Sosiale Kostn. 2024</th>
+                  <th class="num-col" style="font-weight:700; background:rgba(0,0,0,0.02);">Totalt 2024</th>
                   <th class="num-col col-regnskap">Ny Årslønn 2025</th>
-                  <th class="num-col" style="font-weight:700;">Lønnsbudsjett 2025</th>
+                  <th class="num-col" style="font-weight:700; color:var(--header-dark);">Lønnsbudsjett 2025</th>
                   <th class="num-col">Endring 2025</th>
                 </tr>
               </thead>
@@ -3770,7 +3771,7 @@
                 <strong id="salary-res-vikar" class="rag-green">-840 000 kr</strong>
               </div>
               <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
-                <span>Beregnet vakansinnsparing (8,5 FTE):</span>
+                <span>Beregnet vakansinnsparing (<span id="salary-label-vakans-fte">4,0</span> FTE):</span>
                 <strong id="salary-res-vakans" class="rag-green">-657 000 kr</strong>
               </div>
               <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
@@ -9490,6 +9491,7 @@ function renderRecommenderModule(ctx) {
             <td class="num-col col-budget">${fmtNum(p.baseSalary2024)} kr</td>
             <td class="num-col">${fmtNum(lonn2024)} kr</td>
             <td class="num-col" style="color:var(--text-secondary);">${fmtNum(sosial2024)} kr</td>
+            <td class="num-col" style="font-weight:600; background:rgba(0,0,0,0.02);">${fmtNum(total2024)} kr</td>
             <td class="num-col col-regnskap" style="font-weight:600;">${fmtNum(nyLonnSnitt2025)} kr</td>
             <td class="num-col" style="font-weight:700; color:var(--header-dark);">${fmtNum(total2025)} kr</td>
             <td class="num-col rag-amber" style="font-weight:600;">+${fmtNum(endring)} kr <span style="font-size:0.66rem; font-weight:normal;">(+${endringPct.toFixed(1).replace(".", ",")} %)</span></td>
@@ -9508,6 +9510,7 @@ function renderRecommenderModule(ctx) {
             <td class="num-col col-budget">${fmtNum(totFte > 0 ? Math.round(sumLonn2024 / totFte) : 0)} kr</td>
             <td class="num-col">${fmtNum(sumLonn2024)} kr</td>
             <td class="num-col">${fmtNum(sumSosial2024)} kr</td>
+            <td class="num-col" style="font-weight:700; background:rgba(0,0,0,0.02);">${fmtNum(sumTotal2024)} kr</td>
             <td class="num-col col-regnskap">${fmtNum(totFte > 0 ? Math.round(sumLonn2025 / totFte) : 0)} kr</td>
             <td class="num-col" style="color:var(--header-dark);">${fmtNum(sumTotal2025)} kr</td>
             <td class="num-col rag-amber">+${fmtNum(totEndring)} kr (+${totEndringPct.toFixed(1).replace(".", ",")} %)</td>
@@ -9517,6 +9520,7 @@ function renderRecommenderModule(ctx) {
 
       // 5. Oppdater de 4 sammendragskortene over tabellen
       const sumBasisEl = document.getElementById("pos-sum-basis");
+      const sumBasisSubEl = document.getElementById("pos-sum-basis-sub");
       const sumVekstEl = document.getElementById("pos-sum-vekst");
       const sumVekstPctEl = document.getElementById("pos-sum-vekst-pct");
       const sumSosialEl = document.getElementById("pos-sum-sosial");
@@ -9528,11 +9532,12 @@ function renderRecommenderModule(ctx) {
       const vekstTotalPct = sumTotal2024 > 0 ? (vekstTotal / sumTotal2024) * 100 : 0;
 
       if (sumBasisEl) sumBasisEl.textContent = `${fmtNum(sumLonn2024)} kr`;
+      if (sumBasisSubEl) sumBasisSubEl.textContent = `Totalt 2024 inkl. sosiale: ${fmtNum(sumTotal2024)} kr`;
       if (sumVekstEl) sumVekstEl.textContent = `+${fmtNum(vekstLonn)} kr`;
       if (sumVekstPctEl) sumVekstPctEl.textContent = `+${(growthRate * 100).toFixed(1).replace(".", ",")} % samlet lønnsvekst`;
       if (sumSosialEl) sumSosialEl.textContent = `${fmtNum(sumSosial2025)} kr`;
       if (sumTotal2025El) sumTotal2025El.textContent = `${fmtNum(sumTotal2025)} kr`;
-      if (sumDiffEl) sumDiffEl.textContent = `Endring vs 2024: +${fmtNum(vekstTotal)} kr (+${vekstTotalPct.toFixed(1).replace(".", ",")} %)`;
+      if (sumDiffEl) sumDiffEl.textContent = `Endring vs 2024 (${(sumTotal2024 / 1000000).toFixed(2).replace(".", ",")} M): +${fmtNum(vekstTotal)} kr (+${vekstTotalPct.toFixed(1).replace(".", ",")} %)`;
     }
     
 function renderSalaryBudgetModule(ctx) {
@@ -9630,6 +9635,11 @@ function renderSalaryBudgetModule(ctx) {
       // 6. Render Stillingsstruktur & Lønnsbudsjettering Neste År (Framsikt)
       if (typeof renderSalaryPositionsTable === "function") {
         renderSalaryPositionsTable(ctx);
+      }
+
+      // 7. Oppdater What-If Tariff- og Vakanssimulator dynamisk
+      if (typeof updateSalaryBudgetSimulator === "function") {
+        updateSalaryBudgetSimulator();
       }
     }
 
@@ -9769,27 +9779,61 @@ function renderSalaryBudgetModule(ctx) {
       document.getElementById("salary-val-vakans").textContent = `${vakansMnd.toFixed(1).replace(".", ",")} mnd`;
       document.getElementById("salary-val-klp").textContent = `${klpPct.toFixed(1).replace(".", ",")} %`;
 
-      const baseFastlonn = 233062968;
+      // Hent aktiv filterkontekst dynamisk
+      const ctx = typeof getFilteredContext === "function" ? getFilteredContext() : { sektor: "ALL", ansvar: "ALL", funksjon: "ALL" };
+      const { sektor, ansvar, funksjon } = ctx;
+
+      const filteredUnits = (typeof SALARY_UNITS_DATA !== "undefined" ? SALARY_UNITS_DATA : []).filter(u => {
+        if (sektor !== "ALL" && u.sektor !== sektor) return false;
+        if (ansvar !== "ALL" && u.code !== ansvar) return false;
+        if (funksjon !== "ALL" && u.fn !== funksjon) return false;
+        return true;
+      });
+
+      let totPlanFte = 0;
+      let totVakansFte = 0;
+      let weightedLonnSum = 0;
+      filteredUnits.forEach(u => {
+        totPlanFte += u.ftePlan;
+        totVakansFte += u.vakans;
+        weightedLonnSum += u.snittLonn * u.ftePlan;
+      });
+      const avgSnittLonn = totPlanFte > 0 ? (weightedLonnSum / totPlanFte) : 538869;
+      const baseFastlonn = weightedLonnSum > 0 ? weightedLonnSum : 90530000;
+
       const ksVirkning = Math.round(baseFastlonn * (ksPct / 100.0) * (8 / 12));
-      const vikarRest4M = 4200000;
+      const vikarRest4M = Math.round(baseFastlonn * 0.046);
       const vikarSaving = Math.round(vikarRest4M * (1.0 - vikarPct / 100.0));
-      const snittLonnMnd = 618500 / 12;
-      const vakansSaving = Math.round(8.5 * snittLonnMnd * Math.min(4, vakansMnd));
-      const totalSosialPct = klpPct + 14.1;
+      const snittLonnMnd = avgSnittLonn / 12;
+      const vakansSaving = Math.round(totVakansFte * snittLonnMnd * Math.min(4, vakansMnd));
+      const totalSosialPct = klpPct + (1.0 + klpPct / 100.0) * 14.1; // KLP pensjon + AGA 14,1 % på lønn og pensjon
       const totalLonnSim = baseFastlonn + ksVirkning;
       const totalSosial = Math.round(totalLonnSim * (totalSosialPct / 100.0));
       const ksDiff = ksVirkning - Math.round(baseFastlonn * 0.052 * (8 / 12));
-      const netVariance = 6582116 + ksDiff - vikarSaving - vakansSaving;
+
+      // Hent netto avvik fra snapshot for aktiv enhet/sektor
+      const snapKey = `${sektor}__${ansvar}`;
+      const snap = (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined" && DUCKDB_MONTHLY_REPORT_SNAPSHOTS[snapKey])
+        || (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined" && DUCKDB_MONTHLY_REPORT_SNAPSHOTS[`${sektor}__ALL`])
+        || (typeof DUCKDB_MONTHLY_REPORT_SNAPSHOTS !== "undefined" && DUCKDB_MONTHLY_REPORT_SNAPSHOTS["ALL__ALL"])
+        || {};
+      const pp = snap.personnel_profile || {};
+      const baseAvvik = Math.round(pp.brutto_eoy_variance_nok || 2322973);
+      const netVariance = baseAvvik + ksDiff - vikarSaving - vakansSaving;
 
       document.getElementById("salary-res-ks").textContent = `${ksVirkning >= 0 ? "+" : ""}${fmtNum(ksVirkning)} kr`;
       document.getElementById("salary-res-vikar").textContent = `-${fmtNum(vikarSaving)} kr`;
       document.getElementById("salary-res-vakans").textContent = `-${fmtNum(vakansSaving)} kr`;
+
+      const vakansLabelEl = document.getElementById("salary-label-vakans-fte");
+      if (vakansLabelEl) vakansLabelEl.textContent = totVakansFte.toFixed(1).replace(".", ",");
+
       document.getElementById("salary-res-sosial").textContent = `${fmtNum(totalSosial)} kr`;
 
       const nettoEl = document.getElementById("salary-res-netto");
       if (nettoEl) {
         nettoEl.textContent = `${netVariance >= 0 ? "+" : ""}${fmtNum(netVariance)} kr`;
-        nettoEl.className = netVariance > 10000000 ? "rag-red" : (netVariance > 0 ? "rag-amber" : "rag-green");
+        nettoEl.className = netVariance > 5000000 ? "rag-red" : (netVariance > 0 ? "rag-amber" : "rag-green");
       }
     }
 
