@@ -366,3 +366,4 @@ def get_dynamic_ml_metrics(
         }
     finally:
         conn.close()
+
