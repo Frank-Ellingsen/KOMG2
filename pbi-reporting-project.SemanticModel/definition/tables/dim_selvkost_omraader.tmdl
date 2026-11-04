@@ -66,3 +66,4 @@ table dim_selvkost_omraader
 				    Source
 
 	annotation PBI_ResultType = Table
+

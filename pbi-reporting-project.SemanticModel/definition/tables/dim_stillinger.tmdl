@@ -65,3 +65,4 @@ table dim_stillinger
 				    Source
 
 	annotation PBI_ResultType = Table
+
