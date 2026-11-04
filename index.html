@@ -9547,6 +9547,7 @@ function renderFavorableBarChart(report) {
         setVal("aarshjul-flt-funksjon", curFunksjon);
         setVal("flt-status", curStatus);
         setVal("ts-flt-status", curStatus);
+        setVal("eda-filter-sektor", curSektor);
 
         // Synkroniser også Modul 12 (Min Økonomi / Månedsrapport)
         const minSec = document.getElementById("min-sector");
@@ -9600,6 +9601,9 @@ function renderFavorableBarChart(report) {
     });
 
     // Hendelser for Modul 12 (Min Økonomi)
+    document.getElementById("eda-filter-sektor")?.addEventListener("change", (e) => {
+      syncDynamicFilters("sektor", e.target.value);
+    });
     document.getElementById("min-sector")?.addEventListener("change", (e) => {
       syncDynamicFilters("sektor", e.target.value);
     });
@@ -11453,7 +11457,23 @@ function renderSalaryBudgetModule(ctx) {
     // 17. EDA & FT VISUAL VOCABULARY MODULE (DYNAMIC EXPLORATORY ANALYSIS)
         // [FT_CHART_TYPES defined in Section 1 Data Constants]
 
-function getEdaDataset(sektorFilter = "ALL") {
+function getEdaDataset(filterArg = "ALL") {
+      let sektorFilter = "ALL";
+      let ansvarFilter = "ALL";
+      let funksjonFilter = "ALL";
+      let statusFilter = "ALL";
+      let periodFilter = "ALL";
+
+      if (typeof filterArg === "string") {
+        sektorFilter = filterArg;
+      } else if (filterArg && typeof filterArg === "object") {
+        sektorFilter = filterArg.sektor || "ALL";
+        ansvarFilter = filterArg.ansvar || "ALL";
+        funksjonFilter = filterArg.funksjon || "ALL";
+        statusFilter = filterArg.status || filterArg.statusFlt || "ALL";
+        periodFilter = filterArg.period || "ALL";
+      }
+
       // Reelle tall aggregert fra DuckDB Gold Layer og modellens ansvarsenheter
       const rawUnits = [
         {
@@ -11512,17 +11532,21 @@ function getEdaDataset(sektorFilter = "ALL") {
         }
       ];
 
-      return rawUnits
-        .filter(u => sektorFilter === "ALL" || u.sektor === sektorFilter)
-        .map(u => {
-          const avvik_kr = u.reg - u.bud;
-          const avvik_pct = u.bud > 0 ? (avvik_kr / u.bud) * 100 : 0;
-          const burn_rate = u.bud > 0 ? (u.reg / u.bud) * 100 : 100;
-          const fastlonn = Math.max(0, u.reg - u.vikar - u.overtid - u.klp - u.drift);
+      const isSingleMonth = periodFilter !== "ALL";
+      const pMeta = (typeof PERIOD_META !== "undefined" && PERIOD_META[periodFilter]) ? PERIOD_META[periodFilter] : null;
+      const mIdx = (pMeta && pMeta.idx >= 0) ? pMeta.idx : 7;
 
+      return rawUnits
+        .filter(u => {
+          if (sektorFilter !== "ALL" && u.sektor !== sektorFilter) return false;
+          if (ansvarFilter !== "ALL" && u.code !== ansvarFilter) return false;
+          if (funksjonFilter !== "ALL" && u.fn !== funksjonFilter) return false;
+          return true;
+        })
+        .map(u => {
           // Generer månedlig tidsbane basert på MONTHLY_SERIES og enhetens andel
           const mShare = u.reg / 31524851;
-          const monthly = MONTHLY_SERIES.map((m, idx) => {
+          const monthly = (typeof MONTHLY_SERIES !== "undefined" ? MONTHLY_SERIES : []).map((m, idx) => {
             const mRegVal = Math.round(m.reg * mShare * (u.sektor === "Helse og Omsorg" ? (1.0 + idx * 0.02) : (1.0 - idx * 0.005)));
             const mBudVal = Math.round(m.bud * mShare);
             return {
@@ -11535,15 +11559,59 @@ function getEdaDataset(sektorFilter = "ALL") {
             };
           });
 
+          let bud = u.bud;
+          let reg = u.reg;
+          let vikar = u.vikar;
+          let overtid = u.overtid;
+          let klp = u.klp;
+          let drift = u.drift;
+
+          if (isSingleMonth && monthly[mIdx]) {
+            bud = monthly[mIdx].bud;
+            reg = monthly[mIdx].reg;
+            const scale = u.reg > 0 ? reg / u.reg : 1.0;
+            vikar = Math.round(u.vikar * scale);
+            overtid = Math.round(u.overtid * scale);
+            klp = Math.round(u.klp * scale);
+            drift = Math.round(u.drift * scale);
+          }
+
+          const avvik_kr = reg - bud;
+          const avvik_pct = bud > 0 ? (avvik_kr / bud) * 100 : 0;
+          const burn_rate = bud > 0 ? (reg / bud) * 100 : 100;
+          const fastlonn = Math.max(0, reg - vikar - overtid - klp - drift);
+
+          const statusStr = (typeof computeStatus === "function") 
+            ? computeStatus(bud - reg, burn_rate, isSingleMonth)
+            : (avvik_pct > 5.0 ? "🔴 KRITISK AVVIK" : (avvik_pct > 0.0 ? "🟡 ADVARSEL" : "🟢 I RUTE"));
+
+          const rag = (typeof getStatusKey === "function")
+            ? getStatusKey(statusStr)
+            : (avvik_pct > 5.0 ? "red" : (avvik_pct > 0.0 ? "amber" : "green"));
+
           return {
             ...u,
+            bud,
+            reg,
+            vikar,
+            overtid,
+            klp,
+            drift,
             avvik_kr,
             avvik_pct,
             burn_rate,
             fastlonn,
             monthly,
-            rag: avvik_pct > 5.0 ? "red" : (avvik_pct > 0.0 ? "amber" : "green")
+            statusStr,
+            rag
           };
+        })
+        .filter(u => {
+          if (statusFilter === "ALL") return true;
+          if (u.statusStr === statusFilter) return true;
+          if (typeof getStatusKey === "function" && getStatusKey(statusFilter) === u.rag) return true;
+          if (statusFilter.toLowerCase() === u.rag) return true;
+          return false;
         });
     }
 
@@ -11683,8 +11751,8 @@ function getEdaDataset(sektorFilter = "ALL") {
           renderEdaModule();
         });
 
-        sektorSelect?.addEventListener("change", () => {
-          renderEdaModule();
+        sektorSelect?.addEventListener("change", (e) => {
+          syncDynamicFilters("sektor", e.target.value);
         });
 
         varXSelect?.addEventListener("change", () => renderEdaModule());
@@ -11708,6 +11776,10 @@ function getEdaDataset(sektorFilter = "ALL") {
     }
 
     function renderEdaModule(ctx) {
+      if (!ctx || typeof ctx !== "object" || !ctx.sektor) {
+        ctx = typeof getFilteredContext === "function" ? getFilteredContext() : {};
+      }
+
       const intentSelect = document.getElementById("eda-intent-select");
       const chartTypeSelect = document.getElementById("eda-chart-type-select");
       const sektorSelect = document.getElementById("eda-filter-sektor");
@@ -11721,8 +11793,8 @@ function getEdaDataset(sektorFilter = "ALL") {
 
       const intent = intentSelect.value;
       const chartType = chartTypeSelect.value;
-      let sektor = sektorSelect ? sektorSelect.value : "ALL";
 
+      let sektor = sektorSelect ? sektorSelect.value : "ALL";
       if (ctx && ctx.sektor && (!sektorSelect || sektorSelect.value === "ALL" || ctx.sektor !== "ALL")) {
         if (sektorSelect && ctx.sektor !== sektorSelect.value && ctx.sektor !== "ALL") {
           sektorSelect.value = ctx.sektor;
@@ -11733,15 +11805,33 @@ function getEdaDataset(sektorFilter = "ALL") {
       const varX = varXSelect ? varXSelect.value : "vikar_kr";
       const varY = varYSelect ? varYSelect.value : "overtid_kr";
 
-      let data = getEdaDataset(sektor);
-      if (ctx && ctx.ansvar && ctx.ansvar !== "ALL") {
-        const filtered = data.filter(d => d.code === ctx.ansvar);
-        if (filtered.length > 0) data = filtered;
-      }
+      const curAnsvar = ctx.ansvar || document.getElementById("flt-ansvar")?.value || "ALL";
+      const curFunksjon = ctx.funksjon || document.getElementById("flt-funksjon")?.value || "ALL";
+      const curStatus = ctx.statusFlt || document.getElementById("flt-status")?.value || "ALL";
+      const curPeriod = ctx.period || document.getElementById("flt-period")?.value || "ALL";
+
+      let data = getEdaDataset({
+        sektor: sektor,
+        ansvar: curAnsvar,
+        funksjon: curFunksjon,
+        status: curStatus,
+        period: curPeriod
+      });
 
       if (filterSummaryEl) {
-        const sekLabel = sektor === "ALL" ? "Alle Sektorer" : sektor;
-        filterSummaryEl.textContent = `Aktive filtervalg: ${sekLabel} (${data.length} aktive ansvarssteder)`;
+        const parts = [];
+        if (sektor !== "ALL") parts.push(sektor);
+        if (curAnsvar !== "ALL") {
+          const ansName = (typeof ANSVAR_UNITS !== "undefined" && ANSVAR_UNITS[curAnsvar]) ? ANSVAR_UNITS[curAnsvar].name : curAnsvar;
+          parts.push(ansName.includes(" - ") ? ansName.split(" - ")[1] : ansName);
+        }
+        if (curFunksjon !== "ALL") parts.push(`Fn ${curFunksjon}`);
+        if (curPeriod !== "ALL") parts.push(curPeriod);
+        if (curStatus !== "ALL") parts.push(curStatus.replace(/[🔴🟡🟢]\s*/, ""));
+
+        const sekLabel = parts.length > 0 ? parts.join(" · ") : "Alle Sektorer";
+        const unitWord = data.length === 1 ? "aktivt ansvarssted" : "aktive ansvarssteder";
+        filterSummaryEl.textContent = `Aktive filtervalg: ${sekLabel} (${data.length} ${unitWord})`;
       }
 
       // Oppdater FT Visual Guide veiledningskort
@@ -11773,26 +11863,34 @@ function getEdaDataset(sektorFilter = "ALL") {
       const navEl = document.getElementById("eda-c-nav-val");
 
       if (fastEl) fastEl.textContent = `${totFastlonn > 0 ? "+" : ""}${fmtNum(totFastlonn)} kr`;
-      if (vikarEl) vikarEl.textContent = `+${fmtNum(totVikar)} kr`;
-      if (overtidEl) overtidEl.textContent = `+${fmtNum(totOvertid)} kr`;
+      if (vikarEl) vikarEl.textContent = `${totVikar > 0 ? "+" : ""}${fmtNum(totVikar)} kr`;
+      if (overtidEl) overtidEl.textContent = `${totOvertid > 0 ? "+" : ""}${fmtNum(totOvertid)} kr`;
       if (navEl) navEl.textContent = `${fmtNum(totNav)} kr`;
 
       // Pedagogisk narrativ oppsummering
       const sortedPeers = [...data].sort((a, b) => b.burn_rate - a.burn_rate);
       const avgBurn = data.length > 0 ? (data.reduce((a, b) => a + b.burn_rate, 0) / data.length) : 100;
+      const scopeDesc = sektor === "ALL" ? "kommunen" : sektor;
       
       let localNarrative = "";
-      if (currentEdaTrack === "spor_a") {
-        const topUnit = sortedPeers[0];
-        localNarrative = `«Innenfor ${sektor === "ALL" ? "valgt utvalg" : sektor} står ${topUnit?.name || "enheten"} for den største avviksbelastningen. Dypdykk viser at merforbruket primært drives av vikarlønn (art 1020) og kjøp av eksterne vikarbyråtjenester (art 1270).»`;
-      } else if (currentEdaTrack === "spor_b") {
-        localNarrative = `«Regnskapet for valgt utvalg viser stabil kostnadsutvikling i Q1 (Jan–Mar), men fikk en markant kostnadsvekst på +18,4 % i juni og juli. Hvis denne månedstakten fortsetter ut året, vil EOY-avviket lande på ${fmtNum(Math.round(totVikar * 1.8))} kr.»`;
-      } else if (currentEdaTrack === "spor_c") {
-        localNarrative = `«Det er en sterk sammenheng i dette utvalget: Mindreforbruk på fast lønn (art 1010) er erstattet av vesentlig dyrere vikarinnleie (art 1020/1270) på +${fmtNum(totVikar)} kr og overtid på +${fmtNum(totOvertid)} kr. Netto merkostnad ved vikarer fremfor faste ansettelser er +${fmtNum(nettoSub)} kr.»`;
-      } else if (currentEdaTrack === "spor_d") {
-        const high = sortedPeers[0];
-        const low = sortedPeers[sortedPeers.length - 1];
-        localNarrative = `«Blant alle ${data.length} enheter i ${sektor === "ALL" ? "kommunen" : sektor} har ${high?.shortName || "enhet"} den høyeste forbruksintensiteten (${high?.burn_rate.toFixed(1).replace(".", ",")} % Burn Rate), mens ${low?.shortName || "enhet"} har lavest (${low?.burn_rate.toFixed(1).replace(".", ",")} % Burn Rate). Gjennomsnittet ligger på ${avgBurn.toFixed(1).replace(".", ",")} %.»`;
+      if (data.length === 0) {
+        localNarrative = `«Ingen ansvarsenheter matcher det valgte filterkriteriet. Vennligst juster filterkombinasjonen eller trykk Nullstill Filter for å gjenopprette utvalget.»`;
+      } else if (data.length === 1) {
+        const u = data[0];
+        localNarrative = `«For ${u.name} (${u.fnName}) er det bokført et regnskap på ${fmtNum(u.reg)} kr mot budsjett ${fmtNum(u.bud)} kr (${u.avvik_kr >= 0 ? "+" : ""}${fmtNum(u.avvik_kr)} kr, ${u.burn_rate.toFixed(1).replace(".", ",")} % Burn Rate). Hoveddriveren er vikarkostnader (${fmtNum(u.vikar)} kr) og overtid (${fmtNum(u.overtid)} kr).»`;
+      } else {
+        if (currentEdaTrack === "spor_a") {
+          const topUnit = sortedPeers[0];
+          localNarrative = `«Innenfor ${sektor === "ALL" ? "valgt utvalg" : sektor} står ${topUnit?.name || "enheten"} for den største avviksbelastningen. Dypdykk viser at merforbruket primært drives av vikarlønn (art 1020) og kjøp av eksterne vikarbyråtjenester (art 1270).»`;
+        } else if (currentEdaTrack === "spor_b") {
+          localNarrative = `«Regnskapet for valgt utvalg viser stabil kostnadsutvikling i Q1 (Jan–Mar), men fikk en markant kostnadsvekst på +18,4 % i juni og juli. Hvis denne månedstakten fortsetter ut året, vil EOY-avviket lande på ${fmtNum(Math.round(totVikar * 1.8))} kr.»`;
+        } else if (currentEdaTrack === "spor_c") {
+          localNarrative = `«Det er en sterk sammenheng i dette utvalget: Mindreforbruk på fast lønn (art 1010) er erstattet av vesentlig dyrere vikarinnleie (art 1020/1270) på +${fmtNum(totVikar)} kr og overtid på +${fmtNum(totOvertid)} kr. Netto merkostnad ved vikarer fremfor faste ansettelser er +${fmtNum(nettoSub)} kr.»`;
+        } else if (currentEdaTrack === "spor_d") {
+          const high = sortedPeers[0];
+          const low = sortedPeers[sortedPeers.length - 1];
+          localNarrative = `«Blant alle ${data.length} enheter i ${scopeDesc} har ${high?.shortName || "enhet"} den høyeste forbruksintensiteten (${high?.burn_rate.toFixed(1).replace(".", ",")} % Burn Rate), mens ${low?.shortName || "enhet"} har lavest (${low?.burn_rate.toFixed(1).replace(".", ",")} % Burn Rate). Gjennomsnittet ligger på ${avgBurn.toFixed(1).replace(".", ",")} %.»`;
+        }
       }
       if (narrativeEl) narrativeEl.textContent = localNarrative;
 
@@ -11814,10 +11912,24 @@ function getEdaDataset(sektorFilter = "ALL") {
         } catch (err) {}
       }
 
-      // Rendring av SVG basert på aktivt spor
       const W = 920;
       const H = 400;
 
+      if (data.length === 0) {
+        if (titleEl) titleEl.textContent = "Ingen data for valgt filterkombinasjon";
+        if (statEl) statEl.textContent = "0 enheter funnet";
+        canvasEl.innerHTML = `
+          <svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="font-family:var(--font-sans);">
+            <rect x="0" y="0" width="${W}" height="${H}" fill="var(--bg-subtle)" rx="6"/>
+            <text x="${W/2}" y="${H/2 - 10}" text-anchor="middle" fill="var(--text-primary)" font-size="14" font-weight="600">Ingen ansvarsenheter matcher det valgte filteret</text>
+            <text x="${W/2}" y="${H/2 + 15}" text-anchor="middle" fill="var(--text-muted)" font-size="11">Prøv å endre sektor, KOSTRA-funksjon eller ansvarssted, eller trykk «Nullstill Filter»</text>
+          </svg>
+        `;
+        renderEdaTable([]);
+        return;
+      }
+
+      // Rendring av SVG basert på aktivt spor
       let svgHtml = "";
 
       if (currentEdaTrack === "spor_c") {
