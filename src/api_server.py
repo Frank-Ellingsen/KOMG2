@@ -22,6 +22,7 @@ import openpyxl
 from pptx import Presentation
 from pptx.util import Inches as PptxInches, Pt as PptxPt
 from pptx.dml.color import RGBColor as PptxRGBColor
+from src.services.eda_engine import get_dynamic_eda_analysis
 from src.services.duckdb_engine import (
     get_cascading_options,
     get_filtered_fact_data,
@@ -2632,6 +2633,59 @@ def export_bystyrenotat_docx(
 
 
 # ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# 7B. DYNAMISK EDA, RELASJONER OG TIDSSERIER (V1.0 SPEC)
+# ---------------------------------------------------------------------------
+
+class EDARequest(BaseModel):
+    periode: Optional[str] = "ALL"
+    sektor: Optional[str] = "ALL"
+    ansvar: Optional[str] = "ALL"
+    funksjon: Optional[str] = "ALL"
+    rag_status: Optional[str] = "ALL"
+
+
+@app.get("/api/v1/eda/dynamic-analysis", tags=["EDA"])
+def api_dynamic_eda_get(
+    periode: Optional[str] = Query("ALL"),
+    sektor: Optional[str] = Query("ALL"),
+    ansvar: Optional[str] = Query("ALL"),
+    funksjon: Optional[str] = Query("ALL"),
+    rag_status: Optional[str] = Query("ALL")
+) -> Dict[str, Any]:
+    """
+    Delivers dynamic exploratory data analysis (EDA) across 4 tracks:
+    - Spor A: Hierarki (Funksjon -> Art)
+    - Spor B: Utvikling over tid (Tidsserie M01-M08 + LOY M09-M12)
+    - Spor C: Aarsak og Virkning (Loennsarter: Fastloenn, Vikar, Overtid, NAV)
+    - Spor D: Relativ Sammenligning og Benchmarking (Peer Burn Rate %)
+    Plus Norwegian natural language narratives without data-science jargon.
+    """
+    filters = {
+        "periode": periode,
+        "sektor": sektor,
+        "ansvar": ansvar,
+        "funksjon": funksjon,
+        "rag_status": rag_status
+    }
+    return get_dynamic_eda_analysis(filters)
+
+
+@app.post("/api/v1/eda/dynamic-analysis", tags=["EDA"])
+def api_dynamic_eda_post(req: EDARequest) -> Dict[str, Any]:
+    """
+    POST variant for dynamic EDA analysis accepting a JSON body with filter values.
+    """
+    filters = {
+        "periode": req.periode,
+        "sektor": req.sektor,
+        "ansvar": req.ansvar,
+        "funksjon": req.funksjon,
+        "rag_status": req.rag_status
+    }
+    return get_dynamic_eda_analysis(filters)
+
 # 7. DYNAMIC FILTER CASCADE & ANALYTICS ENDPOINTS (DOC 10 & V3 SPEC)
 # ---------------------------------------------------------------------------
 

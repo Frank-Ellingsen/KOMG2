@@ -515,6 +515,31 @@ def run_tests():
     assert "Helse og Omsorg" in cp_resp["response"]
     print("  OK: Copilot injected active filter state banner into response")
 
+        # 40. Dynamic EDA 4-Track Analysis & Plain-Norwegian Narratives (GET & POST)
+    print("Testing 40: /api/v1/eda/dynamic-analysis (GET & POST)")
+    res = client.get("/api/v1/eda/dynamic-analysis?sektor=Oppvekst%20og%20Utdanning")
+    assert res.status_code == 200
+    eda_data = res.json()
+    assert eda_data["status"] == "ok"
+    assert "spor_a_hierarchy" in eda_data
+    assert "spor_b_trend" in eda_data
+    assert "spor_c_payroll" in eda_data
+    assert "spor_d_peers" in eda_data
+    assert "narratives" in eda_data
+    assert "PPT Senter" in eda_data["narratives"]["spor_d"] or "Oppvekst og Utdanning" in eda_data["narratives"]["spor_d"]
+    assert len(eda_data["spor_b_trend"]) == 12 # 8 historical + 4 LOY projection months
+    print("  OK: GET /api/v1/eda/dynamic-analysis delivered all 4 EDA tracks & narratives")
+
+    res_post = client.post("/api/v1/eda/dynamic-analysis", json={
+        "sektor": "Helse og Omsorg",
+        "periode": "M08"
+    })
+    assert res_post.status_code == 200
+    eda_post = res_post.json()
+    assert eda_post["status"] == "ok"
+    assert eda_post["spor_c_payroll"]["vikar_avvik"] > 0
+    print("  OK: POST /api/v1/eda/dynamic-analysis verified payroll cause/effect and substitution")
+
     print("\n==================================================")
     print("ALL 39 ENDPOINTS (100% SUITE, ULTIMATE & DYNAMIC CASCADE v3) PASSED WITH ZERO ERRORS!")
     print("==================================================")

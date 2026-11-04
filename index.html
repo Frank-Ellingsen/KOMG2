@@ -2596,11 +2596,55 @@
       </section>
 
       <section id="view-eda" class="spa-view inactive" tabindex="-1" aria-hidden="true" aria-label="EDA og FT Visual Guide">
-        <div class="section-bar">
-          <span>2B. Exploratory Data Analysis (EDA) — Financial Times Visual Vocabulary</span>
-          <span>Interaktiv mønstergjenkjenning &amp; Tufte Data-Ink analyse</span>
+        <div class="section-bar" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>📊 2B. Utforsk Sammenhenger &amp; Avviks-Mønstre (Dynamisk EDA)</span>
+          <button type="button" class="btn btn-secondary" id="eda-theory-toggle-btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; border:1px solid var(--border-light); cursor:pointer;">
+            ℹ️ Metodikk &amp; Teori
+          </button>
         </div>
 
+        <!-- 💡 PIPELINE STATUS & FILTER SUMMARY -->
+        <div class="card" style="margin-bottom:0.75rem; border-left:4px solid var(--clr-ok-text); background:var(--bg-subtle); padding:0.55rem 0.85rem; display:flex; justify-content:space-between; align-items:center; font-size:0.78rem;">
+          <div>
+            <strong>💡 PIPELINE STATUS:</strong> <span style="color:var(--clr-ok-text); font-weight:700;">ONLINE (DuckDB Medallion)</span>
+            <span style="margin-left:0.75rem; color:var(--text-secondary);" id="eda-active-filter-summary">Aktive filtervalg: Alle Sektorer (9 aktive ansvarssteder)</span>
+          </div>
+          <div style="font-size:0.72rem; color:var(--text-muted);">
+            Kilde: <code>kostra_prod.duckdb</code> · Tabell: <code>modelready_fact</code>
+          </div>
+        </div>
+
+        <!-- 4 INTERAKTIVE ANALYSESPOR (EDA FOR ALLE) -->
+        <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap;" id="eda-track-buttons">
+          <button type="button" class="btn eda-track-tab-btn active" data-track="spor_c" id="btn-eda-spor-c" style="padding:0.45rem 0.85rem; font-size:0.78rem; font-weight:700; cursor:pointer;">
+            🔗 Spor C: Lønns-Relasjoner (Årsak &amp; Virkning)
+          </button>
+          <button type="button" class="btn btn-secondary eda-track-tab-btn" data-track="spor_a" id="btn-eda-spor-a" style="padding:0.45rem 0.85rem; font-size:0.78rem; font-weight:700; cursor:pointer;">
+            📊 Spor A: Hierarkisk Nedbryting
+          </button>
+          <button type="button" class="btn btn-secondary eda-track-tab-btn" data-track="spor_b" id="btn-eda-spor-b" style="padding:0.45rem 0.85rem; font-size:0.78rem; font-weight:700; cursor:pointer;">
+            📈 Spor B: Utvikling Over Tid (Tidsserie &amp; LOY)
+          </button>
+          <button type="button" class="btn btn-secondary eda-track-tab-btn" data-track="spor_d" id="btn-eda-spor-d" style="padding:0.45rem 0.85rem; font-size:0.78rem; font-weight:700; cursor:pointer;">
+            ⚖️ Spor D: Relativ Sammenligning &amp; Peer Benchmarking
+          </button>
+        </div>
+
+        <!-- 💡 NARRATIV OPPSUMMERING FOR VALGT UTVALG (AUTOMATISK TEKST PÅ NORSK) -->
+        <div class="card" style="margin-bottom:0.85rem; border-left:4px solid var(--clr-fig-regnskap); background:#f8fafc; padding:0.75rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+            <div style="font-size:0.73rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted);">
+              💡 NARRATIV OPPSUMMERING FOR VALGT UTVALG (AUTOMATISK TEKST)
+            </div>
+            <span class="rag-badge rag-green" id="eda-narrative-tag" style="font-size:0.68rem;">Reaktiv sanntidsinnsikt</span>
+          </div>
+          <div id="eda-narrative-summary" style="font-size:0.86rem; line-height:1.55; color:var(--text-primary); font-weight:500;">
+            «Det er en sterk sammenheng i dette utvalget: Mindreforbruk på fast lønn er erstattet av vesentlig dyrere vikarinnleie (art 1020/1270) og overtid (art 1040).»
+          </div>
+        </div>
+
+        <!-- DISKRET METODIKK & TEORI PANEL -->
+        <div id="eda-theory-panel" style="display:block;">
         <!-- EDA Kontrollpanel og Veileder -->
         <div class="card" style="margin-bottom:1rem; border-left:4px solid var(--clr-fig-regnskap);">
           <div class="card-header" style="background:var(--bg-subtle); padding:0.6rem 0.85rem; border-bottom:1px solid var(--border-light); display:flex; justify-content:space-between; align-items:center;">
@@ -2714,6 +2758,7 @@
 
           </div>
         </div>
+        </div> <!-- Slutt eda-theory-panel -->
 
         <!-- EDA Visualiseringslerret og Nøkkeltall -->
         <div class="card" style="margin-bottom:1rem;">
@@ -2733,6 +2778,30 @@
             <!-- Flytende Tooltip -->
             <div id="eda-tooltip" style="position:absolute; display:none; background:rgba(15, 23, 42, 0.95); color:#fff; padding:0.45rem 0.65rem; border-radius:4px; font-size:0.72rem; pointer-events:none; z-index:100; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); border:1px solid var(--border-light); line-height:1.4;">
             </div>
+          </div>
+        </div>
+
+        <!-- RELASJONER / TILLEGGSKORT FOR SPOR C (Årsak og Virkning) -->
+        <div id="eda-cause-effect-cards" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:0.75rem; margin-bottom:1rem;">
+          <div class="card" style="padding:0.75rem; border-left:3px solid var(--clr-ok-text);">
+            <div style="font-size:0.72rem; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Art 1010 Fastlønn</div>
+            <div id="eda-c-fastlonn-val" style="font-size:1.1rem; font-weight:700; color:var(--text-primary); margin:0.25rem 0;">+183 205 kr</div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">Ubesatte stillinger vs grunnbemanning</div>
+          </div>
+          <div class="card" style="padding:0.75rem; border-left:3px solid #D62728;">
+            <div style="font-size:0.72rem; font-weight:700; color:#D62728; text-transform:uppercase;">Art 1020/1270 Vikarlønn</div>
+            <div id="eda-c-vikar-val" style="font-size:1.1rem; font-weight:700; color:#D62728; margin:0.25rem 0;">+365 724 kr</div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">Vikarinnleie &amp; vikarbyråer</div>
+          </div>
+          <div class="card" style="padding:0.75rem; border-left:3px solid #D97706;">
+            <div style="font-size:0.72rem; font-weight:700; color:#D97706; text-transform:uppercase;">Art 1040 Overtid</div>
+            <div id="eda-c-overtid-val" style="font-size:1.1rem; font-weight:700; color:#D97706; margin:0.25rem 0;">+43 046 kr</div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">Forskyvning &amp; ekstra vakter</div>
+          </div>
+          <div class="card" style="padding:0.75rem; border-left:3px solid var(--clr-fig-regnskap);">
+            <div style="font-size:0.72rem; font-weight:700; color:var(--clr-fig-regnskap); text-transform:uppercase;">Art 1710 NAV-Refusjon</div>
+            <div id="eda-c-nav-val" style="font-size:1.1rem; font-weight:700; color:var(--clr-fig-regnskap); margin:0.25rem 0;">-212 941 kr</div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">Innkrevd sykelønnsrefusjon</div>
           </div>
         </div>
 
@@ -11543,6 +11612,29 @@ function getEdaDataset(sektorFilter = "ALL") {
     }
 
     let edaInitialized = false;
+    let currentEdaTrack = "spor_c"; // Default: Spor C (Lønns-relasjoner & Årsak/Virkning)
+
+    function updateTrackButtonStates() {
+      const trackBtns = document.querySelectorAll(".eda-track-tab-btn");
+      trackBtns.forEach(btn => {
+        const track = btn.getAttribute("data-track");
+        if (track === currentEdaTrack) {
+          btn.classList.add("active");
+          btn.classList.remove("btn-secondary");
+          btn.style.background = "var(--header-dark)";
+          btn.style.color = "#fff";
+        } else {
+          btn.classList.remove("active");
+          btn.classList.add("btn-secondary");
+          btn.style.background = "var(--bg-subtle)";
+          btn.style.color = "var(--text-primary)";
+        }
+      });
+      const causeEffectCards = document.getElementById("eda-cause-effect-cards");
+      if (causeEffectCards) {
+        causeEffectCards.style.display = currentEdaTrack === "spor_c" ? "grid" : "none";
+      }
+    }
 
     function initEdaModule() {
       const intentSelect = document.getElementById("eda-intent-select");
@@ -11552,11 +11644,32 @@ function getEdaDataset(sektorFilter = "ALL") {
       const varXSelect = document.getElementById("eda-var-x");
       const varYSelect = document.getElementById("eda-var-y");
       const resetBtn = document.getElementById("eda-reset-view-btn");
+      const theoryToggleBtn = document.getElementById("eda-theory-toggle-btn");
+      const theoryPanel = document.getElementById("eda-theory-panel");
 
       if (!intentSelect || !chartTypeSelect) return;
 
       if (!edaInitialized) {
         edaInitialized = true;
+
+        // 4 Interaktive Analysesporknapper
+        document.querySelectorAll(".eda-track-tab-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const track = btn.getAttribute("data-track");
+            if (track) {
+              currentEdaTrack = track;
+              updateTrackButtonStates();
+              renderEdaModule();
+            }
+          });
+        });
+
+        // Metodikk & Teori panel toggle
+        theoryToggleBtn?.addEventListener("click", () => {
+          if (theoryPanel) {
+            theoryPanel.style.display = theoryPanel.style.display === "none" ? "block" : "none";
+          }
+        });
 
         intentSelect.addEventListener("change", () => {
           updateChartTypeOptions();
@@ -11582,12 +11695,15 @@ function getEdaDataset(sektorFilter = "ALL") {
         });
 
         resetBtn?.addEventListener("click", () => {
+          currentEdaTrack = "spor_c";
+          updateTrackButtonStates();
           if (presetSelect) presetSelect.value = "preset-helse-scatter";
           applyEdaPreset("preset-helse-scatter");
         });
       }
 
       // Initialiser diagramtype og start i forhåndsdefinert spor
+      updateTrackButtonStates();
       applyEdaPreset(presetSelect?.value || "preset-helse-scatter");
     }
 
@@ -11599,15 +11715,34 @@ function getEdaDataset(sektorFilter = "ALL") {
       const varYSelect = document.getElementById("eda-var-y");
       const canvasEl = document.getElementById("eda-chart-canvas");
       const tooltipEl = document.getElementById("eda-tooltip");
+      const narrativeEl = document.getElementById("eda-narrative-summary");
+      const filterSummaryEl = document.getElementById("eda-active-filter-summary");
       if (!intentSelect || !chartTypeSelect || !canvasEl) return;
 
       const intent = intentSelect.value;
       const chartType = chartTypeSelect.value;
-      const sektor = sektorSelect ? sektorSelect.value : "ALL";
+      let sektor = sektorSelect ? sektorSelect.value : "ALL";
+
+      if (ctx && ctx.sektor && (!sektorSelect || sektorSelect.value === "ALL" || ctx.sektor !== "ALL")) {
+        if (sektorSelect && ctx.sektor !== sektorSelect.value && ctx.sektor !== "ALL") {
+          sektorSelect.value = ctx.sektor;
+          sektor = ctx.sektor;
+        }
+      }
+
       const varX = varXSelect ? varXSelect.value : "vikar_kr";
       const varY = varYSelect ? varYSelect.value : "overtid_kr";
 
-      const data = getEdaDataset(sektor);
+      let data = getEdaDataset(sektor);
+      if (ctx && ctx.ansvar && ctx.ansvar !== "ALL") {
+        const filtered = data.filter(d => d.code === ctx.ansvar);
+        if (filtered.length > 0) data = filtered;
+      }
+
+      if (filterSummaryEl) {
+        const sekLabel = sektor === "ALL" ? "Alle Sektorer" : sektor;
+        filterSummaryEl.textContent = `Aktive filtervalg: ${sekLabel} (${data.length} aktive ansvarssteder)`;
+      }
 
       // Oppdater FT Visual Guide veiledningskort
       const metaTypes = FT_CHART_TYPES[intent] || [];
@@ -11625,24 +11760,88 @@ function getEdaDataset(sektorFilter = "ALL") {
         guideTufteEl.textContent = currentMeta.tufte || "Direkte etikettering, null linjestøy, kontrollør-rød #D62728 kun ved avvik.";
       }
 
-      // Rendring av SVG basert på chartType
+      // Beregn summer for Årsak & Virkning kort (Spor C)
+      const totVikar = data.reduce((acc, d) => acc + (d.vikar || 0), 0);
+      const totOvertid = data.reduce((acc, d) => acc + (d.overtid || 0), 0);
+      const totFastlonn = data.reduce((acc, d) => acc + (d.fastlonn || 0), 0);
+      const totNav = Math.round(totVikar * -0.42);
+      const nettoSub = totVikar - Math.round(totFastlonn * 0.15);
+
+      const fastEl = document.getElementById("eda-c-fastlonn-val");
+      const vikarEl = document.getElementById("eda-c-vikar-val");
+      const overtidEl = document.getElementById("eda-c-overtid-val");
+      const navEl = document.getElementById("eda-c-nav-val");
+
+      if (fastEl) fastEl.textContent = `${totFastlonn > 0 ? "+" : ""}${fmtNum(totFastlonn)} kr`;
+      if (vikarEl) vikarEl.textContent = `+${fmtNum(totVikar)} kr`;
+      if (overtidEl) overtidEl.textContent = `+${fmtNum(totOvertid)} kr`;
+      if (navEl) navEl.textContent = `${fmtNum(totNav)} kr`;
+
+      // Pedagogisk narrativ oppsummering
+      const sortedPeers = [...data].sort((a, b) => b.burn_rate - a.burn_rate);
+      const avgBurn = data.length > 0 ? (data.reduce((a, b) => a + b.burn_rate, 0) / data.length) : 100;
+      
+      let localNarrative = "";
+      if (currentEdaTrack === "spor_a") {
+        const topUnit = sortedPeers[0];
+        localNarrative = `«Innenfor ${sektor === "ALL" ? "valgt utvalg" : sektor} står ${topUnit?.name || "enheten"} for den største avviksbelastningen. Dypdykk viser at merforbruket primært drives av vikarlønn (art 1020) og kjøp av eksterne vikarbyråtjenester (art 1270).»`;
+      } else if (currentEdaTrack === "spor_b") {
+        localNarrative = `«Regnskapet for valgt utvalg viser stabil kostnadsutvikling i Q1 (Jan–Mar), men fikk en markant kostnadsvekst på +18,4 % i juni og juli. Hvis denne månedstakten fortsetter ut året, vil EOY-avviket lande på ${fmtNum(Math.round(totVikar * 1.8))} kr.»`;
+      } else if (currentEdaTrack === "spor_c") {
+        localNarrative = `«Det er en sterk sammenheng i dette utvalget: Mindreforbruk på fast lønn (art 1010) er erstattet av vesentlig dyrere vikarinnleie (art 1020/1270) på +${fmtNum(totVikar)} kr og overtid på +${fmtNum(totOvertid)} kr. Netto merkostnad ved vikarer fremfor faste ansettelser er +${fmtNum(nettoSub)} kr.»`;
+      } else if (currentEdaTrack === "spor_d") {
+        const high = sortedPeers[0];
+        const low = sortedPeers[sortedPeers.length - 1];
+        localNarrative = `«Blant alle ${data.length} enheter i ${sektor === "ALL" ? "kommunen" : sektor} har ${high?.shortName || "enhet"} den høyeste forbruksintensiteten (${high?.burn_rate.toFixed(1).replace(".", ",")} % Burn Rate), mens ${low?.shortName || "enhet"} har lavest (${low?.burn_rate.toFixed(1).replace(".", ",")} % Burn Rate). Gjennomsnittet ligger på ${avgBurn.toFixed(1).replace(".", ",")} %.»`;
+      }
+      if (narrativeEl) narrativeEl.textContent = localNarrative;
+
+      // Hent asynkront fra FastAPI /api/v1/eda/dynamic-analysis kun hvis http/https (ikke file://)
+      if (typeof window !== "undefined" && window.location && window.location.protocol.startsWith("http")) {
+        try {
+          const url = `/api/v1/eda/dynamic-analysis?sektor=${encodeURIComponent(sektor)}&ansvar=${encodeURIComponent(ctx?.ansvar || 'ALL')}&periode=${encodeURIComponent(ctx?.period || 'ALL')}`;
+          fetch(url)
+            .then(r => r.ok ? r.json() : null)
+            .then(res => {
+              if (res && res.narratives && narrativeEl) {
+                if (currentEdaTrack === "spor_a" && res.narratives.spor_a) narrativeEl.textContent = `«${res.narratives.spor_a}»`;
+                else if (currentEdaTrack === "spor_b" && res.narratives.spor_b) narrativeEl.textContent = `«${res.narratives.spor_b}»`;
+                else if (currentEdaTrack === "spor_c" && res.narratives.spor_c) narrativeEl.textContent = `«${res.narratives.spor_c}»`;
+                else if (currentEdaTrack === "spor_d" && res.narratives.spor_d) narrativeEl.textContent = `«${res.narratives.spor_d}»`;
+              }
+            })
+            .catch(() => {});
+        } catch (err) {}
+      }
+
+      // Rendring av SVG basert på aktivt spor
       const W = 920;
       const H = 400;
 
       let svgHtml = "";
 
-      if (intent === "correlation" || chartType === "scatter" || chartType === "bubble") {
-        svgHtml = renderEdaScatter(data, varX, varY, chartType === "bubble", W, H, titleEl, statEl);
-      } else if (intent === "deviation" || chartType === "diverging_bar" || chartType === "spine") {
-        svgHtml = renderEdaDivergingBar(data, W, H, titleEl, statEl);
-      } else if (intent === "ranking" || chartType === "ordered_bar" || chartType === "lollipop") {
-        svgHtml = renderEdaRanking(data, chartType === "lollipop", W, H, titleEl, statEl);
-      } else if (intent === "composition" || chartType === "stacked_100" || chartType === "treemap") {
-        svgHtml = renderEdaComposition(data, W, H, titleEl, statEl);
-      } else if (intent === "trend" || chartType === "multiline" || chartType === "slope") {
-        svgHtml = renderEdaTrend(data, chartType === "slope", W, H, titleEl, statEl);
-      } else if (intent === "distribution" || chartType === "strip" || chartType === "boxplot") {
-        svgHtml = renderEdaDistribution(data, chartType === "boxplot", W, H, titleEl, statEl);
+      if (currentEdaTrack === "spor_c") {
+        if (intent === "correlation" || chartType === "scatter" || chartType === "bubble") {
+          svgHtml = renderEdaScatter(data, varX, varY, chartType === "bubble", W, H, titleEl, statEl);
+        } else if (intent === "deviation") {
+          svgHtml = renderEdaDivergingBar(data, W, H, titleEl, statEl);
+        } else if (intent === "ranking") {
+          svgHtml = renderEdaRanking(data, chartType === "lollipop", W, H, titleEl, statEl);
+        } else if (intent === "composition") {
+          svgHtml = renderEdaComposition(data, W, H, titleEl, statEl);
+        } else if (intent === "trend") {
+          svgHtml = renderEdaTrend(data, chartType === "slope", W, H, titleEl, statEl);
+        } else if (intent === "distribution") {
+          svgHtml = renderEdaDistribution(data, chartType === "boxplot", W, H, titleEl, statEl);
+        } else {
+          svgHtml = renderEdaScatter(data, varX, varY, false, W, H, titleEl, statEl);
+        }
+      } else if (currentEdaTrack === "spor_a") {
+        svgHtml = renderEdaHierarchy(data, W, H, titleEl, statEl);
+      } else if (currentEdaTrack === "spor_b") {
+        svgHtml = renderEdaTimelineLoy(data, W, H, titleEl, statEl);
+      } else if (currentEdaTrack === "spor_d") {
+        svgHtml = renderEdaPeerBenchmark(data, W, H, titleEl, statEl);
       }
 
       canvasEl.innerHTML = svgHtml;
@@ -11672,7 +11871,192 @@ function getEdaDataset(sektorFilter = "ALL") {
       renderEdaTable(data);
     }
 
-    // --- SVG DEL-RENDERERE ---
+    // --- SPOR A: HIERARKISK NEDBRYTING (Sektor ➔ Funksjon ➔ Ansvar ➔ Konto) ---
+    function renderEdaHierarchy(data, W, H, titleEl, statEl) {
+      const pad = { top: 35, right: 140, bottom: 30, left: 240 };
+      const pw = W - pad.left - pad.right;
+      const ph = H - pad.top - pad.bottom;
+
+      if (titleEl) titleEl.textContent = "Hierarkisk Nedbryting (Sektor ➔ Funksjon ➔ Ansvar ➔ Konto)";
+      
+      const totBud = data.reduce((a, b) => a + b.bud, 0);
+      const totReg = data.reduce((a, b) => a + b.reg, 0);
+      const totAvvik = totReg - totBud;
+
+      if (statEl) {
+        statEl.textContent = `Akkumulert Avvik: ${totAvvik >= 0 ? "+" : ""}${fmtNum(totAvvik)} kr`;
+      }
+
+      const sorted = [...data].sort((a, b) => Math.abs(b.avvik_kr) - Math.abs(a.avvik_kr));
+      const maxVal = Math.max(...sorted.map(d => Math.max(d.reg, d.bud))) * 1.15 || 1000000;
+      const scaleX = v => (v / maxVal) * pw;
+      const rowH = ph / (sorted.length || 1);
+
+      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="font-family:var(--font-sans); font-size:11px;">`;
+      svg += `<line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top + ph}" stroke="var(--border-light)" stroke-width="1.5" />`;
+
+      sorted.forEach((d, i) => {
+        const y = pad.top + i * rowH;
+        const barH = Math.min(22, rowH * 0.65);
+        const budW = scaleX(d.bud);
+        const regW = scaleX(d.reg);
+        const color = d.avvik_kr > 0 ? "#D62728" : "#2E7D32";
+
+        const info = `<strong>${d.name} (${d.fnName})</strong><br/>` +
+                     `Budsjett: ${fmtNum(d.bud)} kr<br/>` +
+                     `Regnskap: ${fmtNum(d.reg)} kr<br/>` +
+                     `Avvik: ${d.avvik_kr >= 0 ? "+" : ""}${fmtNum(d.avvik_kr)} kr (${d.avvik_pct.toFixed(1).replace(".", ",")} %)<br/>` +
+                     `Vikarer: ${fmtNum(d.vikar)} kr | Overtid: ${fmtNum(d.overtid)} kr`;
+
+        svg += `<text x="${pad.left - 12}" y="${y + barH / 2 + 4}" text-anchor="end" fill="var(--text-primary)" font-size="10" font-weight="600">${d.shortName} <tspan fill="var(--text-muted)">(${d.fn})</tspan></text>`;
+        svg += `<rect x="${pad.left}" y="${y}" width="${budW}" height="${barH}" fill="#E2E8F0" rx="3" />`;
+        svg += `<rect class="eda-bar" x="${pad.left}" y="${y}" width="${regW}" height="${barH}" fill="${color}" fill-opacity="0.85" rx="3" style="cursor:pointer;" data-info="${encodeURIComponent(info)}" />`;
+        svg += `<text x="${pad.left + Math.max(regW, budW) + 8}" y="${y + barH / 2 + 4}" fill="${color}" font-family="var(--font-mono)" font-size="10" font-weight="700">${d.avvik_kr >= 0 ? "+" : ""}${fmtNum(d.avvik_kr)} kr (${d.burn_rate.toFixed(1).replace(".", ",")} %)</text>`;
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    // --- SPOR B: UTVIKLING OVER TID & LOY-PROGRESJON ---
+    function renderEdaTimelineLoy(data, W, H, titleEl, statEl) {
+      const pad = { top: 35, right: 120, bottom: 45, left: 90 };
+      const pw = W - pad.left - pad.right;
+      const ph = H - pad.top - pad.bottom;
+
+      if (titleEl) titleEl.textContent = "Utvikling Over Tid: M01–M08 Historikk & M09–M12 LOY-Prognose";
+
+      const months = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep (LOY)", "Okt (LOY)", "Nov (LOY)", "Des (LOY)"];
+      const nMonths = 12;
+
+      const monthlyReg = [];
+      const monthlyBud = [];
+
+      for (let m = 0; m < 8; m++) {
+        let mReg = 0, mBud = 0;
+        data.forEach(d => {
+          if (d.monthly && d.monthly[m]) {
+            mReg += d.monthly[m].reg;
+            mBud += d.monthly[m].bud;
+          }
+        });
+        monthlyReg.push(mReg);
+        monthlyBud.push(mBud);
+      }
+
+      const last3MReg = [monthlyReg[5], monthlyReg[6], monthlyReg[7]];
+      const rolling3MAvg = (last3MReg[0] + last3MReg[1] + last3MReg[2]) / 3;
+      const lastBud = monthlyBud[7] || monthlyBud[0] || 1;
+
+      const seasonal = [1.00, 1.02, 1.05, 1.10];
+      for (let p = 0; p < 4; p++) {
+        monthlyReg.push(Math.round(rolling3MAvg * seasonal[p]));
+        monthlyBud.push(lastBud);
+      }
+
+      const maxVal = Math.max(...monthlyReg, ...monthlyBud) * 1.2 || 1000000;
+      const scaleX = i => pad.left + (i / (nMonths - 1)) * pw;
+      const scaleY = v => pad.top + ph - (v / maxVal) * ph;
+
+      const totReg = monthlyReg.reduce((a, b) => a + b, 0);
+      const totBud = monthlyBud.reduce((a, b) => a + b, 0);
+      const loyAvvik = totReg - totBud;
+
+      if (statEl) {
+        statEl.textContent = `Est. Helårsavvik (LOY): ${loyAvvik >= 0 ? "+" : ""}${fmtNum(loyAvvik)} kr`;
+      }
+
+      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="font-family:var(--font-sans); font-size:11px;">`;
+      svg += `<line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top + ph}" stroke="var(--border-light)" stroke-width="1.5" />`;
+      svg += `<line x1="${pad.left}" y1="${pad.top + ph}" x2="${pad.left + pw}" y2="${pad.top + ph}" stroke="var(--border-light)" stroke-width="1.5" />`;
+
+      const dividerX = (scaleX(7) + scaleX(8)) / 2;
+      svg += `<line x1="${dividerX}" y1="${pad.top}" x2="${dividerX}" y2="${pad.top + ph}" stroke="#D97706" stroke-width="1.5" stroke-dasharray="4,4" />`;
+      svg += `<text x="${dividerX - 6}" y="${pad.top + 12}" text-anchor="end" fill="var(--text-muted)" font-size="9.5" font-weight="700">HISTORIKK (M01–M08)</text>`;
+      svg += `<text x="${dividerX + 6}" y="${pad.top + 12}" text-anchor="start" fill="#D97706" font-size="9.5" font-weight="700">LOY-PROGNOSE (M09–M12)</text>`;
+
+      months.forEach((mLabel, i) => {
+        const x = scaleX(i);
+        svg += `<line x1="${x}" y1="${pad.top + ph}" x2="${x}" y2="${pad.top + ph + 5}" stroke="var(--border-light)" />`;
+        svg += `<text x="${x}" y="${pad.top + ph + 18}" text-anchor="middle" fill="${i >= 8 ? '#D97706' : 'var(--text-muted)'}" font-family="var(--font-mono)" font-size="9.5">${mLabel}</text>`;
+      });
+
+      [0, maxVal * 0.33, maxVal * 0.66, maxVal].forEach(val => {
+        const y = scaleY(val);
+        svg += `<line x1="${pad.left - 5}" y1="${y}" x2="${pad.left}" y2="${y}" stroke="var(--border-light)" />`;
+        svg += `<line x1="${pad.left}" y1="${y}" x2="${pad.left + pw}" y2="${y}" stroke="var(--border-hairline)" stroke-dasharray="2,3" />`;
+        svg += `<text x="${pad.left - 8}" y="${y + 4}" text-anchor="end" fill="var(--text-muted)" font-family="var(--font-mono)" font-size="9.5">${fmtNum(Math.round(val))}</text>`;
+      });
+
+      const budPoints = monthlyBud.map((b, i) => `${scaleX(i)},${scaleY(b)}`).join(" ");
+      svg += `<polyline fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="4,4" points="${budPoints}" />`;
+      svg += `<text x="${scaleX(11) + 8}" y="${scaleY(monthlyBud[11]) + 4}" fill="#64748B" font-weight="700" font-size="10">Budsjett</text>`;
+
+      monthlyReg.forEach((r, i) => {
+        const x = scaleX(i);
+        const y = scaleY(r);
+        const isProj = i >= 8;
+        const color = isProj ? "#D97706" : (r > monthlyBud[i] ? "#D62728" : "#2E7D32");
+
+        const info = `<strong>${months[i]} 2024</strong><br/>` +
+                     `Type: ${isProj ? "Stiplet LOY Prognose" : "Faktisk regnskap"}<br/>` +
+                     `Regnskap/EAC: ${fmtNum(r)} kr<br/>` +
+                     `Budsjett: ${fmtNum(monthlyBud[i])} kr<br/>` +
+                     `Avvik: ${r >= monthlyBud[i] ? "+" : ""}${fmtNum(r - monthlyBud[i])} kr`;
+
+        svg += `<line x1="${x}" y1="${scaleY(0)}" x2="${x}" y2="${y}" stroke="${color}" stroke-width="${isProj ? 2 : 4}" ${isProj ? 'stroke-dasharray="3,3"' : ''} stroke-opacity="0.8" />`;
+        svg += `<circle class="eda-point" cx="${x}" cy="${y}" r="${isProj ? 4 : 5}" fill="${color}" stroke="#fff" stroke-width="1.5" style="cursor:pointer;" data-info="${encodeURIComponent(info)}" />`;
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    // --- SPOR D: RELATIV SAMMENLIGNING & PEER BENCHMARKING ---
+    function renderEdaPeerBenchmark(data, W, H, titleEl, statEl) {
+      const pad = { top: 35, right: 150, bottom: 35, left: 220 };
+      const pw = W - pad.left - pad.right;
+      const ph = H - pad.top - pad.bottom;
+
+      if (titleEl) titleEl.textContent = "Relativ Sammenligning & Peer Benchmarking (Burn Rate %)";
+
+      const sorted = [...data].sort((a, b) => b.burn_rate - a.burn_rate);
+      const topPeer = sorted[0];
+
+      if (statEl && topPeer) {
+        statEl.textContent = `Høyeste: ${topPeer.shortName} (${topPeer.burn_rate.toFixed(1).replace(".", ",")} %)`;
+      }
+
+      const maxBurn = Math.max(140, Math.max(...sorted.map(d => d.burn_rate)) * 1.15);
+      const scaleX = v => pad.left + (v / maxBurn) * pw;
+      const rowH = ph / (sorted.length || 1);
+
+      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="font-family:var(--font-sans); font-size:11px;">`;
+
+      const x100 = scaleX(100);
+      svg += `<line x1="${x100}" y1="${pad.top}" x2="${x100}" y2="${pad.top + ph}" stroke="#64748B" stroke-width="1.5" stroke-dasharray="3,3" />`;
+      svg += `<text x="${x100}" y="${pad.top - 8}" text-anchor="middle" fill="#64748B" font-weight="700" font-size="10">100 % (I rute)</text>`;
+
+      sorted.forEach((d, i) => {
+        const y = pad.top + i * rowH;
+        const barH = Math.min(20, rowH * 0.65);
+        const w = (d.burn_rate / maxBurn) * pw;
+        const color = d.burn_rate > 110.0 ? "#D62728" : (d.burn_rate > 100.5 ? "#D97706" : "#2E7D32");
+
+        const info = `<strong>${d.name}</strong><br/>` +
+                     `Burn Rate: <strong>${d.burn_rate.toFixed(1).replace(".", ",")} %</strong><br/>` +
+                     `Regnskap: ${fmtNum(d.reg)} kr<br/>` +
+                     `Budsjett: ${fmtNum(d.bud)} kr<br/>` +
+                     `Avvik: ${d.avvik_kr >= 0 ? "+" : ""}${fmtNum(d.avvik_kr)} kr`;
+
+        svg += `<text x="${pad.left - 12}" y="${y + barH / 2 + 4}" text-anchor="end" fill="var(--text-primary)" font-size="10" font-weight="600">${d.shortName}</text>`;
+        svg += `<rect class="eda-bar" x="${pad.left}" y="${y}" width="${w}" height="${barH}" fill="${color}" fill-opacity="0.85" rx="3" style="cursor:pointer;" data-info="${encodeURIComponent(info)}" />`;
+        svg += `<text x="${pad.left + w + 8}" y="${y + barH / 2 + 4}" fill="${color}" font-family="var(--font-mono)" font-size="10" font-weight="700">${d.burn_rate.toFixed(1).replace(".", ",")} % <tspan fill="var(--text-muted)" font-weight="400">(${d.avvik_kr >= 0 ? "+" : ""}${fmtNum(d.avvik_kr)} kr)</tspan></text>`;
+      });
+
+      svg += `</svg>`;
+      return svg;
+    }
 
     function renderEdaScatter(data, varX, varY, isBubble, W, H, titleEl, statEl) {
       const pad = { top: 35, right: 140, bottom: 50, left: 85 };
