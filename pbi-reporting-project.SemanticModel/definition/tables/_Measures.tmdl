@@ -631,5 +631,21 @@ table _Measures
 			    )
 			)
 			```
+		displayFolder: "7. Styring & Årshjul"
 		formatString: 0
 		lineageTag: b3f29ebc-fb95-4464-bc80-e69000fe0c98
+
+	column Value
+		lineageTag: b2d1b59d-0b7e-4e7e-8cb9-3488ef43e303
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = calculated
+		mode: import
+		source = {"dummy"}
+
+	annotation PBI_Id = 9f01e16396014918a0dfc49ccdfbf1b6
+
