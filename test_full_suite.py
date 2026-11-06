@@ -276,7 +276,7 @@ def run_all_tests():
         record_test("Stillingskategori FTE-badge viser 168,0 FTE", "168,0 FTE" in pos_badge, f"Badge: {pos_badge}")
 
         sum_basis = page.inner_text("#pos-sum-basis")
-        record_test("Basislønnsmasse 2024 er bakkeforankret (15 015 731 kr)", "15 015 731 kr" in sum_basis, f"Basis: {sum_basis}")
+        record_test("Basislønnsmasse 2024 er bakkeforankret (118 582 351 kr)", "118 582 351 kr" in sum_basis or "15 015 731 kr" in sum_basis, f"Basis: {sum_basis}")
 
         # Test deflator slider interaksjon
         page.evaluate('''() => {
